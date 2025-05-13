@@ -1,0 +1,53 @@
+.tiki-header {
+    background-color: #fff !important; /* Đảm bảo background trắng */
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo img {
+    display: block;
+}
+
+.header-icons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.header-icons > * {
+    margin-left: 20px;
+}
+
+.location, .account, .cart {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.85);
+}
+
+.location svg, .account svg, .cart svg {
+    margin-right: 5px;
+    font-size: 1.2rem;
+}
+
+.category-menu-row {
+    background-color: #f0f2f5; /* Màu nền nhẹ cho menu */
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.category-menu-button {
+    width: 200px; /* Độ rộng tương tự Tiki */
+    text-align: left;
+}
+
+.ant-dropdown-menu {
+    min-width: 200px; /* Độ rộng dropdown */
+}
+
+/* Tùy chỉnh thêm style cho dropdown menu nếu cần */
