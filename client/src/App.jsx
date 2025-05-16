@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { routes } from './Routes/index.js'
 import Header from './components/Header/Header.jsx';
 import DefauPage from './components/DefautPage/DefauPage.jsx';
+
  function App() {
   
   return (

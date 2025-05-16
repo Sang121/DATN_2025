@@ -1,0 +1,48 @@
+  html{ background-color: #efefef;
+font-family: Inter, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.15;
+    text-size-adjust: 100%;
+} 
+element.style {}
+
+@media only screen and (min-width: 1440px) {
+    .home-page-container {
+        width: 1440px;
+    }
+}
+.home-page-container {
+
+    padding-left: px;
+    padding-right: 24px;
+    margin-right: auto;
+    margin-left: auto;
+}
+*, ::before, ::after {
+    box-sizing: border-box;
+}
+div
+ {
+    display: block;
+    unicode-bidi: isolate;
+}
+*, ::before, ::after {
+    box-sizing: border-box;
+}
+.home-page{
+           display: flex
+;
+    padding-top: 16px;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+}
+.home-page-contain{
+    width: calc(100% - 254px);
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    unicode-bidi: isolate;
+
+
+}

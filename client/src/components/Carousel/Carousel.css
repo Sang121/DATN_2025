@@ -1,0 +1,22 @@
+.carousel {
+    display: flex;
+}
+.slider {
+    display: flex;
+    flex-direction: row;
+    padding: 16px;
+    align-items: center;
+    gap: 12px;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+}
+.imageSlider {
+    border-radius: 8px;
+    width: 49.5%;
+    object-fit: cover;
+    display: block;
+      aspect-ratio: 16 / 9;
+      
+      opacity:1;
+}
