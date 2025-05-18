@@ -40,7 +40,6 @@ div
     width: 230px;
         display: flex;
         flex-direction: column;
-        gap: 16px;
         position: sticky;
         top: 24px;
         height: fit-content;
