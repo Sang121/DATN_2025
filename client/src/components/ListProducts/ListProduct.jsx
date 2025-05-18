@@ -5,15 +5,13 @@ import { Flex } from "antd";
 import { useEffect } from "react";
 import { useState } from "react";
 import { BaseUrl } from "../dumpApi";
-import { fetchProducts } from "../GetProducts";
-function ListProduct() {
+function ListProduct({ Collections }) {
   const [products, setProducts] = useState([]);
   useEffect(() => {
-    fetchProducts().then((data) => {
-      setProducts(data);
-  
-    });
-  }, []); 
+         fetch(`https://dummyjson.com/products/category/${Collections}`)
+           .then((res) => res.json())
+           .then((data) => setProducts(data.products));
+      }, [Collections]);
 
   return (
     <div>
@@ -27,7 +25,7 @@ function ListProduct() {
             oldPrice={product.oldPrice}
             rating={product.rating}
             discount={product.discountPercentage}
-            badge={product.brand}
+         
            
             extra={product.description}
           />
