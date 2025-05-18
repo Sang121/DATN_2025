@@ -8,9 +8,7 @@ function ProductCard({
   price,
   rating,
   discount,
-  badge,
-  labels = [],
-  extra,
+  
 }) {
   const newPrice = price - (price * discount) / 100;
   const formattedPrice = new Intl.NumberFormat("vi-VN", {
@@ -19,7 +17,6 @@ function ProductCard({
   }).format(newPrice);
   return (
     <div className={styles["product-card"]}>
-      {badge && <div className={styles["product-card-badge"]}>{badge}</div>}
       <div className={styles["product-card-img-wrap"]}>
         <img className={styles["product-card-img"]} src={image} alt={name} />
       </div>
@@ -34,7 +31,6 @@ function ProductCard({
             </span>
           ))}
         </div> */}
-        {console.log(" id của sản phẩm ", name, "là", productId)}
         <Link to={`/products/${productId}`}>
           <div className={styles["product-card-name"]}>{name}</div>
         </Link>
