@@ -8,10 +8,11 @@ import {
 } from "react-icons/fa";
 import "./Header.css";
 import { Row, Col, Grid, Drawer } from "antd";
+import { Link } from "react-router-dom";
 
 const { useBreakpoint } = Grid;
 
-function Header() {
+function Header({ onShowSignIn }) {
   const screens = useBreakpoint();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -20,14 +21,14 @@ function Header() {
       <div className="header-container">
         <Row align="middle" gutter={[16, 16]} style={{ width: "100%" }}>
           {/* Logo */}
-          <Col xs={20} sm={8} md={6} lg={4} className="logo">
+          <Col xs={20} sm={8} md={6} lg={3} className="logo">
             <a href="/" className="logo-link">
-              LOGO
+              Ecommerce
             </a>
           </Col>
 
           {/* Thanh tìm kiếm */}
-          <Col xs={0} sm={16} md={12} lg={6} className="search-bar-container">
+          <Col xs={0} sm={16} md={12} lg={8} className="search-bar-container">
             <input
               type="text"
               placeholder="Tìm sản phẩm, danh mục hay thương hiệu mong muốn..."
@@ -44,29 +45,30 @@ function Header() {
             xs={0}
             sm={0}
             md={6}
-            lg={9}
+            lg={10}
             className="actions-container"
             style={{ justifyContent: "flex-end" }}
           >
-            <div
-              className="action-item"
-              onClick={() => alert("Chức năng tài khoản!")}
-            >
+            <div className="action-item">
               <FaUserCircle className="action-icon" />
               <div className="account-text-container">
-                <span>Đăng Nhập / Đăng Ký</span>
-                <span style={{ fontWeight: "500" }}>Tài khoản</span>
+                <span style={{ cursor: "pointer" }} onClick={onShowSignIn}>
+                  Đăng Nhập Đăng Ký
+                </span>
+                <Link to="/account">
+                  <span style={{ fontWeight: "500" }}>Tài khoản</span>
+                </Link>
               </div>
             </div>
-            <a href="/cart" className="action-item">
+            <Link to="/cart" className="action-item">
               <FaShoppingCart className="action-icon" />
               <span className="cart-text">Giỏ Hàng</span>
               <span className="cart-count">3</span>
-            </a>
-            <a href="/fitting_room" className="action-item">
+            </Link>
+            <Link to="/fitting_room" className="action-item">
               <FaPersonBooth className="action-icon" />
               <span className="cart-text">Phòng thử đồ</span>
-            </a>
+            </Link>
           </Col>
 
           {/* Menu icon: Hiện trên mobile */}
