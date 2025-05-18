@@ -3,34 +3,29 @@ import { useParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 import { Button } from "antd";
 import ProductCard from "../../components/ProductCard/ProductCard";
-
+import ListProducts from "../../components/ListProducts/ListProduct";
 function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(""); // Thêm state cho ảnh chọn
   const sizes = ["S", "M", "L", "XL"];
 
   useEffect(() => {
     fetch(`https://dummyjson.com/products/${id}`)
       .then((response) => response.json())
-      .then((data) => setProduct(data))
+      .then((data) => {
+        setProduct(data);
+        // Nếu có images thì lấy ảnh đầu tiên, không thì lấy thumbnail
+        setSelectedImage(
+          data.images && data.images.length > 0
+            ? data.images[0]
+            : data.thumbnail
+        );
+      })
       .catch((error) => console.error("Error fetching product:", error));
   }, [id]);
-
-  // Fetch sản phẩm cùng category
-  useEffect(() => {
-    if (product?.category) {
-      fetch(`https://dummyjson.com/products/category/${product.category}`)
-        .then((res) => res.json())
-        .then((data) => {
-          // Loại bỏ sản phẩm hiện tại khỏi danh sách
-          const filtered = data.products.filter((p) => p.id !== Number(id));
-          setRelatedProducts(filtered);
-        });
-    }
-  }, [product, id]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -43,7 +38,8 @@ function ProductDetail() {
       <div className={styles["product-detail-container"]}>
         <div className={styles["product-detail-breadcrumb"]}>
           <h1>
-            <a href="/">Trang chủ</a> / <a href="/brand">{product.category}</a>{" "}
+            <a href="/">Trang chủ</a> /{" "}
+            <a href={`/collections/${product.category}`}>{product.category}</a>{" "}
             / {product.title}
           </h1>
         </div>
@@ -51,11 +47,21 @@ function ProductDetail() {
           <div className={styles["productImage"]}>
             <div className={styles["productImageThumb"]}>
               {product.images?.slice(0, 3).map((img, idx) => (
-                <img key={idx} src={img} alt="" />
+                <img
+                  key={idx}
+                  src={img}
+                  alt=""
+                  style={{
+                    border: selectedImage === img ? "2px solid #1a94ff" : "",
+                    opacity: selectedImage === img ? 1 : 0.7,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setSelectedImage(img)}
+                />
               ))}
             </div>
             <div className={styles["productImageMain"]}>
-              <img src={product.thumbnail} alt="" />
+              <img src={selectedImage} alt="" />
             </div>
           </div>
           <div style={{ flex: 1, paddingLeft: 32 }}>
@@ -120,29 +126,12 @@ function ProductDetail() {
           <h3>Thông số kỹ thuật</h3>
         </div>
       </div>
-
-      {/* Danh sách sản phẩm cùng category */}
-      {relatedProducts.length > 0 && (
-        <div style={{ maxWidth: 1200, margin: "32px auto" }}>
-          <h2 style={{ margin: "16px 0" }}>Sản phẩm cùng danh mục</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-            {relatedProducts.map((item) => (
-              <ProductCard
-                key={item.id}
-                productId={item.id}
-                image={item.thumbnail}
-                name={item.title}
-                price={item.price}
-                oldPrice={item.oldPrice}
-                rating={item.rating}
-                badge={item.brand}
-                labels={item.tags}
-                extra={item.description}
-              />
-            ))}
-          </div>
+      <div className={styles["product-detail-related"]}>
+        <h2>Sản phẩm cùng danh mục</h2>
+        <div className={styles["product-detail-related-list"]}>
+          <ListProducts Collections={product.category} />
         </div>
-      )}
+      </div>
     </div>
   );
 }
