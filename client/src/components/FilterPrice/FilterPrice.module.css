@@ -1,0 +1,81 @@
+.filter-price-container{
+    display: flex;
+flex-direction: column;
+gap: 5px;
+width: 230px;
+max-height: 100vh;
+position: relative;overflow-y: scroll;
+scrollbar-width: none;
+top: 16px;
+background-color: #00000000;
+display: flex;
+padding-bottom: 117px;
+flex-direction: column;
+/* color: rgb(56, 56, 61); */
+font-size: 14px;
+line-height: 20px;
+border-top-left-radius: 4px;
+border-bottom-left-radius: 4px;}
+
+.filterPriceContainer {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding: 12px 8px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  gap: 10px;
+}
+
+.filterPriceTitle {
+  margin-bottom: 8px;
+  padding-left: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgb(39, 39, 42);
+}
+
+.filterPriceRange {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.filterPriceInput {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.filterPriceInput:focus {
+  border: 1.5px solid #1a94ff;
+}
+
+.filterPriceDash {
+  color: #888;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.filterPriceBtn {
+  margin: 8px 8px 0 8px;
+  padding: 7px 0;
+  background: #1a94ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.filterPriceBtn:hover {
+  background: #1769ff;
+}

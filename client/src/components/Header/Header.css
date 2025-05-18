@@ -162,3 +162,41 @@
   line-height: 15px;
   height: 17px;
 }
+
+/* Ẩn actions-container trên mobile, hiện icon menu */
+@media (max-width: 767px) {
+  .actions-container {
+    display: none !important;
+  }
+  .search-bar-container {
+   
+  }
+  .menu-mobile-col {
+    display: flex !important;
+    justify-content: flex-start; /* Đẩy icon sang trái */
+    align-items: center;
+  }
+  .menu-mobile-icon {
+    font-size: 28px;
+    color: black;
+    cursor: pointer;
+  }
+}
+@media (min-width: 768px) {
+  .menu-mobile-col {
+    display: none !important;
+  }
+}
+.actions-container-mobile .action-item {
+  margin-bottom: 18px;
+}
+
+.actions-container-mobile {
+  color: #222 !important;
+  padding: 24px 12px;
+}
+.actions-container-mobile .action-item,
+.actions-container-mobile .cart-text,
+.actions-container-mobile .account-text-container span {
+  color: #222 !important;
+}

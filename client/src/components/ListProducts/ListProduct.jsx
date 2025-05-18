@@ -20,7 +20,7 @@ function ListProduct() {
       <Flex wrap gap="small" className={styles["list-product-container"]}>
         {products.map((product) => (
           <ProductCard
-            key={product.id}
+            productId={product.id}
             image={product.thumbnail}
             name={product.title}
             price={product.price}
@@ -28,8 +28,8 @@ function ListProduct() {
             rating={product.rating}
             discount={product.discountPercentage}
             badge={product.brand}
-            labels={product.tags}
-            extra={product.brand}
+           
+            extra={product.description}
           />
         ))}
       </Flex>

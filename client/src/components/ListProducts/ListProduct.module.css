@@ -1,0 +1,20 @@
+.list-product-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  margin: 0 12px;
+}
+
+.list-product-item {
+  flex: 1 1 calc(33.333% - 24px);
+  margin: 12px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.list-product-item:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}

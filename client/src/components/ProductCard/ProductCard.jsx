@@ -1,51 +1,61 @@
 import React from "react";
-import "./ProductCard.css";
-
+import styles from "./ProductCard.module.css";
+import { Link } from "react-router-dom";
 function ProductCard({
+  productId,
   image,
   name,
   price,
-  oldPrice,
   rating,
   discount,
   badge,
   labels = [],
   extra,
 }) {
+  const newPrice = price - (price * discount) / 100;
+  const formattedPrice = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(newPrice);
   return (
-    <div className="product-card">
-      {badge && <div className="product-card-badge">{badge}</div>}
-      <div className="product-card-img-wrap">
-        <img className="product-card-img" src={image} alt={name} />
+    <div className={styles["product-card"]}>
+      {badge && <div className={styles["product-card-badge"]}>{badge}</div>}
+      <div className={styles["product-card-img-wrap"]}>
+        <img className={styles["product-card-img"]} src={image} alt={name} />
       </div>
-      <div className="product-card-body">
-        <div className="product-card-labels">
+      <div className={styles["product-card-body"]}>
+        {/* <div className={styles["product-card-labels"]}>
           {labels.map((label, idx) => (
-            <span key={idx} className={`product-card-label ${label.type}`}>
-              {label.text}
+            <span
+              key={idx}
+              className={`${styles["product-card-label"]} ${label.type}`}
+            >
+              {label.text}ddd
             </span>
           ))}
-        </div>
-        <div className="product-card-name">{name}</div>
-        <div className="product-card-rating">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <span key={i} className={i < rating ? "star filled" : "star"}>
-              ★
-            </span>
-          ))}
-        </div>
-        <div className="product-card-price">
-          {discount && (
-            <span className="product-card-discount">-{discount}%</span>
-          )}
-          <span className="product-card-price-current">{price}₫</span>
-          {oldPrice && (
-            <span className="product-card-price-old">{oldPrice}₫</span>
-          )}
-        </div>
-        {extra && <div className="product-card-extra">{extra}</div>}
-        <button className="product-card-btn">Thêm vào giỏ</button>
+        </div> */}
+        {console.log(" id của sản phẩm ", name, "là", productId)}
+        <Link to={`/products/${productId}`}>
+          <div className={styles["product-card-name"]}>{name}</div>
+        </Link>
       </div>
+      <div className={styles["product-card-rating"]}>
+        <span className={styles["product-card-rating-value"]}>{rating}</span>
+        <span className={styles["product-card-rating-star"]}>★</span>
+      </div>
+
+      <div className={styles["product-card-price"]}>
+        <span className={styles["product-card-price-current"]}>
+          {formattedPrice}
+        </span>
+        <span className={styles["product-card-price-old"]}>
+          {new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          }).format(price)}
+        </span>
+      </div>
+      <button className={styles["product-card-btn"]}>Thêm vào giỏ</button>
     </div>
   );
 }

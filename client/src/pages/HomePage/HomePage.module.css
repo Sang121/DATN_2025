@@ -36,6 +36,16 @@ div
     -webkit-box-pack: justify;
     justify-content: space-between;
 }
+.home-page-sidebar{
+    width: 230px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: sticky;
+        top: 24px;
+        height: fit-content;
+        z-index:2;
+}
 .home-page-contain{
     width: calc(100% - 254px);
     overflow-x: hidden;
@@ -45,4 +55,10 @@ div
     unicode-bidi: isolate;
 
 
+}
+.home-page-list{
+    background-color: rgb(255, 255, 255);    ;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
 }

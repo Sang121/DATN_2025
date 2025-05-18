@@ -1,0 +1,118 @@
+.product-detail-body {
+  background: #fafafa;
+  padding: 32px 0 48px;
+  min-height: 100vh;
+}
+
+.product-detail-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 32px 24px;
+}
+
+.product-detail-breadcrumb h1 {
+  color: #1a1a1a;
+  font-family: Inter, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+  margin-bottom: 28px;
+  margin-top: 0;
+  letter-spacing: 0.01em;
+}
+
+.product-detail-breadcrumb a {
+  color: #1a94ff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.product-detail-breadcrumb a:hover {
+  color: #1769ff;
+  text-decoration: underline;
+}
+
+.productMain {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.productImage {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px 0;
+}
+
+.productImageThumb {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 80px;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+}
+
+.productImageThumb img {
+  width: 68px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border 0.2s;
+}
+.productImageThumb img:hover {
+  border: 1.5px solid #1a94ff;
+}
+
+.productImageMain {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.productImageMain img {
+  width: 340px;
+  height: 340px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #f7f7f7;
+  border: 1.5px solid #e0e0e0;
+}
+
+@media (max-width: 900px) {
+  .productMain {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .productImageMain img {
+    width: 220px;
+    height: 220px;
+  }
+  .product-detail-container {
+    padding: 18px 4px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .product-detail-container {
+    max-width: 1280px;
+  }
+}

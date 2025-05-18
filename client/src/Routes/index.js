@@ -2,6 +2,7 @@ import HomePage from "../pages/HomePage/HomePage"
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage"
 import OrderPage from "../pages/OrderPage/OrderPage"
 import ProductPage from "../pages/productPage/ProductPage"
+import ProductDetail from "../pages/ProductDetails/ProductDetail"
 export const routes= [
   { 
     path: '/',
@@ -19,6 +20,11 @@ export const routes= [
     page: ProductPage,
         isShowHeader: true
  
+  },
+  {
+    path: '/products/:id',
+    page: ProductDetail,
+    isShowHeader: true
   },
   {
     path:'/*',
