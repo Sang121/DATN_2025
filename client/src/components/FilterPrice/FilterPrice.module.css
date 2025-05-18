@@ -6,7 +6,6 @@ width: 230px;
 max-height: 100vh;
 position: relative;overflow-y: scroll;
 scrollbar-width: none;
-top: 16px;
 background-color: #00000000;
 display: flex;
 padding-bottom: 117px;
