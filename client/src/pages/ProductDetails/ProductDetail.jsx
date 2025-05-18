@@ -9,7 +9,7 @@ function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(""); // Thêm state cho ảnh chọn
+  const [selectedImage, setSelectedImage] = useState("");
   const sizes = ["S", "M", "L", "XL"];
 
   useEffect(() => {
@@ -17,7 +17,6 @@ function ProductDetail() {
       .then((response) => response.json())
       .then((data) => {
         setProduct(data);
-        // Nếu có images thì lấy ảnh đầu tiên, không thì lấy thumbnail
         setSelectedImage(
           data.images && data.images.length > 0
             ? data.images[0]
@@ -76,7 +75,6 @@ function ProductDetail() {
             <div>
               <strong>Category:</strong> {product.category}
             </div>
-            {/* Chọn size */}
             <div className={styles.sizeSelectBlock}>
               <strong>Chọn size:</strong>
               <div className={styles.sizeList}>
@@ -98,7 +96,7 @@ function ProductDetail() {
                 </div>
               )}
             </div>
-            {/* Chọn số lượng */}
+       
             <div className={styles.quantityBlock}>
               <strong>Số lượng:</strong>
               <div className={styles.quantityControl}>
