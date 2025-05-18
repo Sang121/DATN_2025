@@ -1,0 +1,170 @@
+.signinBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signinModal {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  display: flex;
+  width: 700px;
+  max-width: 95vw;
+  min-height: 420px;
+  overflow: hidden;
+  position: relative; /* Thêm dòng này để nút close bám vào popup */
+}
+
+.signinLeft {
+  flex: 1.2;
+  padding: 36px 32px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logo {
+  text-align: left;
+  margin-bottom: 18px;
+}
+.logo img {
+  height: 36px;
+}
+
+.signinFormBlock h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: #27272a;
+}
+.subTitle {
+  color: #757575;
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+
+.signinForm .ant-input {
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.submitBtn {
+  background: #ff424e !important;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  height: 44px;
+}
+.submitBtn:hover {
+  background: #e11b1e !important;
+}
+
+.emailLogin {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.emailLogin a {
+  color: #1a94ff;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.divider {
+  margin: 16px 0 10px 0 !important;
+  color: #bdbdbd;
+  font-size: 13px;
+}
+
+.socialLogin {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.socialBtn {
+  flex: 1;
+  border-radius: 8px !important;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.policyText {
+  color: #757575;
+  font-size: 12px;
+  margin-top: 8px;
+  text-align: center;
+}
+.policyText a {
+  color: #1a94ff;
+  text-decoration: underline;
+}
+
+.signinRight {
+  flex: 1;
+  background: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-width: 220px;
+  padding: 0 18px;
+}
+.rightImg {
+  width: 120px;
+  margin-bottom: 18px;
+}
+.rightText {
+  text-align: center;
+}
+.rightTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a94ff;
+  margin-bottom: 4px;
+}
+.rightDesc {
+  font-size: 14px;
+  color: #757575;
+}
+
+@media (max-width: 700px) {
+  .signinModal {
+    flex-direction: column;
+    min-width: 0;
+    width: 98vw;
+    border-radius: 12px;
+  }
+  .signinLeft, .signinRight {
+    padding: 18px 8px;
+  }
+  .signinRight {
+    min-width: 0;
+  }
+}
+
+.customCloseBtn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s;
+}
+.customCloseBtn:hover {
+  color: #ff424e;
+}
