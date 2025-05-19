@@ -20,14 +20,12 @@ function Header({ onShowSignIn }) {
     <header className="header">
       <div className="header-container">
         <Row align="middle" gutter={[16, 16]} style={{ width: "100%" }}>
-          {/* Logo */}
           <Col xs={20} sm={8} md={6} lg={3} className="logo">
             <a href="/" className="logo-link">
               Ecommerce
             </a>
           </Col>
 
-          {/* Thanh tìm kiếm */}
           <Col xs={0} sm={16} md={12} lg={8} className="search-bar-container">
             <input
               type="text"
@@ -51,7 +49,7 @@ function Header({ onShowSignIn }) {
           >
             <div className="action-item">
               <FaUserCircle className="action-icon" />
-              <div className="account-text-container">
+              <div className="account-text-container ">
                 <span style={{ cursor: "pointer" }} onClick={onShowSignIn}>
                   Đăng Nhập Đăng Ký
                 </span>
@@ -71,7 +69,7 @@ function Header({ onShowSignIn }) {
             </Link>
           </Col>
 
-          {/* Menu icon: Hiện trên mobile */}
+       
           <Col xs={4} sm={0} md={0} lg={0} className="menu-mobile-col">
             <FaBars
               className="menu-mobile-icon"
@@ -82,7 +80,7 @@ function Header({ onShowSignIn }) {
       </div>
       {/* Drawer cho mobile menu */}
       <Drawer
-        placement="left" // Đổi từ "right" sang "left"
+        placement="left" 
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
         width={window.innerWidth < 500 ? "80vw" : 220}

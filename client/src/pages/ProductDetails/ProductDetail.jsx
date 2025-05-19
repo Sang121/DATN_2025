@@ -90,15 +90,9 @@ function ProductDetail() {
                   </Button>
                 ))}
               </div>
-              {selectedSize && (
-                <div className={styles.sizeSelectedText}>
-                  Đã chọn size: <b>{selectedSize}</b>
-                </div>
-              )}
             </div>
-       
             <div className={styles.quantityBlock}>
-              <strong>Số lượng:</strong>
+              <strong> Số lượng:</strong>
               <div className={styles.quantityControl}>
                 <Button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -107,7 +101,7 @@ function ProductDetail() {
                 >
                   -
                 </Button>
-                <span className={styles.quantityValue}>{quantity}</span>
+                <span className={styles.quantityValue}> {quantity} </span>
                 <Button
                   onClick={() => setQuantity((q) => q + 1)}
                   className={styles.quantityBtn}
@@ -115,6 +109,16 @@ function ProductDetail() {
                   +
                 </Button>
               </div>
+            </div>
+            <div style={{ marginTop: 24 }}>
+              <Button
+                type="primary"
+                size="large"
+                disabled={!selectedSize}
+                onClick={() => {}}
+              >
+                Thêm vào giỏ hàng
+              </Button>
             </div>
           </div>
         </div>

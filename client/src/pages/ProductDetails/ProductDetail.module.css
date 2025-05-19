@@ -148,3 +148,26 @@
     max-width: 1280px;
   }
 }
+
+.sizeBtn {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fff;
+  color: #222;
+  font-weight: 500;
+  min-width: 44px;
+  min-height: 36px;
+  font-size: 15px;
+  transition: background 0.2s, border 0.2s, color 0.2s;
+}
+.sizeBtn:hover {
+  border: 1.5px solid #1a94ff;
+  color: #1a94ff;
+}
+.selected {
+  background: #1a94ff !important;
+  color: #fff !important;
+  border: 1.5px solid #1a94ff !important;
+}
