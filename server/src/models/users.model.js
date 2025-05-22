@@ -8,6 +8,7 @@ const modelUser = new Schema(
         email: { type: String, require: true },
         password: { type: String, require: true },
         phone: { type: String, require: true },
+        address:{type: String, require: true},
         isAdmin: { type: Boolean, default: false },
         accessToken: { type: String, default: null },
         refreshToken: { type: String, default: null },
