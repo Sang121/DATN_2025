@@ -10,8 +10,10 @@ const authMiddleware = (req, res, next) => {
             
         }
         jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
-            
-            if(user.payload.isAdmin){
+            if (err) {
+                return res.status(403).json({ status: 'Error', message: 'Token is invalid' });
+            }
+            if(user.isAdmin){
                 req.user = user;
                 next();
             }
@@ -25,6 +27,5 @@ const authMiddleware = (req, res, next) => {
         return res.status(500).json({ status: 'Error', message: 'Server error:', error});
        
     }
-};
-
+}
 module.exports = authMiddleware;
