@@ -1,4 +1,4 @@
-const User = require('../models/users.model');
+const User = require('../models/userModel');
 const bcrypt=require('bcryptjs');
 const jwt=require('jsonwebtoken');
 const {genneralRefreshToken,genneralAccessToken} = require('./jwtService');
@@ -155,4 +155,32 @@ const getDetailUser = (id) => {
         }
     });
 };
-module.exports = { createUser, loginUser,updateUser,deleteUser,getAllUser,getDetailUser };
+const refreshToken = (token) => {
+    return new Promise(async (resolve, reject) => {          
+            try{
+
+          jwt.verify(token,process.env.REFRESH_TOKEN, async (err,user)=>{
+            if(err){
+                resolve({
+
+                status: 'Err',
+                status:'The authentication'
+                })
+                }
+            const {payload}=user
+            const access_token= await genneralAccessToken({
+                id:payload?.id,
+                isAdmin:payload?.isAdmin
+            })
+           
+        
+        
+                    resolve({ status:'Ok', message: 'Refresh token success',access_token});
+                })
+                
+    } catch (error) {
+            reject({ message: 'Server error while get user', error });
+        }
+    });
+};
+module.exports = { createUser, loginUser,updateUser,deleteUser,getAllUser,getDetailUser,refreshToken};
