@@ -2,11 +2,10 @@ const jwt = require('jsonwebtoken')
 const  dotenv=require('dotenv')
 dotenv.config()
 const genneralAccessToken=async(payload)=>{
-     console.log(payload)
     const access_token=jwt.sign({
-        payload
+           ...payload
     },process.env.ACCESS_TOKEN,{
-        expiresIn:'1h'
+        expiresIn:'30s'
     })
     return access_token
 }
