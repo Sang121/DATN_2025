@@ -113,8 +113,24 @@ const getDetailUser = async (req, res) => {
         return res.status(200).json(response); 
     }
     catch (error) {
-        return res.status(404).json({ message: 'Server error', error });
+        return res.status(404).json({ message: 'Server errorr', error });
     }
 }
-
- module.exports = { createUser,loginUser,updateUser,deleteUser,getAllUser,getDetailUser };
+const refreshToken = async (req, res) => {
+    try {
+        const token=req.headers.token.split(' ')[1];
+        if(!token){
+            return res.status(200).json({
+                status: 'Err',
+                message:'the token is required'
+            })
+        }
+       const response= await UserService.refreshToken(token);
+        return res.status(200).json(response); 
+    }
+     
+    catch (error) {
+        return res.status(404).json({ message: 'Error when get refresh token', error });
+    }
+}
+ module.exports = { createUser,loginUser,updateUser,deleteUser,getAllUser,getDetailUser,refreshToken };
