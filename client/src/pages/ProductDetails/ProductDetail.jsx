@@ -1,36 +1,80 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
-import { Button } from "antd";
-import ProductCard from "../../components/ProductCard/ProductCard";
+import { Alert, Button, Spin } from "antd";
 import ListProducts from "../../components/ListProducts/ListProduct";
+import {fetchDetailProduct} from "../../components/fetchProducts";
+import { useQuery } from "@tanstack/react-query";
+
 function ProductDetail() {
   const { id } = useParams();
-  const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("");
   const sizes = ["S", "M", "L", "XL"];
 
-  useEffect(() => {
-    fetch(`https://dummyjson.com/products/${id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setProduct(data);
-        setSelectedImage(
-          data.images && data.images.length > 0
-            ? data.images[0]
-            : data.thumbnail
-        );
-      })
-      .catch((error) => console.error("Error fetching product:", error));
-  }, [id]);
+  const {
+    data: product,
+    isLoading,
+    isError,
+    isSuccess,
+    error,
+  } = useQuery({
+    queryKey: ["productDetail", id],
+    queryFn: () => fetchDetailProduct(id),
+    enabled: !!id,
+  });
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [id]);
+  useEffect(() => {
+    if (isSuccess && product) {
+      // Chỉ chạy khi product đã tải thành công
+      setSelectedImage(
+        product.images && product.images.length > 0
+          ? product.images[0]
+          : product.thumbnail||'a'
+      );
+    }
+  }, [isSuccess, product]);
 
-  if (!product) return null;
+  if (isLoading) {
+    return (
+      <div
+        className={styles.statusContainer}
+        style={{ display: "flex", textalign: "center" }}
+      >
+        <Spin size="large" />
+        <p>Loading product details...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className={styles.statusContainer}>
+        <Alert
+          message="Error"
+          description={
+            error?.message ||
+            "Failed to load product details. Please try again later."
+          }
+          type="error"
+          showIcon
+        />
+      </div>
+    );
+  }
+
+  // Nếu không loading, không lỗi và product là null (không tìm thấy sản phẩm)
+  if (!product) {
+    return (
+      <div className={styles.statusContainer}>
+        <p>Product not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles["product-detail-body"]}>
@@ -38,18 +82,19 @@ function ProductDetail() {
         <div className={styles["product-detail-breadcrumb"]}>
           <h1>
             <a href="/">Trang chủ</a> /{" "}
-            <a href={`/collections/${product.category}`}>{product.category}</a>{" "}
-            / {product.title}
+            <a href={`/category/${product.category}`}>{product.category}</a> /{" "}
+            {product.name}
           </h1>
         </div>
         <div className={styles["productMain"]}>
           <div className={styles["productImage"]}>
             <div className={styles["productImageThumb"]}>
+              {/* Kiểm tra product.images trước khi map */}
               {product.images?.slice(0, 3).map((img, idx) => (
                 <img
-                  key={idx}
+                  key={idx} 
                   src={img}
-                  alt=""
+                  alt={product.name} 
                   style={{
                     border: selectedImage === img ? "2px solid #1a94ff" : "",
                     opacity: selectedImage === img ? 1 : 0.7,
@@ -60,11 +105,11 @@ function ProductDetail() {
               ))}
             </div>
             <div className={styles["productImageMain"]}>
-              <img src={selectedImage} alt="" />
+              <img src={selectedImage} alt={product.name} />
             </div>
           </div>
           <div style={{ flex: 1, paddingLeft: 32 }}>
-            <h2>{product.title}</h2>
+            <h2>{product.name}</h2>
             <p>{product.description}</p>
             <div>
               <strong>Giá:</strong> {product.price}$
@@ -131,7 +176,7 @@ function ProductDetail() {
       <div className={styles["product-detail-related"]}>
         <h2>Sản phẩm cùng danh mục</h2>
         <div className={styles["product-detail-related-list"]}>
-          <ListProducts Collections={product.category} />
+          {product.category && <ListProducts category={product.category} />}
         </div>
       </div>
     </div>

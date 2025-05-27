@@ -26,7 +26,15 @@
   margin-top: 0;
   letter-spacing: 0.01em;
 }
-
+.statusContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  text-align: center;
+  padding: 20px;
+}
 .product-detail-breadcrumb a {
   color: #1a94ff;
   text-decoration: none;
