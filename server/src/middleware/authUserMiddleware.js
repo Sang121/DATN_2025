@@ -20,13 +20,13 @@ const authUserMiddleware = (req, res, next) => {
             }
             else{
 
-                return res.status(403).json({ status: 'Error', message: 'The authenticationn' });
+                return res.status(403).json({ status: 'Error', message: 'The authentication' });
 
             }
             
         });
     } catch (error) {
-        return res.status(500).json({ status: 'Error', message: 'Server eerror:', error});
+        return res.status(500).json({ status: 'Error', message: 'Server error:', error});
        
     }
 };
