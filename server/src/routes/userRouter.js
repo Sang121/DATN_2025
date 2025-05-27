@@ -6,6 +6,8 @@ const authUserMiddleware=require('../middleware/authUserMiddleware')
 
 router.post('/signin',userController.loginUser);
 router.post('/signup',userController.createUser);
+router.post("/logout", userController.logoutUser);
+
 router.put('/update-user/:id',userController.updateUser);
 router.get('/delete-user/:id',authMiddleware,userController.deleteUser);
 router.get('/getAllUser',authMiddleware,userController.getAllUser);
