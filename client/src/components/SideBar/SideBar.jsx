@@ -1,29 +1,29 @@
-import React from 'react';
-import styles from './SideBar.module.css';
-import { Link } from 'react-router-dom';
+import React from "react";
+import styles from "./SideBar.module.css";
+import { Link } from "react-router-dom";
 function Sidebar() {
   const typeProductsList = [
     {
       name: "Quần Nam",
-      collections: "mens-shirts",
+      category: "mens-shirts",
       image:
         "https://salt.tikicdn.com/cache/280x280/ts/product/7f/24/d6/bb72bd4e447a082c6a6989021153e8ac.jpg",
     },
     {
       name: "Áo Sơ Mi",
-      collections: 'beauty',
+      category: "áo",
       image:
         "https://salt.tikicdn.com/cache/280x280/ts/product/48/aa/f9/c6233b9cf5225a8c2e8dd4513377587c.jpg",
     },
     {
       name: "Áo Thun",
-      collections: "fragrances",
+      category: "fragrances",
       image:
         " https://salt.tikicdn.com/cache/100x100/ts/category/00/5d/97/384ca1a678c4ee93a0886a204f47645d.png ",
     },
     {
       name: "Quần áo Nữ",
-      collections: "womens-dresses",
+      category: "womens-dresses",
       image:
         "https://salt.tikicdn.com/ts/category/cd/c9/c8/30464d36bc19f1738ab7208762df4378.png",
     },
@@ -39,13 +39,13 @@ function Sidebar() {
     },
     {
       name: "Giày dép",
-      collections: "womens-shoes",
+      category: "Giày",
       image:
         " https://salt.tikicdn.com/cache/100x100/ts/category/d6/7f/6c/5d53b60efb9448b6a1609c825c29fa40.png",
     },
     {
       name: "Đồng Hồ",
-      collections: "womens-watches",
+      category: "womens-watches",
       image:
         " https://salt.tikicdn.com/cache/100x100/ts/category/8b/d4/a8/5924758b5c36f3b1c43b6843f52d6dd2.png",
     },
@@ -62,23 +62,26 @@ function Sidebar() {
   ];
 
   return (
-    
-<div className={styles.sidebar}> 
-    <div className={styles.typeProductsContainer}>
+    <div className={styles.sidebar}>
+      <div className={styles.typeProductsContainer}>
         <h2 className={styles.typeProductsTitle}>Danh mục sản phẩm</h2>
-      {typeProductsList.map((product, index) => (
-        <Link to={`/Collections/${product.collections}`} key={index} className={styles.typeProductItem}>
-          {product.image && (
-            <img
-              src={product.image}
-              alt={product.name}
-              className={styles.typeProductImage}
-            />
-          )}
-          {product.name}
-        </Link>
-      ))}
-    </div>
+        {typeProductsList.map((product, index) => (
+          <Link
+            to={`/category/${product.category}`}
+            key={index}
+            className={styles.typeProductItem}
+          >
+            {product.image && (
+              <img
+                src={product.image}
+                alt={product.name}
+                className={styles.typeProductImage}
+              />
+            )}
+            {product.name}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
