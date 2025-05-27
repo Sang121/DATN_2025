@@ -23,17 +23,17 @@ function HomePage() {
               </div>
               <div className={styles["home-page-list"]}>
                 <h2>Thời trang nam</h2>
-                <ListProduct Collections={"mens-shirts"} />
+                <ListProduct category={"Áo"} />
               </div>
               <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" />
               <div className={styles["home-page-list"]}>
                 <h2> Thời Trang Nữ</h2>
-                <ListProduct Collections={"womens-dresses"} />
+                <ListProduct category={"Giày"} />
               </div>
               <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" />
               <div className={styles["home-page-list"]}>
                 <h2> Phụ Kiện </h2>
-                <ListProduct Collections={"tops"} />
+                <ListProduct category={"tops"} />
               </div>
             </div>
           </div>
