@@ -6,7 +6,7 @@ import ListProduct from "../../components/ListProducts/ListProduct";
 import { useParams } from "react-router-dom";
 
 function TypeProductPage() {
-  const { type } = useParams();
+  const { category } = useParams();
 
   return (
     <div className={styles["type-product-page-container"]}>
@@ -19,11 +19,11 @@ function TypeProductPage() {
           <div className={styles["type-product-page-list"]}>
             <div className={styles["product-detail-breadcrumb"]}>
               <h1>
-                <a href="/">Trang chủ</a> / {type}
+                <a href="/">Trang chủ</a> / {category}
               </h1>
             </div>
 
-            <ListProduct Collections={type} />
+            <ListProduct category={category} />
           </div>
         </div>
       </div>
