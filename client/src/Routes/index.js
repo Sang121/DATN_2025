@@ -6,6 +6,7 @@ import ProductDetail from "../pages/ProductDetails/ProductDetail"
 import TypeProductPage from "../pages/TypeProductPage/TypeProductPage"
 import SignInPage from "../pages/SignInPage/SignInPage"
 import SignUpPage from "../pages/SignUpPage/SignUpPage"
+import SearchPage from "../pages/search/SearchPage"
 export const routes= [
   { 
     path: '/',
@@ -16,13 +17,11 @@ export const routes= [
     path: '/order/:id',
     page: OrderPage,
         isShowHeader: true
-
   },
   { 
     path: '/products',
     page: ProductPage,
         isShowHeader: true
- 
   },
   {
     path: '/products/:id',
@@ -31,8 +30,13 @@ export const routes= [
   },
 
 {
-  path:'/collections/:type',
+  path:'/category/:category',
   page: TypeProductPage,
+  isShowHeader: true
+},
+{
+  path:'/search/:query',
+  page: SearchPage,
   isShowHeader: true
 },
 {
