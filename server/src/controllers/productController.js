@@ -43,7 +43,7 @@ const updateProduct = async (req, res) => {
         ); 
     }
     catch (error) {
-        return res.status(404).json({ message: 'aServer error when update product', error });
+        return res.status(404).json({ message: 'Server error when update product', error });
     }
 }
 const getDetailProduct = async (req, res) => {

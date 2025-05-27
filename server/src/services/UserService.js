@@ -1,186 +1,214 @@
-const User = require('../models/userModel');
-const bcrypt=require('bcryptjs');
-const jwt=require('jsonwebtoken');
-const {genneralRefreshToken,genneralAccessToken} = require('./jwtService');
+const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { genneralRefreshToken, genneralAccessToken } = require("./jwtService");
 //const genneralRefreshToken = require('./jwtService');
 const createUser = (newUser) => {
-    return new Promise(async (resolve, reject) => {
-    
-            const { name, email,address, password,confirmPassword, phone } = newUser;
-            
-            try{
-                const existingUser = await User.findOne({ email: newUser.email });
-            if (existingUser) {
-                return reject({ message: 'Email đã tồn tại!' });
-            }
-            const hashedPassword = await bcrypt.hashSync(password, 10);
-            const confirmHashedPassword = await bcrypt.hashSync(confirmPassword, 10);
-            console.log( hashedPassword)
-                const createUser=await User.create({
-                    name,
-                    email,
-                    address,
-                    password: hashedPassword,
-                    confirmPassword: confirmHashedPassword,
-                    phone,
-                })
-                if(createUser){
-                    resolve({ status:'Ok', message: 'User created successfully', data: createUser });
-                }else{
-                    reject({ message: 'User created Unsuccessfully' });
-                }
-        } catch (error) {
-            reject({ message: 'Server error while create user', error });
-        }
-    });
-};
-const loginUser = (userLogin) => {
-    return new Promise(async (resolve, reject) => {
-    
-            const {  email, password} = userLogin;
-            
-            try{
-                const existingUser = await User.findOne({ email: email });
-            if (existingUser === null) {
-                resolve({status:'Ok', message: 'Email không tồn tại!' });
-            }
-            const comparePassword=bcrypt.compareSync(password, existingUser.password);
-            if(!comparePassword){
-                return reject({status:'Ok', message: 'Mật khẩu không đúng!' });
-            }
+  return new Promise(async (resolve, reject) => {
+    const { username, email, address, password, phone } = newUser;
 
-         
-
-           const access_token=await genneralAccessToken({
-            id:existingUser._id,
-            isAdmin:existingUser.isAdmin,
-            // name:existingUser.name,
-            // email:existingUser.email,
-            // phone:existingUser.phone
-           })
-           const refresh_token= await genneralRefreshToken({
-            id:existingUser._id,
-            isAdmin:existingUser.isAdmin,
-        })
-        
-                    resolve({ status:'Ok', message: 'Success', access_token, refresh_token });
-                // }else{
-                //     reject({ message: 'User created Unsuccessfully' });
-                // }
+    try {
+      const existingUser = await User.findOne({ username: newUser.username, email: newUser.email });
+      if (existingUser) {
+        return reject({ message: "Tên đăng nhập hoặc email đã tồn tại!" });
+      }
+      const hashedPassword = await bcrypt.hashSync(password, 10);
+      const createUser = await User.create({
+        username,
+        email,
+        address,
+        password: hashedPassword,
+        phone,
+      });
+      if (createUser) {
+        resolve({
+          status: "Ok",
+          message: "User created successfully",
+          data: createUser,
+        });
+      } else {
+        reject({ message: "User created Unsuccessfully" });
+      }
     } catch (error) {
-            reject({ message: 'Server error while create user', error });
-        }
-    });
+      reject({ message: "Server error while create user", error });
+    }
+  });
 };
-const updateUser = (id,data) => {
-    return new Promise(async (resolve, reject) => {          
-            try{
-                const existingUser = await User.findById(id)
-         if(!existingUser){
-            resolve({
-                    status: 'Ok',
-                    message: 'User not found',
-                })
-         }
-            
-            
-           const updateUser=await User.findByIdAndUpdate(id,data,{new:true})
-           console.log(updateUser)
+const loginUser = (loginData) => {
+  return new Promise(async (resolve, reject) => {
+    const { identifier, password } = loginData;
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const isEmail = emailRegex.test(identifier);
+    const newLoginData = isEmail
+      ? { email: identifier.trim().toLowerCase() }
+      : { username: identifier.trim() };
+    try {
+      const existingUser = await User.findOne(newLoginData);
+      if (existingUser === null) {
+        reject({ status: "Err", message: "Email hoặc tên người dùng không tồn tại!" });
+      }
+      const comparePassword = bcrypt.compareSync(
+        password,
+        existingUser.password
+      );
+      if (!comparePassword) {
+        return reject({ status: "Err", message: "Mật khẩu không đúng!" });
+      }
 
-        
-                    resolve({ status:'Ok', message: 'Success',data:updateUser });
-                // }else{
-                //     reject({ message: 'User created Unsuccessfully' });
-                // }
+      const access_token = await genneralAccessToken({
+        id: existingUser._id,
+        isAdmin: existingUser.isAdmin,
+      });
+      const refresh_token = await genneralRefreshToken({
+        id: existingUser._id,
+        isAdmin: existingUser.isAdmin,
+      });
+
+      resolve({
+        status: "Ok",
+        message: "Success",
+        access_token,
+        refresh_token
+      });
+     
     } catch (error) {
-            reject({ message: 'Server error while create user', error });
-        }
-    });
+      console.error("Error during login:", error); // Log lỗi chi tiết
+      reject({ status: "Err", message: "Server error while login", error });
+    }
+  });
+};
+const updateUser = (id, data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const existingUser = await User.findById(id);
+      if (!existingUser) {
+        reject({
+          status: "Err",
+          message: "User not found",
+        });
+      }
+
+      const updateUser = await User.findByIdAndUpdate(id, data, { new: true });
+      console.log(updateUser);
+
+      resolve({ status: "Ok", message: "Success", data: updateUser });
+      // }else{
+      //     reject({ message: 'User created Unsuccessfully' });
+      // }
+    } catch (error) {
+      reject({ message: "Server error while update user", error });
+    }
+  });
 };
 const deleteUser = (id) => {
-    return new Promise(async (resolve, reject) => {          
-            try{
-                const existingUser = await User.findById(id)
-         if(!existingUser){
-            resolve({
-                    status: 'Ok',
-                    message: 'User not found',
-                })
-         }
-          await User.findByIdAndDelete(id)
+  return new Promise(async (resolve, reject) => {
+    try {
+      const existingUser = await User.findById(id);
+      if (!existingUser) {
+        return reject({
+          status: "Err",
+          message: "User not found",
+        });
+      }
+      await User.findByIdAndDelete(id);
 
-        
-                    resolve({ status:'Ok', message: 'Delete user success'});
-                // }else{
-                //     reject({ message: 'User created Unsuccessfully' });
-                // }
+      resolve({ status: "Ok", message: "Delete user success" });
+      // }else{
+      //     reject({ message: 'User created Unsuccessfully' });
+      // }
     } catch (error) {
-            reject({ message: 'Server error while delete user', error });
-        }
-    });
+      reject({ message: "Server error while delete user", error });
+    }
+  });
 };
 const getAllUser = () => {
-    return new Promise(async (resolve, reject) => {          
-            try{
-        
-          const allUser= await User.find() 
-                    resolve({ status:'Ok', message: 'Get all  user success',data:allUser});
-                // }else{
-                //     reject({ message: 'User created Unsuccessfully' });
-                // }
+  return new Promise(async (resolve, reject) => {
+    try {
+      const allUser = await User.find();
+      resolve({
+        status: "Ok",
+        message: "Get all  user success",
+        data: allUser,
+      });
+      // }else{
+      //     reject({ message: 'User created Unsuccessfully' });
+      // }
     } catch (error) {
-            reject({ message: 'Server error while get user', error });
-        }
-    });
+      reject({ message: "Server error while get user", error });
+    }
+  });
 };
 const getDetailUser = (id) => {
-    return new Promise(async (resolve, reject) => {          
-            try{
-                const existingUser = await User.findById(id)
-         if(!existingUser){
-            resolve({
-                    status: 'Ok',
-                    message: 'User not found',
-                })
-         }
-          userDetail=await User.findById(id)
+  return new Promise(async (resolve, reject) => {
+    try {
+      const existingUser = await User.findById(id);
+      if (!existingUser) {
+        resolve({
+          status: "Ok",
+          message: "User not found",
+        });
+      }
 
-        
-                    resolve({ status:'Ok', message: 'Get user success',data:userDetail});
-                // }else{
-                //     reject({ message: 'User created Unsuccessfully' });
-                // }
+      resolve({
+        status: "Ok",
+        message: "Get user success",
+        data: existingUser,
+      });
     } catch (error) {
-            reject({ message: 'Server error while get user', error });
-        }
-    });
+      reject({ message: "Server error while get user", error });
+    }
+  });
 };
 const refreshToken = (token) => {
-    return new Promise(async (resolve, reject) => {          
-            try{
-
-          jwt.verify(token,process.env.REFRESH_TOKEN, async (err,user)=>{
-            if(err){
-                resolve({
-
-                status: 'Err',
-                status:'The authentication'
-                })
-                }
-            const {payload}=user
-            const access_token= await genneralAccessToken({
-                id:payload?.id,
-                isAdmin:payload?.isAdmin
-            })
-           
-        
-        
-                    resolve({ status:'Ok', message: 'Refresh token success',access_token});
-                })
-                
-    } catch (error) {
-            reject({ message: 'Server error while get user', error });
-        }
+  if (!token) {
+    return Promise.reject({
+      status: "Err",
+      message: "The token is required",
     });
+  }
+  return new Promise(async (resolve, reject) => {
+    try {
+      jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
+        if (err) {
+          reject({
+            status: "Err",
+            message: "The authentication",
+          });
+        }
+        const { payload } = user;
+        const access_token = await genneralAccessToken({
+          id: payload?.id,
+          isAdmin: payload?.isAdmin,
+        });
+
+        resolve({
+          status: "Ok",
+          message: "Refresh token success",
+          access_token,
+        });
+      });
+    } catch (error) {
+      reject({ message: "Server error while get user", error });
+    }
+  });
 };
-module.exports = { createUser, loginUser,updateUser,deleteUser,getAllUser,getDetailUser,refreshToken};
+const logoutUser = (token) => {
+  
+  return new Promise(async (resolve, reject) => {
+    try {
+     
+    } catch (error) {
+      reject({ message: "Server error while get user", error });
+    }
+  });
+};
+module.exports = {
+  createUser,
+  loginUser,
+  updateUser,
+  deleteUser,
+  getAllUser,
+  getDetailUser,
+  refreshToken,
+  logoutUser,
+};

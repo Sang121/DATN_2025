@@ -40,8 +40,8 @@ const updateProduct = (id,data) => {
             try{
                 const existingProduct = await Product.findById(id)
          if(!existingProduct){
-            resolve({
-                    status: 'Ok',
+            reject({
+                    status: 'Err',
                     message: 'Product not found',
                     data: null
                 })
@@ -61,8 +61,8 @@ const getDetailProduct = (id) => {
             try{
                 const existingProduct = await Product.findById(id)
          if(!existingProduct){
-            resolve({
-                    status: 'Ok',
+            reject({
+                    status: 'Err',
                     message: 'Product not found',
                 })
          }
@@ -79,8 +79,8 @@ const deleteProduct = (id) => {
             try{
                 const existingProduct = await Product.findById(id)
          if(!existingProduct){
-            resolve({
-                    status: 'Ok',
+            reject({
+                    status: 'Err',
                     message: 'Product not found',
                 })
          }
