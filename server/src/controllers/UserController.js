@@ -16,7 +16,7 @@ const createUser = async (req, res) => {
     ) {
       return res.status(200).json({
         status: "Err",
-        message: "the input is required",
+        message: "The input is required",
       });
     } else if (isCheckEmail === false) {
       return res.status(200).json({
@@ -34,35 +34,34 @@ const createUser = async (req, res) => {
 
     return res.status(201).json(response);
   } catch (error) {
-    console.error("Error creating user:", error);
-    return res.status(500).json({ message: "Server error", error });
+    return res.status(500).json({ message: error.message, error });
   }
 };
 const loginUser = async (req, res) => {
   try {
-    const { identifier, password } = req.body; // identifier có thể là username hoặc email
+    const { identifier, password } = req.body;
     if (!identifier || !password) {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "Err",
         message: "The input is required",
       });
     }
-
-    const loginData = { identifier: identifier.trim(), password };
+ 
+    const loginData = { identifier, password };
 
     console.log("loginData", loginData);
     const response = await UserService.loginUser(loginData);
     const { refresh_token, ...newResponse } = response;
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
-      secure: false, // Set to true if using HTTPS
-      // secure: true, // Uncomment this line if your server is using HTTPS
+      secure: process.env.NODE_ENV === "production", // Đặt secure: true nếu môi trường là production
       sameSite: "strict",
     });
 
     console.log("response", newResponse);
     return res.status(201).json(newResponse);
   } catch (error) {
+    console.error("Error during login:", error); // Log lỗi chi tiết hơn
     return res.status(500).json({ message: "Server error when login", error });
   }
 };
