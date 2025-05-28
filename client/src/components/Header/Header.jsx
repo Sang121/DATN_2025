@@ -1,110 +1,238 @@
-import React, { useState } from "react";
+// src/components/Header/Header.jsx
+import React, { useState, useEffect } from "react";
 import {
   FaSearch,
   FaUserCircle,
   FaShoppingCart,
   FaPersonBooth,
+  FaSignOutAlt,
   FaBars,
 } from "react-icons/fa";
-import "./Header.css";
-import { Row, Col, Grid, Drawer } from "antd";
-import { Link } from "react-router-dom";
-
-const { useBreakpoint } = Grid;
+import styles from "./Header.module.css";
+import { Row, Col, Drawer } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { updateUser, logout } from "../../redux/slices/userSlice";
 
 function Header({ onShowSignIn }) {
-  const screens = useBreakpoint();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const currentUsername = user.username;
+  const currentIsLoggedIn = !!user.access_token;
+
+  useEffect(() => {
+    if (user.username) {
+      sessionStorage.setItem("username", user.username);
+    } else {
+      sessionStorage.removeItem("username");
+    }
+    if (user._id) {
+      sessionStorage.setItem("userId", user._id);
+    } else {
+      sessionStorage.removeItem("userId");
+    }
+    if (user.access_token) {
+      sessionStorage.setItem("access_token", user.access_token);
+    } else {
+      sessionStorage.removeItem("access_token");
+    }
+    if (user.refresh_token) {
+      sessionStorage.setItem("refresh_token", user.refresh_token);
+    } else {
+      sessionStorage.removeItem("refresh_token");
+    }
+  }, [user.refresh_token]);
+
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "userState") {
+        const storedState = sessionStorage.getItem("userState");
+        if (storedState) {
+          const parsedState = JSON.parse(storedState);
+          dispatch(updateUser(parsedState.user));
+        } else {
+          dispatch(logout());
+        }
+      }
+      if (e.key === "access_token" && !e.newValue) {
+        dispatch(logout());
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [dispatch]);
+  const handleSearch = () => {
+    const trimmedSearchTerm = searchTerm.trim();
+    if (trimmedSearchTerm) {
+      navigate(`/search/${encodeURIComponent(trimmedSearchTerm)}`);
+      setDrawerOpen(false);
+    }
+  };
+  const handleLogout = () => {
+    sessionStorage.clear();
+    dispatch(logout());
+    //navigate("/");
+  };
+
+  const handleLoginSuccess = (userData) => {
+    if (userData) {
+      dispatch(updateUser(userData));
+    }
+  };
 
   return (
-    <header className="header">
-      <div className="header-container">
-        <Row align="middle" gutter={[16, 16]} style={{ width: "100%" }}>
-          <Col xs={20} sm={8} md={6} lg={3} className="logo">
-            <a href="/" className="logo-link">
+    <header className={styles.header}>
+      <div className={styles["header-container"]}>
+        <Row
+          align="middle"
+          gutter={[16, 16]}
+          style={{ width: "100%" }}
+          className={styles["header-row"]}
+        >
+          <Col xs={20} sm={8} md={6} lg={3} className={styles.logo}>
+            <Link to="/" className={styles["logo-link"]}>
               Ecommerce
-            </a>
+            </Link>
           </Col>
 
-          <Col xs={0} sm={16} md={12} lg={8} className="search-bar-container">
+          <Col
+            xs={0}
+            sm={16}
+            md={12}
+            lg={9}
+            className={styles["search-bar-container"]}
+          >
             <input
               type="text"
               placeholder="Tìm sản phẩm, danh mục hay thương hiệu mong muốn..."
-              className="search-input"
+              className={styles["search-input"]}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <button className="search-button">
-              <FaSearch className="search-icon" />
+            <button className={styles["search-button"]} onClick={handleSearch}>
+              <FaSearch className={styles["search-icon"]} />
               Tìm kiếm
             </button>
           </Col>
 
-          {/* Actions: Hiện trên desktop, ẩn trên mobile */}
           <Col
             xs={0}
             sm={0}
             md={6}
             lg={10}
-            className="actions-container"
+            className={styles["actions-container"]}
             style={{ justifyContent: "flex-end" }}
           >
-            <div className="action-item">
-              <FaUserCircle className="action-icon" />
-              <div className="account-text-container ">
-                <span style={{ cursor: "pointer" }} onClick={onShowSignIn}>
-                  Đăng Nhập Đăng Ký
-                </span>
-                <Link to="/account">
-                  <span style={{ fontWeight: "500" }}>Tài khoản</span>
-                </Link>
+            {currentIsLoggedIn ? (
+              <div className={styles["action-item"]}>
+                <FaUserCircle className={styles["action-icon"]} />
+                <div className={styles["account-text-container"]}>
+                  <Link to="/account">
+                    <span className={styles["bold-text"]}>
+                      {currentUsername || "Tài khoản"}{" "}
+                    </span>
+                  </Link>
+                </div>
               </div>
-            </div>
-            <Link to="/cart" className="action-item">
-              <FaShoppingCart className="action-icon" />
-              <span className="cart-text">Giỏ Hàng</span>
-              <span className="cart-count">3</span>
+            ) : (
+              <div className={styles["action-item"]}>
+                <FaUserCircle className={styles["action-icon"]} />
+                <div className={styles["account-text-container"]}>
+                  <span
+                    className={styles.clickable}
+                    onClick={() => onShowSignIn(handleLoginSuccess)}
+                  >
+                    Đăng Nhập/Đăng Ký
+                  </span>
+                </div>
+              </div>
+            )}
+            <Link to="/cart" className={styles["action-item"]}>
+              <FaShoppingCart className={styles["action-icon"]} />
+              <span className={styles["cart-text"]}>Giỏ Hàng</span>
+              <span className={styles["cart-count"]}>3</span>
             </Link>
-            <Link to="/fitting_room" className="action-item">
-              <FaPersonBooth className="action-icon" />
-              <span className="cart-text">Phòng thử đồ</span>
+            <Link to="/fitting_room" className={styles["action-item"]}>
+              <FaPersonBooth className={styles["action-icon"]} />
+              <span className={styles["cart-text"]}>Phòng thử đồ</span>
             </Link>
+
+            {currentIsLoggedIn && (
+              <div className={styles["action-item"]} onClick={handleLogout}>
+                <FaSignOutAlt className={styles["action-icon"]} />
+                <span className={styles["logout-text"]}>Đăng xuất</span>
+              </div>
+            )}
           </Col>
 
-       
-          <Col xs={4} sm={0} md={0} lg={0} className="menu-mobile-col">
+          <Col
+            xs={4}
+            sm={0}
+            md={0}
+            lg={0}
+            className={styles["menu-mobile-col"]}
+          >
             <FaBars
-              className="menu-mobile-icon"
+              className={styles["menu-mobile-icon"]}
               onClick={() => setDrawerOpen(true)}
             />
           </Col>
         </Row>
       </div>
-      {/* Drawer cho mobile menu */}
+
       <Drawer
-        placement="left" 
+        placement="left"
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
         width={window.innerWidth < 500 ? "80vw" : 220}
       >
-        <div className="actions-container-mobile">
-          <div
-            className="action-item"
-            onClick={() => alert("Chức năng tài khoản!")}
-          >
-            <FaUserCircle className="action-icon" />
-            <div className="account-text-container">
-              <span>Đăng Nhập / Đăng Ký</span>
-              <span style={{ fontWeight: "500" }}>Tài khoản</span>
+        <div className={styles["actions-container-mobile"]}>
+          {currentIsLoggedIn ? (
+            <div className={styles["action-item"]}>
+              <FaUserCircle className={styles["action-icon"]} />
+              <div className={styles["account-text-container"]}>
+                <Link to="/account" onClick={() => setDrawerOpen(false)}>
+                  <span className={styles["bold-text"]}>Tài khoản</span>
+                </Link>
+              </div>
             </div>
-          </div>
-          <a href="/cart" className="action-item">
-            <FaShoppingCart className="action-icon" />
-            <span className="cart-text">Giỏ Hàng</span>
-            <span className="cart-count">3</span>
-          </a>
-          <a href="/fitting_room" className="action-item">
-            <FaPersonBooth className="action-icon" />
-            <span className="cart-text">Phòng thử đồ</span>
-          </a>
+          ) : (
+            <div
+              className={styles["action-item"]}
+              onClick={() => {
+                onShowSignIn(handleLoginSuccess);
+                setDrawerOpen(false);
+              }}
+            >
+              <FaUserCircle className={styles["action-icon"]} />
+              <div className={styles["account-text-container"]}>
+                <span className={styles.clickable}>Đăng Nhập Đăng Ký</span>
+              </div>
+            </div>
+          )}
+          <Link
+            to="/cart"
+            className={styles["action-item"]}
+            onClick={() => setDrawerOpen(false)}
+          >
+            <FaShoppingCart className={styles["action-icon"]} />
+            <span className={styles["cart-text"]}>Giỏ Hàng</span>
+            <span className={styles["cart-count"]}>3</span>
+          </Link>
+          <Link
+            to="/fitting_room"
+            className={styles["action-item"]}
+            onClick={() => setDrawerOpen(false)}
+          >
+            <FaPersonBooth className={styles["action-icon"]} />
+            <span className={styles["cart-text"]}>Phòng thử đồ</span>
+          </Link>
         </div>
       </Drawer>
     </header>

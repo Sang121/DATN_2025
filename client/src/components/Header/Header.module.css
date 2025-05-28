@@ -1,0 +1,359 @@
+/* Variables for easier theme management */
+:root {
+  --primary-blue: #1A94FF;
+  --dark-blue: #0D5CB6;
+  --text-color-light: #fff;
+  --text-color-dark: #333;
+  --border-color: #e0e0e0;
+  --background-light-grey: #f0f2f5;
+  --yellow-accent: rgb(253, 216, 53);
+  --dark-grey-text: rgb(74, 74, 74);
+  --spacing-xs: 5px;
+  --spacing-sm: 10px;
+  --spacing-md: 15px;
+  --spacing-lg: 20px;
+  --max-width: 1200px;
+}
+
+.header {
+  background-color: var(--primary-blue);
+  padding: var(--spacing-sm) 0;
+  color: var(--text-color-light);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Thêm đổ bóng nhẹ */
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  width: 100%;
+}
+
+.header-row {
+  /* Đảm bảo Ant Design Row chiếm 100% chiều rộng */
+  width: 100%;
+  align-items: center;
+  margin: 0 !important;
+  /* Reset margin mặc định của Antd Row */
+}
+
+.logo {
+  margin-right: var(--spacing-lg);
+  display: flex;
+  /* Đảm bảo logo nằm giữa nếu cần */
+  align-items: center;
+}
+
+.logo-link {
+  text-decoration: none;
+  color: var(--text-color-light);
+  font-size: 28px;
+  /* Slightly adjusted font size */
+  font-weight: bold;
+  transition: color 0.2s ease-in-out;
+  /* Hiệu ứng hover */
+}
+
+.logo-link:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.search-bar-container {
+  flex-grow: 1;
+  display: flex;
+  max-width: 600px;
+  /* Hơi giảm max-width cho search bar */
+  border-radius: 4px;
+  /* Bo góc nhẹ cho toàn bộ search bar */
+  overflow: hidden;
+  /* Đảm bảo input và button bo góc cùng */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng cho search bar */
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 10px 15px;
+  border: none;
+  /* Bỏ border */
+  font-size: 14px;
+  outline: none;
+  color: var(--text-color-dark);
+}
+
+.search-button {
+  background-color: var(--dark-blue);
+  color: var(--text-color-light);
+  border: none;
+  padding: 0 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  transition: background-color 0.2s ease-in-out;
+  /* Hiệu ứng hover */
+}
+
+.search-button:hover {
+  background-color: #0B4C99;
+  /* Màu đậm hơn khi hover */
+}
+
+.search-icon {
+  margin-right: var(--spacing-xs);
+  font-size: 15px;
+  /* Điều chỉnh kích thước icon */
+}
+
+.actions-container {
+  display: flex;
+  align-items: center;
+  margin-left: var(--spacing-lg);
+  gap: var(--spacing-lg);
+  /* Sử dụng gap thay vì margin-left cho các item */
+}
+
+.action-item {
+  display: flex;
+  flex-direction: row;
+  /* Sắp xếp icon và text theo chiều dọc */
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-color-light);
+  transition: color 0.2s ease-in-out;
+  white-space: nowrap;
+  /* Ngăn không cho chữ xuống dòng */
+}
+
+.action-item:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.action-icon {
+  margin-bottom: 2px;
+  /* Khoảng cách giữa icon và text */
+  font-size: 20px;
+  /* Tăng kích thước icon */
+}
+
+
+
+.account-text-container {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+  /* Căn giữa text dưới icon */
+}
+
+.account-text-container .clickable {
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.account-text-container .clickable:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cart-text {
+  font-size: 13px;
+  margin-top: 2px;
+  /* Đảm bảo căn chỉnh với icon */
+}
+
+.cart-count {
+  background-color: var(--yellow-accent);
+  color: var(--dark-grey-text);
+  border-radius: 50%;
+  /* Làm tròn hoàn hảo */
+  padding: 2px 6px;
+  /* Điều chỉnh padding cho phù hợp */
+  font-size: 11px;
+  font-weight: bold;
+  margin-left: var(--spacing-xs);
+  min-width: 20px;
+  /* Đảm bảo kích thước tối thiểu */
+  height: 20px;
+  /* Đảm bảo kích thước tối thiểu */
+  display: flex;
+  /* Dùng flex để căn giữa số */
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  /* Reset line-height */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.logout-button {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-color-light);
+  margin-left: var(--spacing-sm);
+  /* Đẩy nút logout ra xa hơn một chút */
+  transition: color 0.2s ease-in-out;
+}
+
+.logout-button:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.logout-button .action-icon {
+  margin-bottom: 0;
+  /* Reset margin bottom cho icon logout */
+  margin-right: 0;
+  /* No margin right, as it's typically just an icon */
+}
+
+
+/* Tùy chỉnh cho mobile */
+@media (max-width: 991px) {
+
+  /* Thay đổi breakpoint từ 767px lên 991px để phù hợp với md breakpoint của Antd */
+  .actions-container {
+    display: none !important;
+  }
+
+  .search-bar-container {
+    max-width: 100%;
+    /* Cho search bar chiếm toàn bộ chiều rộng có thể */
+    margin-right: var(--spacing-md);
+    /* Thêm khoảng cách với menu mobile */
+  }
+
+  .logo {
+    margin-right: var(--spacing-md);
+  }
+
+  .menu-mobile-col {
+    display: flex !important;
+    justify-content: flex-end;
+    /* Đẩy icon menu sang phải trên mobile */
+    align-items: center;
+    flex-grow: 1;
+    /* Cho phép nó chiếm không gian còn lại */
+  }
+
+  .menu-mobile-icon {
+    font-size: 24px;
+    /* Giảm kích thước icon một chút */
+    color: var(--text-color-light);
+    /* Đảm bảo màu trắng */
+    cursor: pointer;
+  }
+
+  .header-container {
+    padding: 0 var(--spacing-sm);
+    /* Giảm padding ngang trên mobile */
+  }
+}
+
+@media (min-width: 992px) {
+
+  /* Ẩn menu mobile trên desktop */
+  .menu-mobile-col {
+    display: none !important;
+  }
+}
+
+/* Styles cho Drawer (Mobile Menu) */
+.actions-container-mobile {
+  padding: var(--spacing-lg) var(--spacing-md);
+  color: var(--text-color-dark) !important;
+  /* Đảm bảo màu chữ tối */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  /* Khoảng cách giữa các item */
+}
+
+.actions-container-mobile .action-item {
+  margin-left: 0;
+  margin-bottom: 0;
+  flex-direction: row;
+  /* Sắp xếp icon và text theo chiều ngang */
+  justify-content: flex-start;
+  /* Căn trái */
+  color: var(--text-color-dark) !important;
+  /* Đảm bảo màu chữ tối */
+}
+
+.actions-container-mobile .action-item .action-icon {
+  margin-right: var(--spacing-sm);
+  /* Khoảng cách giữa icon và text */
+  margin-bottom: 0;
+}
+
+.actions-container-mobile .cart-text,
+.actions-container-mobile .account-text-container span,
+.actions-container-mobile .bold-text {
+  color: var(--text-color-dark) !important;
+  /* Đảm bảo màu chữ tối */
+  font-size: 15px;
+  /* Kích thước chữ rõ ràng hơn */
+}
+
+.actions-container-mobile .account-text-container {
+  text-align: left;
+  /* Căn trái text trong mobile menu */
+  flex-direction: row;
+  /* Để "Đăng Nhập/Đăng Ký" nằm trên 1 dòng */
+}
+
+.actions-container-mobile .cart-count {
+  /* Giữ nguyên style này cho số lượng giỏ hàng trên mobile menu */
+  margin-left: var(--spacing-xs);
+}
+
+/* Các style không liên quan đến Header đã được loại bỏ hoặc giữ nguyên nếu không ảnh hưởng */
+.tiki-header {
+  /* Có vẻ không còn sử dụng vì đã có .header */
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-inner {
+  /* Có vẻ không còn sử dụng vì đã có .header-container */
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.location,
+.account,
+.cart {
+  /* Các class này có thể đã được thay thế bởi action-item */
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.location svg,
+.account svg,
+.cart svg {
+  margin-right: var(--spacing-xs);
+  font-size: 1.2rem;
+}
+
+.category-menu-row {
+  background-color: var(--background-light-grey);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.category-menu-button {
+  width: 200px;
+  text-align: left;
+}
+
+.ant-dropdown-menu {
+  min-width: 200px;
+}
