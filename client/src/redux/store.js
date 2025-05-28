@@ -1,8 +1,23 @@
-import { configureStore } from '@reduxjs/toolkit'
-import counterReducer from './slices/counterSlice'
+import { configureStore } from "@reduxjs/toolkit";
+import userReducer from "./slices/userSlice";
+import { loadState, saveState } from "../utils/storage";
+import throttle from "lodash/throttle"; 
 
-export default configureStore({
+const preloadedState = loadState();
+
+const Store = configureStore({
   reducer: {
-    counter: counterReducer
-  }
-})
+    user: userReducer,
+  },
+  preloadedState: preloadedState,
+});
+
+Store.subscribe(
+  throttle(() => {
+    saveState({
+      user: Store.getState().user,
+    });
+  }, 1000)
+);
+
+export default Store;
