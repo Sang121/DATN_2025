@@ -3,19 +3,51 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { genneralRefreshToken, genneralAccessToken } = require("./jwtService");
 //const genneralRefreshToken = require('./jwtService');
+const validateEmail = (email) => {
+  const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
+};
+
+const validateUsername = (username) => {
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  return usernameRegex.test(username);
+};
+
 const createUser = (newUser) => {
   return new Promise(async (resolve, reject) => {
     const { username, email, address, password, phone } = newUser;
 
+    if (!validateEmail(email)) {
+      return reject({
+        status: 400,
+        message: "Email không hợp lệ!",
+      });
+    }
+
+    if (!validateUsername(username)) {
+      return reject({
+        status: 400,
+        message: "Tên đăng nhập không hợp lệ! Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới, từ 3 đến 20 ký tự.",
+      });
+    }
+
     try {
-      const existingUser = await User.findOne({ username: newUser.username, email: newUser.email });
+      const existingUser = await User.findOne({
+        $or: [
+          { username: username.trim().toLowerCase() },
+          { email: email.trim().toLowerCase() },
+        ],
+      });
       if (existingUser) {
-        return reject({ message: "Tên đăng nhập hoặc email đã tồn tại!" });
+        return reject({
+          status: 400,
+          message: "Tên đăng nhập hoặc email đã tồn tại!",
+        });
       }
       const hashedPassword = await bcrypt.hashSync(password, 10);
       const createUser = await User.create({
-        username,
-        email,
+        username: username.trim().toLowerCase(),
+        email: email.trim().toLowerCase(),
         address,
         password: hashedPassword,
         phone,
@@ -41,11 +73,14 @@ const loginUser = (loginData) => {
     const isEmail = emailRegex.test(identifier);
     const newLoginData = isEmail
       ? { email: identifier.trim().toLowerCase() }
-      : { username: identifier.trim() };
+      : { username: identifier.trim().toLowerCase() };
     try {
       const existingUser = await User.findOne(newLoginData);
       if (existingUser === null) {
-        reject({ status: "Err", message: "Email hoặc tên người dùng không tồn tại!" });
+        reject({
+          status: "Err",
+          message: "Email hoặc tên người dùng không tồn tại!",
+        });
       }
       const comparePassword = bcrypt.compareSync(
         password,
@@ -68,9 +103,8 @@ const loginUser = (loginData) => {
         status: "Ok",
         message: "Success",
         access_token,
-        refresh_token
+        refresh_token,
       });
-     
     } catch (error) {
       console.error("Error during login:", error); // Log lỗi chi tiết
       reject({ status: "Err", message: "Server error while login", error });
@@ -92,9 +126,6 @@ const updateUser = (id, data) => {
       console.log(updateUser);
 
       resolve({ status: "Ok", message: "Success", data: updateUser });
-      // }else{
-      //     reject({ message: 'User created Unsuccessfully' });
-      // }
     } catch (error) {
       reject({ message: "Server error while update user", error });
     }
@@ -113,9 +144,6 @@ const deleteUser = (id) => {
       await User.findByIdAndDelete(id);
 
       resolve({ status: "Ok", message: "Delete user success" });
-      // }else{
-      //     reject({ message: 'User created Unsuccessfully' });
-      // }
     } catch (error) {
       reject({ message: "Server error while delete user", error });
     }
@@ -193,10 +221,8 @@ const refreshToken = (token) => {
   });
 };
 const logoutUser = (token) => {
-  
   return new Promise(async (resolve, reject) => {
     try {
-     
     } catch (error) {
       reject({ message: "Server error while get user", error });
     }
