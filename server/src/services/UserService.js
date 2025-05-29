@@ -27,7 +27,8 @@ const createUser = (newUser) => {
     if (!validateUsername(username)) {
       return reject({
         status: 400,
-        message: "Tên đăng nhập không hợp lệ! Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới, từ 3 đến 20 ký tự.",
+        message:
+          "Tên đăng nhập không hợp lệ! Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới, từ 3 đến 20 ký tự.",
       });
     }
 
@@ -116,21 +117,38 @@ const updateUser = (id, data) => {
     try {
       const existingUser = await User.findById(id);
       if (!existingUser) {
-        reject({
+        return reject({
           status: "Err",
           message: "User not found",
         });
       }
 
-      const updateUser = await User.findByIdAndUpdate(id, data, { new: true });
-      console.log(updateUser);
+      // `new: true` để trả về document đã cập nhật
+      const updatedUser = await User.findByIdAndUpdate(id, data, { new: true });
 
-      resolve({ status: "Ok", message: "Success", data: updateUser });
+      // TẠO  ACCESS_TOKEN VÀ REFRESH_TOKEN MỚI SAU KHI CẬP NHẬT
+      const access_token = await genneralAccessToken({
+        id: updatedUser._id,
+        isAdmin: updatedUser.isAdmin,
+      });
+      const refresh_token = await genneralRefreshToken({
+        id: updatedUser._id,
+        isAdmin: updatedUser.isAdmin,
+      });
+
+      resolve({
+        status: "Ok",
+        message: "Success",
+        data: updatedUser, // Trả về thông tin user đã cập nhật
+        access_token, // Trả về access_token mới
+        refresh_token, // Trả về refresh_token mới
+      });
     } catch (error) {
-      reject({ message: "Server error while update user", error });
+      reject({ message: "Server error while updating user", error });
     }
   });
 };
+
 const deleteUser = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -198,12 +216,15 @@ const refreshToken = (token) => {
     try {
       jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
         if (err) {
-          reject({
+          return reject({
+            // Sử dụng return để thoát khỏi hàm
             status: "Err",
-            message: "The authentication",
+            message:
+              "The authentication failed: Refresh token invalid or expired",
           });
         }
-        const { payload } = user;
+        const payload = user;
+        // Tạo access_token mới từ refresh token hợp lệ
         const access_token = await genneralAccessToken({
           id: payload?.id,
           isAdmin: payload?.isAdmin,
@@ -212,11 +233,11 @@ const refreshToken = (token) => {
         resolve({
           status: "Ok",
           message: "Refresh token success",
-          access_token,
+          access_token, // TRẢ VỀ ACCESS_TOKEN MỚI
         });
       });
     } catch (error) {
-      reject({ message: "Server error while get user", error });
+      reject({ message: "Server error while refreshing token", error });
     }
   });
 };
