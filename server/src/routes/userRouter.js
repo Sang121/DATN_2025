@@ -12,7 +12,7 @@ router.put('/update-user/:id',userController.updateUser);
 router.get('/delete-user/:id',authMiddleware,userController.deleteUser);
 router.get('/getAllUser',authMiddleware,userController.getAllUser);
 router.get('/getDetailUser/:id',authUserMiddleware,userController.getDetailUser);
-router.post('/refreshToken',userController.refreshToken);
+router.get('/refreshToken',userController.refreshToken);
 
 module.exports = router;
 
