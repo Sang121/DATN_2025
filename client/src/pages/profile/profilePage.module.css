@@ -1,0 +1,131 @@
+main{
+    background-color: rgb(245, 245, 250);
+}
+.profileContainer {
+    width: 1270px;
+        padding-left: 15px;
+        padding-right: 15px;
+        margin-right: auto;
+        margin-left: auto;
+        
+}
+.profile{
+    display: flex;
+        width: 100%;
+        margin: 0px auto 20px;
+        flex-wrap: wrap;
+
+}
+html{
+    line-height: 1.15;
+        text-size-adjust: 100%;
+}
+.breadcrumbContainer{
+    background-color: rgb(245, 245, 250);
+    width: 1270px;
+        padding-right: 15px;
+        margin-right: auto;
+        margin-left: auto;
+}
+.breadcrumb{
+    display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+}
+.breadcrumbItem{
+    position: relative;
+        display: flex;
+        -webkit-box-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        align-items: center;
+        height: 40px;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 300;
+        white-space: nowrap;
+}
+.sidebar{
+    width: 250px;
+        margin-right: 17px;
+        margin-top: 20px;
+}
+.sidebarHeader{
+    display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        padding-left: 7px;
+        margin: 0px 0px 12px;
+}
+ul{
+    margin: 0px;
+        padding: 0px;
+        list-style: none;
+        font-size: 13px;
+}
+li{
+    display: list-item;
+        text-align: -webkit-match-parent;
+        unicode-bidi: isolate;
+}
+li>a{
+    display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        padding: 7px 18px;
+}
+li>a:hover{
+    background-color: rgb(245, 245, 250);
+        color: rgb(0, 0, 0);
+}
+li>a.active{
+    background-color: rgb(235, 235, 240);
+        color: rgb(0, 0, 0);
+}
+
+.account-info{
+    flex: 1 1 0%;
+        font-size: 13px;
+        line-height: 15px;
+        color: rgb(51, 51, 51);
+        font-weight: 300;
+}
+.profileContent{
+    flex: 1 1 0%;
+        overflow: hidden;
+}
+.profileContent>h2{
+    font-size: 20px;
+        line-height: 32px;
+        font-weight: 300;
+        margin: 4px 0px 12px;
+}
+.mainProfile{
+    display: flex;
+        flex-wrap: nowrap;
+        -webkit-box-pack: justify;
+        justify-content: space-between;
+        background-color: rgb(255, 255, 255);
+        border-radius: 8px;
+
+}
+.infoLeft{
+    width: 553px;
+        padding: 16px 24px 16px 16px;
+}
+.vertical{
+    border-left: 1px solid rgb(235, 235, 240);
+        margin: 16px 0px;
+}
+.infoRight{
+    width: calc(100% - 553px);
+        padding: 16px 16px 16px 24px;
+        display: flex;
+        flex-direction: column;
+}
+.infoTitle{
+    font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+        color: rgb(100, 100, 109);
+}
