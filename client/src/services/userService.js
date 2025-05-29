@@ -1,14 +1,9 @@
-import axiosInstance from "../utils/axios"; // Đảm bảo đã import axiosInstance
-//import axios from "axios"; // Import axios để sử dụng trong các hàm khác
-import { message as antdMessage } from "antd"; // Import Ant Design message for error handling
+import axiosInstance from "../utils/axios";
+import { message as antdMessage } from "antd"; 
 export const signInUser = async (credentials) => {
   try {
-    // SỬ DỤNG axiosInstance và BỎ baseURL khỏi đường dẫn
-    const response = await axiosInstance.post(
-      `/user/signin`, // BaseURL đã được cấu hình trong axiosInstance
-      credentials // credentials là đối tượng chứa thông tin đăng nhập (email, password)
-    );
-    return response.data;
+    const response = await axiosInstance.post(`/user/signin`, credentials);
+    return response.data; 
   } catch (error) {
     const errorMessage =
       error.response?.data?.message ||
@@ -19,13 +14,10 @@ export const signInUser = async (credentials) => {
   }
 };
 
+// Hàm signUpUser
 export const signUpUser = async (userData) => {
   try {
-    // SỬ DỤNG axiosInstance và BỎ baseURL khỏi đường dẫn
-    const response = await axiosInstance.post(
-      `/user/signup`, // BaseURL đã được cấu hình trong axiosInstance
-      userData
-    );
+    const response = await axiosInstance.post(`/user/signup`, userData);
     console.log("Sign up response:", response.data);
     return response.data;
   } catch (error) {
@@ -34,19 +26,14 @@ export const signUpUser = async (userData) => {
       error.message ||
       "Unknown error occurred during sign up.";
     console.error(errorMessage);
-    antdMessage.error(errorMessage);
     throw new Error(errorMessage);
   }
 };
 
-// Hàm getDetailUser: Đã đúng, đang dùng axiosInstance
-export const getDetailUser = async (userId, token) => {
+// Hàm getDetailUser
+export const getDetailUser = async (userId) => {
   try {
-    const response = await axiosInstance.get(
-      `/user/getDetailUser/${userId}`,
-      { headers: { token: `Bearer ${token}` } }
-    );
-    console.log("User details fetched successfully:", response.data);
+    const response = await axiosInstance.get(`/user/getDetailUser/${userId}`);
     return response.data;
   } catch (error) {
     console.error(
@@ -57,13 +44,10 @@ export const getDetailUser = async (userId, token) => {
   }
 };
 
-// Hàm logoutUser: Đã đúng, đang dùng axiosInstance
+// Hàm logoutUser
 export const logoutUser = async (userId) => {
   try {
-    const response = await axiosInstance.post(
-      `/user/logout`,
-      { userId }
-    );
+    const response = await axiosInstance.post(`/user/logout`, { userId });
     return response.data;
   } catch (error) {
     console.error(
@@ -76,16 +60,32 @@ export const logoutUser = async (userId) => {
 
 export const refreshToken = async () => {
   try {
-    const response = await axiosInstance.get(
-      `/user/refreshToken`
-    );
+    const response = await axiosInstance.get(`/user/refreshToken`);
+    console.log("Token refreshed successfully (userService):", response.data);
+  
     return response.data;
   } catch (error) {
     const errorMessage =
       error.response?.data?.message ||
       error.message ||
       "Unknown error occurred during refresh token.";
-    console.error("Error refreshing token:", errorMessage);
-    throw new Error(errorMessage);
+    console.error("Error refreshing token (userService):", errorMessage);
+    throw error;
+  }
+};
+
+export const updateUser = async (userId, userData) => {
+  try {
+    const response = await axiosInstance.put(
+      `/user/update-user/${userId}`,
+      userData
+    );
+    return response.data; 
+  } catch (error) {
+    console.error(
+      `Error updating user with ID ${userId}:`,
+      error.response?.data || error.message
+    );
+    throw error; 
   }
 };
