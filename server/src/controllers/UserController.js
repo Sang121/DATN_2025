@@ -46,7 +46,7 @@ const loginUser = async (req, res) => {
         message: "The input is required",
       });
     }
- 
+
     const loginData = { identifier, password };
 
     console.log("loginData", loginData);
@@ -54,14 +54,13 @@ const loginUser = async (req, res) => {
     const { refresh_token, ...newResponse } = response;
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Đặt secure: true nếu môi trường là production
+      secure: false,
       sameSite: "strict",
     });
 
     console.log("response", newResponse);
     return res.status(201).json(newResponse);
   } catch (error) {
-    console.error("Error during login:", error); // Log lỗi chi tiết hơn
     return res.status(500).json({ message: "Server error when login", error });
   }
 };
@@ -70,26 +69,32 @@ const updateUser = async (req, res) => {
     const userId = req.params.id;
     const data = req.body;
     if (!userId) {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "Err",
         message: "the userId is required",
       });
     }
-    console.log("data", data);
-    console.log("userId", userId);
 
     const response = await UserService.updateUser(userId, data);
-    const { refresh_token, ...newResponse } = response;
-    response.cookies("refresh_token", refresh_token, {
+    // Bóc tách access_token và refresh_token từ phản hồi của UserService
+    const { refresh_token, access_token, ...restResponse } = response;
+
+    // Set refresh_token vào cookie
+    res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production", // Đặt secure: true trong production
       sameSite: "strict",
     });
-    return res.status(200).json(newResponse);
+
+    // Trả về access_token trong body của response cho frontend
+    return res.status(200).json({ ...restResponse, access_token });
   } catch (error) {
-    return res.status(404).json({ message: "Server error", error });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
+
 const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -125,44 +130,38 @@ const getDetailUser = async (req, res) => {
     }
 
     const response = await UserService.getDetailUser(userId);
-    return res.status(200).json(response); // Đảm bảo trả về username và các thông tin cần thiết
+    return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ message: "Server error", error });
   }
 };
 const refreshToken = async (req, res) => {
   try {
-    const token = req.cookies.refresh_token;
+    const token = req.cookies.refresh_token; // Lấy token từ cookie
     if (!token) {
-      return res.status(200).json({
-        status: "Err",
-        message: "the token is required",
-      });
+      return res.status(401).json({ message: "No refresh token found" });
     }
-
     const response = await UserService.refreshToken(token);
     return res.status(200).json(response);
   } catch (error) {
     return res
-      .status(404)
-      .json({ message: "Error when get refresh token", error });
+      .status(401)
+      .json({ message: error.message || "Error refreshing token" });
   }
 };
+
 const logoutUser = async (req, res) => {
   try {
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      secure: false, // Set to true if using HTTPS
+      secure: process.env.NODE_ENV === "production", // Đặt secure: true trong production
       sameSite: "strict",
     });
-    const response = await UserService.logoutUser();
-    return res.status(200).json({
-      status: "Ok",
-      message: "Logout success",
-      data: response,
-    });
+    return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    return res.status(404).json({ message: "Server error", error });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
 module.exports = {
