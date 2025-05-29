@@ -9,11 +9,12 @@ import {
   FaBars,
 } from "react-icons/fa";
 import styles from "./Header.module.css";
-import { Row, Col, Drawer } from "antd";
+import { Row, Col, Drawer, Popover } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser, logout } from "../../redux/slices/userSlice";
-
+import { logoutUser } from "../../services/userService";
+import { message as antdMessage } from "antd";
 function Header({ onShowSignIn }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,7 +77,16 @@ function Header({ onShowSignIn }) {
   const handleLogout = () => {
     sessionStorage.clear();
     dispatch(logout());
-    //navigate("/");
+    logoutUser()
+      .then(() => {
+        console.log("Logout successful");
+        antdMessage.success("Đăng xuất thành công!");
+        setDrawerOpen(false);
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Logout failed:", error);
+      });
   };
 
   const handleLoginSuccess = (userData) => {
@@ -133,11 +143,29 @@ function Header({ onShowSignIn }) {
               <div className={styles["action-item"]}>
                 <FaUserCircle className={styles["action-icon"]} />
                 <div className={styles["account-text-container"]}>
-                  <Link to="/account">
+                  <Popover
+                    content={
+                      <div className={styles["popover-content"]}>
+                        <Link to="/profile" className={styles["account-link"]}>
+                          <span className={styles["account-btn"]}>
+                            Thông tin tài khoản
+                          </span>
+                        </Link>
+                        <span
+                          onClick={handleLogout}
+                          className={styles["logout-btn"]}
+                        >
+                          {" "}
+                          <FaSignOutAlt className={styles["action-icon"]} />
+                        </span>
+                      </div>
+                    }
+                    trigger="click"
+                  >
                     <span className={styles["bold-text"]}>
                       {currentUsername || "Tài khoản"}{" "}
                     </span>
-                  </Link>
+                  </Popover>
                 </div>
               </div>
             ) : (
@@ -162,13 +190,6 @@ function Header({ onShowSignIn }) {
               <FaPersonBooth className={styles["action-icon"]} />
               <span className={styles["cart-text"]}>Phòng thử đồ</span>
             </Link>
-
-            {currentIsLoggedIn && (
-              <div className={styles["action-item"]} onClick={handleLogout}>
-                <FaSignOutAlt className={styles["action-icon"]} />
-                <span className={styles["logout-text"]}>Đăng xuất</span>
-              </div>
-            )}
           </Col>
 
           <Col
