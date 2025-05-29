@@ -50,6 +50,10 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
       const userDataToDispatch = {
         _id: userId,
         username: userDetail?.username || decodedToken?.username || "",
+        fullName: userDetail?.fullName || decodedToken?.fullName || "",
+        avatar: userDetail?.avatar || decodedToken?.avatar || "",
+        gender: userDetail?.gender || decodedToken?.gender || "",
+        address: userDetail?.address || decodedToken?.address || "",
         email: userDetail?.email || decodedToken?.email || "",
         phone: userDetail?.phone || decodedToken?.phone || "",
         isAdmin: userDetail?.isAdmin || false,
