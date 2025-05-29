@@ -3,6 +3,9 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   _id: "",
   username: "",
+  fullName: "",
+  avatar: "",
+  address: "",
   email: "",
   phone: "",
   access_token: "",
@@ -18,7 +21,11 @@ export const userSlice = createSlice({
     updateUser: (state, action) => {
       state._id = action.payload._id || "";
       state.username = action.payload.username || "";
+      state.avatar = action.payload.avatar || "";
+      state.fullName = action.payload.fullName || "";
       state.email = action.payload.email || "";
+      state.address = action.payload.address || "";
+      state.gender = action.payload.gender || "";
       state.phone = action.payload.phone || "";
       state.access_token = action.payload.access_token || "";
       state.isAdmin = action.payload.isAdmin || false;
@@ -27,7 +34,11 @@ export const userSlice = createSlice({
     logout: (state) => {
       state._id = "";
       state.username = "";
+      state.fullName = "";
+      state.avatar = "";
+      state.address = "";
       state.email = "";
+      state.gender = "";
       state.phone = "";
       state.isAdmin = false;
       state.isAuthenticated = false;
@@ -35,6 +46,5 @@ export const userSlice = createSlice({
     },
   },
 });
-
 export const { updateUser, logout } = userSlice.actions;
 export default userSlice.reducer;
