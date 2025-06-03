@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 import { Alert, Button, Spin } from "antd";
 import ListProducts from "../../components/ListProducts/ListProduct";
-import {fetchDetailProduct} from "../../components/fetchProducts";
 import { useQuery } from "@tanstack/react-query";
+import { getDetailProduct } from "../../services/productService";
 
 function ProductDetail() {
   const { id } = useParams();
@@ -21,7 +21,7 @@ function ProductDetail() {
     error,
   } = useQuery({
     queryKey: ["productDetail", id],
-    queryFn: () => fetchDetailProduct(id),
+    queryFn: () => getDetailProduct(id),
     enabled: !!id,
   });
 
@@ -34,7 +34,7 @@ function ProductDetail() {
       setSelectedImage(
         product.images && product.images.length > 0
           ? product.images[0]
-          : product.thumbnail||'a'
+          : product.thumbnail || "a"
       );
     }
   }, [isSuccess, product]);
@@ -92,9 +92,9 @@ function ProductDetail() {
               {/* Kiểm tra product.images trước khi map */}
               {product.images?.slice(0, 3).map((img, idx) => (
                 <img
-                  key={idx} 
+                  key={idx}
                   src={img}
-                  alt={product.name} 
+                  alt={product.name}
                   style={{
                     border: selectedImage === img ? "2px solid #1a94ff" : "",
                     opacity: selectedImage === img ? 1 : 0.7,
