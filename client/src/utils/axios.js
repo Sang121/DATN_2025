@@ -69,6 +69,8 @@ axiosInstance.interceptors.request.use(
                     address: newUser.address,
                     email: newUser.email,
                     phone: newUser.phone,
+                    isAdmin: newUser.isAdmin,
+                    gender: newUser.gender,
                     isAuthenticated: newUser.isAuthenticated,
                     loading: newUser.loading,
                     access_token: newAccessToken,
