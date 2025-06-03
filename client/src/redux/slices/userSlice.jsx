@@ -11,7 +11,7 @@ const initialState = {
   access_token: "",
   isAuthenticated: false,
   loading: false,
-  error: "",
+  isAdmin: false,
 };
 
 export const userSlice = createSlice({

@@ -22,10 +22,10 @@ axiosInstance.interceptors.request.use(
       currentUserState?.user?.access_token ||
       sessionStorage.getItem("access_token");
 
-    console.log(
-      "Current access token (from redux/sessionStorage):",
-      accessToken
-    );
+    // console.log(
+    //   "Current access token (from redux/sessionStorage):",
+    //   accessToken
+    // );
 
     // Bỏ qua interceptor này cho yêu cầu làm mới token để tránh vòng lặp vô hạn
     if (config.url === "/user/refreshToken") {
@@ -38,9 +38,9 @@ axiosInstance.interceptors.request.use(
         const currentTime = Date.now() / 1000;
 
         if (decodedAccessToken.exp < currentTime + 5) {
-          console.warn(
-            "Access Token expired or about to expire. Attempting to refresh..."
-          );
+          // console.warn(
+          //   "Access Token expired or about to expire. Attempting to refresh..."
+          // );
 
           // Sử dụng _retry flag để chỉ cho phép thử làm mới token một lần duy nhất cho mỗi request
           if (!config._retry) {
@@ -48,24 +48,33 @@ axiosInstance.interceptors.request.use(
             try {
               // GỌI HÀM REFRESH TOKEN TỪ userService.js ĐÃ IMPORT
               const response = await callRefreshTokenAPI();
-              console.log("Response when refreshing token:", response);
+              //console.log("Response when refreshing token:", response);
 
               // Backend của bạn nên trả về một object có access_token bên trong
               const newAccessToken = response?.access_token;
+              const newUser = response.newUser;
 
               if (newAccessToken) {
-                console.log(
-                  "New access token successfully received from refresh API."
-                );
+                // console.log(
+                //   "New access token successfully received from refresh API."
+                // );
 
                 // Cập nhật Redux store: Chỉ cập nhật thuộc tính 'user' bên trong state user
                 Store.dispatch(
                   updateUser({
-                    ...currentUserState.user,
-                    // Cập nhật access_token mới
+                    _id: newUser._id,
+                    username: newUser.username,
+                    fullName: newUser.fullName,
+                    avatar: newUser.avatar,
+                    address: newUser.address,
+                    email: newUser.email,
+                    phone: newUser.phone,
+                    isAuthenticated: newUser.isAuthenticated,
+                    loading: newUser.loading,
                     access_token: newAccessToken,
                   })
                 );
+
                 // Cập nhật sessionStorage
                 sessionStorage.setItem("access_token", newAccessToken);
 
@@ -90,7 +99,7 @@ axiosInstance.interceptors.request.use(
                 "Phiên đăng nhập đã hết hạn hoặc không thể làm mới. Vui lòng đăng nhập lại."
               );
               sessionStorage.clear();
-              window.location.href = "/login";
+
               // Từ chối request ban đầu
               return Promise.reject(e);
             }
@@ -130,7 +139,7 @@ axiosInstance.interceptors.request.use(
 
 // Response Interceptor
 axiosInstance.interceptors.response.use(
-  (response) => response, 
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
@@ -149,7 +158,7 @@ axiosInstance.interceptors.response.use(
       try {
         console.warn(
           "Received 401 Unauthorized. Attempting to refresh token from response interceptor..."
-        )
+        );
         // GỌI HÀM REFRESH TOKEN TỪ userService.js ĐÃ IMPORT
         const response = await callRefreshTokenAPI();
         console.log("Response after 401 refresh attempt:", response);
@@ -163,7 +172,7 @@ axiosInstance.interceptors.response.use(
           // Cập nhật Redux store và sessionStorage
           Store.dispatch(
             updateUser({
-              ...Store.getState().user.user, 
+              ...Store.getState().user.user,
               access_token: newAccessToken,
             })
           );
@@ -171,7 +180,7 @@ axiosInstance.interceptors.response.use(
 
           // Cập nhật Authorization header cho request ban đầu và gửi lại
           originalRequest.headers.token = `Bearer ${newAccessToken}`;
-          return axiosInstance(originalRequest); 
+          return axiosInstance(originalRequest);
         } else {
           console.error("No new access token after 401 refresh. Logging out.");
           throw new Error("No new access token from refresh after 401.");
@@ -193,7 +202,6 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    
     console.error("API error:", error.response?.data || error.message);
 
     return Promise.reject(error);

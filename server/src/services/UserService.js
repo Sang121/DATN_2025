@@ -224,7 +224,7 @@ const refreshToken = (token) => {
           });
         }
         const payload = user;
-        // Tạo access_token mới từ refresh token hợp lệ
+        const newUser = await User.findById(payload.id); // Tạo access_token mới từ refresh token hợp lệ
         const access_token = await genneralAccessToken({
           id: payload?.id,
           isAdmin: payload?.isAdmin,
@@ -233,6 +233,7 @@ const refreshToken = (token) => {
         resolve({
           status: "Ok",
           message: "Refresh token success",
+          newUser,
           access_token, // TRẢ VỀ ACCESS_TOKEN MỚI
         });
       });
