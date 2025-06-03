@@ -1,9 +1,9 @@
 import axiosInstance from "../utils/axios";
-import { message as antdMessage } from "antd"; 
+import { message as antdMessage } from "antd";
 export const signInUser = async (credentials) => {
   try {
     const response = await axiosInstance.post(`/user/signin`, credentials);
-    return response.data; 
+    return response.data;
   } catch (error) {
     const errorMessage =
       error.response?.data?.message ||
@@ -62,7 +62,6 @@ export const refreshToken = async () => {
   try {
     const response = await axiosInstance.get(`/user/refreshToken`);
     console.log("Token refreshed successfully (userService):", response.data);
-  
     return response.data;
   } catch (error) {
     const errorMessage =
@@ -80,12 +79,12 @@ export const updateUser = async (userId, userData) => {
       `/user/update-user/${userId}`,
       userData
     );
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error(
       `Error updating user with ID ${userId}:`,
       error.response?.data || error.message
     );
-    throw error; 
+    throw error;
   }
 };

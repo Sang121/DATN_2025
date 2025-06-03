@@ -151,6 +151,16 @@ function Header({ onShowSignIn }) {
                             Thông tin tài khoản
                           </span>
                         </Link>
+                        {user?.isAdmin && (
+                          <Link
+                            to="/system/admin"
+                            className={styles["account-link"]}
+                          >
+                            <span className={styles["account-btn"]}>
+                              Quản lý hệ thống
+                            </span>
+                          </Link>
+                        )}
                         <span
                           onClick={handleLogout}
                           className={styles["logout-btn"]}
