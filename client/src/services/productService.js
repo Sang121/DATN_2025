@@ -3,18 +3,27 @@ export const createProduct = async (productData) => {
   try {
     const url = `${import.meta.env.VITE_API_URL}/product/createProduct`;
     const response = await axiosInstance.post(url, productData);
-    return response;
+    console.log("response", response);
+    return response; // Trả về response.data thay vì response
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("Error creating product:", error);
     throw error;
   }
 };
 export const uploadImage = async (formData) => {
   try {
     const url = `${import.meta.env.VITE_API_URL}/product/uploadImage`;
-    const response = await axiosInstance.post(url, formData);
-console.log('response.data',response.data) ;
-   return response.data; 
+    const response = await axiosInstance.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (!response.data || !response.data.data) {
+      throw new Error("Invalid response format");
+    }
+
+    return response.data;
   } catch (error) {
     console.error("Error uploading image:", error);
     throw error;
@@ -30,14 +39,13 @@ export const deleteProduct = async (id) => {
     throw error;
   }
 };
-export const getAllProduct = async (category = "") => {
+export const getAllProduct = async () => {
   try {
-    const url = `${import.meta.env.VITE_API_URL}/product/getAllProduct${
-      category ? `?q=${category}` : ""
-    }`;
+    let url = `${import.meta.env.VITE_API_URL}/product/getAllProduct?`;
+
     const response = await axiosInstance.get(url);
-    console.log("dâtta", response.data.data);
-    return response.data.data;
+    console.log("response getAllProduct", response);
+    return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
     throw error;
@@ -52,6 +60,20 @@ export const getDetailProduct = async (productId) => {
     return response.data.data;
   } catch (error) {
     console.error(`Error fetching product detail for ID ${productId}:`, error);
+    throw error;
+  }
+};
+export const getProductByCategory = async (category) => {
+  try {
+    console.log("category", category);
+    const url = `${
+      import.meta.env.VITE_API_URL
+    }/product/getProductByCategory/${category}`;
+    const response = await axiosInstance.get(url);
+    console.log("response getProductByCategory", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
     throw error;
   }
 };
