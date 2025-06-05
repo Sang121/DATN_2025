@@ -1,15 +1,13 @@
 import React from "react";
 import styles from "./ProductCard.module.css";
 import { Link } from "react-router-dom";
-function ProductCard({
-  productId,
-  image,
-  name,
-  price,
-  rating,
-  discount,
-  
-}) {
+import {
+  StarFilled,
+  ShoppingCartOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
+
+function ProductCard({ productId, image, name, price, rating, discount }) {
   const newPrice = price - (price * discount) / 100;
   const formattedPrice = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -17,9 +15,9 @@ function ProductCard({
   }).format(newPrice);
   return (
     <div className={styles["product-card"]}>
-      <div className={styles["product-card-img-wrap"]}>
-        <img className={styles["product-card-img"]} src={image} alt={name} />
-      </div>
+      <Link to={`/products/${productId}`}>
+        <img src={image} alt={name} className={styles["product-image"]} />
+      </Link>
       <div className={styles["product-card-body"]}>
         {/* <div className={styles["product-card-labels"]}>
           {labels.map((label, idx) => (
@@ -35,9 +33,18 @@ function ProductCard({
           <div className={styles["product-card-name"]}>{name}</div>
         </Link>
       </div>
-      <div className={styles["product-card-rating"]}>
-        <span className={styles["product-card-rating-value"]}>{rating}</span>
-        <span className={styles["product-card-rating-star"]}>★</span>
+      <div className={styles["product-rating"]}>
+        <span className={styles["rating-stars"]}>
+          {[...Array(5)].map((_, index) => (
+            <StarFilled
+              key={index}
+              style={{
+                color: index < Math.floor(rating) ? "#ffd700" : "#e8e8e8",
+              }}
+            />
+          ))}
+        </span>
+        <span className={styles["rating-count"]}>({rating?.toFixed(1)})</span>
       </div>
 
       <div className={styles["product-card-price"]}>
@@ -51,7 +58,11 @@ function ProductCard({
           }).format(price)}
         </span>
       </div>
-      <button className={styles["product-card-btn"]}>Thêm vào giỏ</button>
+      <button className={styles["product-card-btn"]}>
+        {" "}
+        <ShoppingCartOutlined />
+        Thêm vào giỏ
+      </button>
     </div>
   );
 }

@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateUser, logout } from "../../redux/slices/userSlice";
 import { logoutUser } from "../../services/userService";
 import { message as antdMessage } from "antd";
+import { searchProduct } from "../../services/productService";
 function Header({ onShowSignIn }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,6 +71,7 @@ function Header({ onShowSignIn }) {
   const handleSearch = () => {
     const trimmedSearchTerm = searchTerm.trim();
     if (trimmedSearchTerm) {
+     
       navigate(`/search/${encodeURIComponent(trimmedSearchTerm)}`);
       setDrawerOpen(false);
     }
