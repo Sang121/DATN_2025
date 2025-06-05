@@ -5,13 +5,13 @@ function Sidebar() {
   const typeProductsList = [
     {
       name: "Quần Nam",
-      category: "mens-shirts",
+      category: "Quần Nam",
       image:
         "https://salt.tikicdn.com/cache/280x280/ts/product/7f/24/d6/bb72bd4e447a082c6a6989021153e8ac.jpg",
     },
     {
       name: "Áo Sơ Mi",
-      category: "áo",
+      category: "Áo",
       image:
         "https://salt.tikicdn.com/cache/280x280/ts/product/48/aa/f9/c6233b9cf5225a8c2e8dd4513377587c.jpg",
     },

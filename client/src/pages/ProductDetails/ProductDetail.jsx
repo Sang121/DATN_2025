@@ -110,9 +110,14 @@ function ProductDetail() {
           </div>
           <div style={{ flex: 1, paddingLeft: 32 }}>
             <h2>{product.name}</h2>
-         
             <div>
-              <strong>Giá:</strong> {product.price}$
+              <strong>Giá:</strong>{" "}
+              {product.price?.toLocaleString("vi-VN")}đ
+              {product.oldPrice && (
+                <span className={styles.oldPrice}>
+                  {product.oldPrice?.toLocaleString("vi-VN")}đ
+                </span>
+              )}
             </div>
             <div>
               <strong>Brand:</strong> {product.brand}
