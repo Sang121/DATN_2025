@@ -1,52 +1,46 @@
 import classNames from "classnames/bind";
 import styles from "./ProductManager.module.css";
 import { useState } from "react";
-import { message } from "antd";
+import { message, Table, Button, Space, Spin, Alert, Pagination } from "antd";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import AddProduct from "./AddProduct/AddProduct";
 import { deleteProduct, getAllProduct } from "../../../services/productService";
-import Pagination from "@mui/material/Pagination";
-import { Spin, Alert } from "antd";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 const cx = classNames.bind(styles);
 
 function ProductManager() {
   const [type, setType] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const category = "o";
+  const [page, setPage] = useState(1);
+  const [limit] = useState(8);
+  const queryClient = useQueryClient();
+
   const {
-    data: products,
+    data: productData,
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ["products", category],
-    queryFn: () => getAllProduct(category),
+    queryKey: ["products", page, limit],
+    queryFn: () => getAllProduct(limit, page),
   });
+
   if (isLoading) {
     return (
-      <div>
-        <div className={styles.statusContainer}>
-          <Spin size="large" />
-          <p>Loading products...</p>
-        </div>
+      <div className={cx("status-container")}>
+        <Spin size="large" tip="Đang tải dữ liệu..." />
       </div>
     );
   }
+
   if (isError) {
     return (
-      <div className={styles.statusContainer}>
-        {/* Error.message lấy thông báo từ đối tượng lỗi */}
+      <div className={cx("status-container")}>
         <Alert
-          message="Error"
+          message="Lỗi"
           description={
-            error?.message || "Failed to load products. Please try again later."
+            error?.message ||
+            "Không thể tải dữ liệu sản phẩm. Vui lòng thử lại sau."
           }
           type="error"
           showIcon
@@ -55,61 +49,97 @@ function ProductManager() {
     );
   }
 
-  if (!products || products.length === 0) {
+  if (!productData?.data) {
     return (
-      <div className={styles.statusContainer}>
-        <p>No products found for this category. Please try a different one.</p>
+      <div className={cx("status-container")}>
+        <p>Không tìm thấy sản phẩm nào.</p>
       </div>
     );
   }
 
-  const handlePageChange = (event, page) => {
-    setCurrentPage(page);
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const DeleteProduct = async (id) => {
     try {
       const res = await deleteProduct(id);
       message.success(res.message);
-      getAllProduct("o");
+      queryClient.invalidateQueries(["products"]);
     } catch (e) {
       message.error("Lỗi khi xóa sản phẩm", e);
     }
   };
 
-  const renderTableRows = () => {
-    return products.map((product, index) => (
-      <TableRow key={product._id}>
-        <TableCell>{index + 1}</TableCell>
-        <TableCell align="center">
-          <img
-            style={{ width: "100px" }}
-            src={product.images[0]}
-            alt={product.name}
-          />
-        </TableCell>
-        <TableCell align="center">{product.name}</TableCell>
-        <TableCell align="center">
-          {product.price.toLocaleString()} VNĐ
-        </TableCell>
-        <TableCell align="center">{product.stock}</TableCell>
-        <TableCell align="center">
-          <button
-            onClick={() => DeleteProduct(product._id)}
-            style={{ marginLeft: "10px" }}
-            type="button"
-            className="btn btn-danger"
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "index",
+      key: "index",
+      width: 80,
+      render: (_, __, index) => (page - 1) * limit + index + 1,
+    },
+    {
+      title: "Ảnh",
+      dataIndex: "images",
+      key: "images",
+      width: 120,
+      render: (images) => (
+        <img
+          src={images[0]}
+          alt="product"
+          style={{
+            width: "80px",
+            height: "80px",
+            objectFit: "cover",
+            borderRadius: "4px",
+          }}
+        />
+      ),
+    },
+    {
+      title: "Tên sản phẩm",
+      dataIndex: "name",
+      key: "name",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Giá",
+      dataIndex: "price",
+      key: "price",
+      width: 150,
+      render: (price) => `${price.toLocaleString()} VNĐ`,
+    },
+    {
+      title: "Số lượng còn lại",
+      dataIndex: "stock",
+      key: "stock",
+      width: 150,
+    },
+    {
+      title: "Hành động",
+      key: "action",
+      width: 120,
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            type="primary"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => DeleteProduct(record._id)}
           >
             Xóa
-          </button>
-        </TableCell>
-      </TableRow>
-    ));
-  };
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <div className={cx("wrapper")}>
-      <header className={cx("header")}>
+      <div className={cx("header")}>
         <h4>
           {type === 0
             ? "Danh sách sản phẩm"
@@ -117,38 +147,36 @@ function ProductManager() {
             ? "Thêm sản phẩm"
             : "Sửa sản phẩm"}
         </h4>
-        <button
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
           onClick={() => setType(type === 0 ? 1 : 0)}
-          type="button"
-          className="btn btn-primary"
         >
           {type === 0 ? "Thêm sản phẩm" : "Quay lại"}
-        </button>
-      </header>
+        </Button>
+      </div>
 
       {type === 0 ? (
         <div className={cx("product-list")}>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell align="center">Ảnh</TableCell>
-                  <TableCell align="center">Tên sản phẩm</TableCell>
-                  <TableCell align="center">Giá</TableCell>
-                  <TableCell align="center">Số lượng còn lại</TableCell>
-                  <TableCell align="center">Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>{renderTableRows()}</TableBody>
-            </Table>
-          </TableContainer>
+          <Table
+            columns={columns}
+            dataSource={productData.data}
+            rowKey="_id"
+            pagination={false}
+            scroll={{ x: 1000 }}
+            loading={isLoading}
+            bordered
+          />
 
           <div className={cx("pagination-wrapper")}>
             <Pagination
-              page={currentPage}
-              color="primary"
+              current={page}
+              total={productData.total}
+              pageSize={limit}
               onChange={handlePageChange}
+              showSizeChanger={false}
+              showQuickJumper
+              showTotal={(total) => `Tổng số ${total} sản phẩm`}
             />
           </div>
         </div>
@@ -156,7 +184,8 @@ function ProductManager() {
         <AddProduct
           onSuccess={() => {
             setType(0);
-            setCurrentPage(1);
+            setPage(1);
+            queryClient.invalidateQueries(["products"]);
           }}
         />
       ) : null}
