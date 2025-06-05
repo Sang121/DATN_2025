@@ -80,6 +80,21 @@ const updateProduct = (id, data) => {
     }
   });
 };
+const processImageUrls = (product) => {
+  const baseURL =
+    process.env.VITE_API_URL || `http://localhost:${process.env.PORT || 3001}`;
+  const productObject = product.toObject();
+
+  if (productObject.images && productObject.images.length > 0) {
+    productObject.images = productObject.images.map((imagePath) => {
+      const normalizedPath = imagePath.replace(/\\/g, "/");
+      return `${baseURL}/uploads/${normalizedPath}`;
+    });
+  }
+
+  return productObject;
+};
+
 const getDetailProduct = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -90,26 +105,70 @@ const getDetailProduct = (id) => {
           message: "Product not found",
         });
       }
-      const productObject = product.toObject();
-      const baseURL = `http://localhost:3001`;
-      if (productObject.images && productObject.images.length > 0) {
-        productObject.images = productObject.images.map((imagePath) => {
-          const normalizedPath = imagePath.replace(/\\/g, "/"); // Chuyển đổi \ sang /
-          return `${baseURL}/${normalizedPath}`;
-        });
-      }
+
+      const processedProduct = processImageUrls(product);
+
       resolve({
         status: "Ok",
         message: "Get product success",
-        data: product,
+        data: processedProduct,
       });
     } catch (error) {
       reject({ message: "Server error while get product", error });
     }
   });
 };
-const deleteProduct = (id) => {
+
+const getAllProduct = (limit = 8, page = 1, sort, filter, q) => {
   return new Promise(async (resolve, reject) => {
+    try {
+      let query = {};
+
+      // Xử lý filter theo category
+      if (filter) {
+        query.category = filter;
+      }
+
+      // Xử lý tìm kiếm (chỉ áp dụng khi không có filter)
+      if (q && !filter) {
+        query = {
+          $or: [
+            { name: { $regex: q, $options: "i" } },
+            { category: { $regex: q, $options: "i" } },
+            { gender: { $regex: q, $options: "i" } },
+            { description: { $regex: q, $options: "i" } },
+            { brand: { $regex: q, $options: "i" } },
+            { attributes: { $regex: q, $options: "i" } },
+          ],
+        };
+      }
+
+      // Đếm tổng số sản phẩm thỏa mãn điều kiện
+      const totalProduct = await Product.countDocuments(query);
+
+      // Lấy danh sách sản phẩm với phân trang và sắp xếp
+      const allProduct = await Product.find(query)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .sort(sort ? { [sort]: 1 } : { createdAt: -1 });
+
+      const processedProducts = allProduct.map(processImageUrls);
+
+      resolve({
+        status: "Ok",
+        message: q ? "Search product success" : "Get all product success",
+        data: processedProducts,
+        total: totalProduct,
+        pageCurrent: page,
+        totalPage: Math.ceil(totalProduct / limit),
+      });
+    } catch (error) {
+      reject({ message: "Server error when get product", error });
+    }
+  });
+};
+const deleteProduct = (id) => {
+  return new Prmise(async (resolve, reject) => {
     try {
       const existingProduct = await Product.findById(id);
       if (!existingProduct) {
@@ -129,105 +188,37 @@ const deleteProduct = (id) => {
     }
   });
 };
-const getAllProduct = (limit = 8, page = 1, sort, filter, q) => {
+const getProductByCategory = (category) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // Tìm kiếm theo từ khóa q
-      if (q) {
-        const totalProductSearch = await Product.find({
-          $or: [
-            { name: { $regex: q, $options: "i" } },
-            { category: { $regex: q, $options: "i" } },
-            { gender: { $regex: q, $options: "i" } },
-            { description: { $regex: q, $options: "i" } },
-            { brand: { $regex: q, $options: "i" } },
-          ],
-        });
-        return resolve({
-          status: "Ok",
-          message: totalProductSearch.length
-            ? "Search product success"
-            : "Product not found",
-          data: totalProductSearch,
-        });
-      }
-
-      // Lọc theo category
-      if (filter) {
-        const totalProduct = await Product.countDocuments({ category: filter });
-        const allProduct = await Product.find({ category: filter })
-          .limit(limit)
-          .skip((page - 1) * limit)
-          .sort({ name: sort });
-        return resolve({
-          status: "Ok",
-          message: "Get all product success",
-          total: totalProduct,
-          pageCurrent: page,
-          totalPage: Math.ceil(totalProduct / limit),
-          data: allProduct,
-        });
-      }
-
-      // Lấy tất cả sản phẩm (không filter, không search)
-      const allProduct = await Product.find()
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .sort({ name: sort });
-      const baseURL =
-        process.env.VITE_API_URL ||
-        `http://localhost:${process.env.PORT || 3001}`;
-      const processedProducts = allProduct.map((product) => {
-        const productObject = product.toObject(); // Chuyển Mongoose Document thành Object thuần túy
-        if (productObject.images && productObject.images.length > 0) {
-          productObject.images = productObject.images.map((imagePath) => {
-            const normalizedPath = imagePath.replace(/\\/g, "/"); // Chuyển đổi \ sang /
-            return `${baseURL}/${normalizedPath}`;
-          });
-        }
-        return productObject;
+      const existingCategory = await Product.find({
+        category: category,
       });
-      const totalProduct = await Product.countDocuments();
+      console.log(existingCategory);
+      if (!existingCategory) {
+        resolve({
+          status: "Ok",
+          message: "Category not found",
+        });
+      }
+      const allProduct = await Product.find({
+        category: category,
+      });
+      const processedProducts = allProduct.map(processImageUrls);
 
-      const totalPage = Math.ceil(totalProduct / limit);
       resolve({
         status: "Ok",
-        message: "Get all product success",
+        message: "Get all  product success",
         data: processedProducts,
-        total: totalProduct,
-        pageCurrent: page,
-        totalPage: Math.ceil(totalProduct / limit),
-        data: allProduct,
       });
     } catch (error) {
-      reject({ message: "Server error when get product", error });
+      reject({
+        message: "Server error when get get Product By Category",
+        error,
+      });
     }
   });
 };
-// const getProductByCategory = (category) => {
-//     return new Promise(async (resolve, reject) => {
-//             try{
-//                 console.log(category)
-
-//                 const existingCategory= await Product.find({
-//                     category:category,
-//                 })
-//                 console.log(existingCategory)
-//          if(!existingCategory){
-//             resolve({
-//                     status: 'Ok',
-//                     message: 'Category not found',
-//                 })
-//          }
-//           const  allProduct= await Product.find({
-//             category:category,
-//         })
-//                     resolve({ status:'Ok', message: 'Get all  product success', data:allProduct});
-//     } catch (error) {
-//             reject({ message: 'Server error when get get Product By Category', error });
-//         }
-//     });
-// };
 // const searchProduct = (query) => {
 //     return new Promise(async (resolve, reject) => {
 //             try{
@@ -261,4 +252,5 @@ module.exports = {
   getDetailProduct,
   deleteProduct,
   getAllProduct,
+  getProductByCategory,
 };

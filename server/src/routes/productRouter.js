@@ -15,6 +15,9 @@ router.delete(
   authMiddleware,
   productController.deleteProduct
 );
+router.get("/getProductByCategory/:category", productController.getProductByCategory);
+
+
 router.get("/getAllProduct", productController.getAllProduct);
 router.post(
   "/uploadImage",

@@ -1,5 +1,9 @@
 const productService = require("../services/productService");
 
+// Thêm biến BASE_URL ở đầu file
+const BASE_URL =
+  process.env.VITE_API_URL || `http://localhost:${process.env.PORT || 3001}`;
+
 const createProduct = async (req, res) => {
   try {
     const {
@@ -53,16 +57,14 @@ const uploadImage = async (req, res) => {
       });
     }
 
-    // Đảm bảo VITE_API_URL ở frontend khớp với base URL này
-    const baseURL =
-      process.env.VITE_API_URL ||
-      `http://localhost:${process.env.PORT || 3001}`;
-    // Ví dụ: Nếu VITE_API_URL = http://localhost:3001
-    // file.filename là tên file đã lưu bởi multer (ví dụ: images-1701234567890.jpg)
-
     const urls = req.files.map((file) => {
-      return `<span class="math-inline">\{baseURL\}/uploads/</span>{file.filename}`;
+      if (!file.mimetype.startsWith("image/")) {
+        throw new Error("Invalid file type. Only images are allowed.");
+      }
+      return `/${file.filename}`;
     });
+
+    // Bỏ resolve và reject không cần thiết
     return res.status(200).json({
       status: "Ok",
       message: "Upload image success",
@@ -96,6 +98,21 @@ const updateProduct = async (req, res) => {
       .json({ message: "Server error when update product", error });
   }
 };
+const processImageUrls = (product) => {
+  const baseURL =
+    process.env.VITE_API_URL || `http://localhost:${process.env.PORT || 3001}`;
+  const productObject = product.toObject();
+
+  if (productObject.images && productObject.images.length > 0) {
+    productObject.images = productObject.images.map((imagePath) => {
+      const normalizedPath = imagePath.replace(/\\/g, "/");
+      return `${baseURL}/uploads/${normalizedPath}`;
+    });
+  }
+
+  return productObject;
+};
+
 const getDetailProduct = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -148,16 +165,16 @@ const getAllProduct = async (req, res) => {
     return res.status(404).json({ message: "Server error", error });
   }
 };
-// const getProductByCategory = async (req, res) => {
-//     const category=req.params.category
-//     try {
-//         const response= await productService.getProductByCategory(category);
-//         return res.status(200).json(response);
-//     }
-//     catch (error) {
-//         return res.status(404).json({ message: 'Server error', error });
-//     }
-// }
+const getProductByCategory = async (req, res) => {
+    const category=req.params.category
+    try {
+        const response= await productService.getProductByCategory(category);
+        return res.status(200).json(response);
+    }
+    catch (error) {
+        return res.status(404).json({ message: 'Server error', error });
+    }
+}
 // const searchProduct = async (req, res) => {
 //     const query=req.params.query
 //     try {
@@ -176,4 +193,5 @@ module.exports = {
   deleteProduct,
   getAllProduct,
   uploadImage,
+  getProductByCategory,
 };
