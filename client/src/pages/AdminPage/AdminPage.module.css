@@ -1,0 +1,15 @@
+.adminContainer{
+    background-color: white;
+}
+
+.mainContent{
+    display: flex;
+}
+.sideBar{
+     height: 100vh;
+     box-shadow: 1px 1px 2px #ccc;
+}
+.content{
+padding-left :30px;   
+
+}
