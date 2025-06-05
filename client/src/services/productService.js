@@ -77,3 +77,15 @@ export const getProductByCategory = async (category) => {
     throw error;
   }
 };
+export const searchProduct = async (query) => {
+  try {
+    const url = `${
+      import.meta.env.VITE_API_URL
+    }/product/search/${query}`;
+    const response = await axiosInstance.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+};

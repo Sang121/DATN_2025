@@ -166,25 +166,23 @@ const getAllProduct = async (req, res) => {
   }
 };
 const getProductByCategory = async (req, res) => {
-    const category=req.params.category
-    try {
-        const response= await productService.getProductByCategory(category);
-        return res.status(200).json(response);
-    }
-    catch (error) {
-        return res.status(404).json({ message: 'Server error', error });
-    }
-}
-// const searchProduct = async (req, res) => {
-//     const query=req.params.query
-//     try {
-//         const response= await productService.searchProduct(query);
-//         return res.status(200).json(response);
-//     }
-//     catch (error) {
-//         return res.status(404).json({ message: 'Server error', error });
-//     }
-// }
+  const category = req.params.category;
+  try {
+    const response = await productService.getProductByCategory(category);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({ message: "Server error", error });
+  }
+};
+const searchProduct = async (req, res) => {
+  const query = req.params.query;
+  try {
+    const response = await productService.searchProduct(query);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({ message: "Server error", error });
+  }
+};
 
 module.exports = {
   createProduct,
@@ -194,4 +192,5 @@ module.exports = {
   getAllProduct,
   uploadImage,
   getProductByCategory,
+  searchProduct,
 };

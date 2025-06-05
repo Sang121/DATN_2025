@@ -219,32 +219,37 @@ const getProductByCategory = (category) => {
     }
   });
 };
-// const searchProduct = (query) => {
-//     return new Promise(async (resolve, reject) => {
-//             try{
-//                  const productSearch= await Product.find({
-//                     $or: [
-//                         { name: { $regex: query, $options: 'i' } },
-//                         { category: { $regex: query, $options: 'i' } },
-//                         { gender: { $regex: query, $options: 'i' } },
-//                         { description: { $regex: query, $options: 'i' } },
-//                         { brand: { $regex: query, $options: 'i' } },
-//                     ],
-//                 })
-//                 console.log(productSearch)
-//                 if(!productSearch){
-//                     resolve({
-//                         status: 'Ok',
-//                         message: 'Product not found',
-//                     })
-//                 }
-//                 resolve ({ status:'Ok', message: 'Search product success', data:productSearch})
-//             }
-//             catch (error) {
-//             reject({ message: 'Server error when search product', error });
-//         }
-//     });
-// }
+const searchProduct = (query) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const productSearch = await Product.find({
+        $or: [
+          { name: { $regex: query, $options: "i" } },
+          { category: { $regex: query, $options: "i" } },
+          { gender: { $regex: query, $options: "i" } },
+          { description: { $regex: query, $options: "i" } },
+          { brand: { $regex: query, $options: "i" } },
+        ],
+      });
+      console.log(productSearch);
+      if (!productSearch) {
+        resolve({
+          status: "Ok",
+          message: "Product not found",
+        });
+      }
+      const processedProducts = productSearch.map(processImageUrls);
+
+      resolve({
+        status: "Ok",
+        message: "Search product success",
+        data: processedProducts,
+      });
+    } catch (error) {
+      reject({ message: "Server error when search product", error });
+    }
+  });
+};
 
 module.exports = {
   createProduct,
@@ -253,4 +258,5 @@ module.exports = {
   deleteProduct,
   getAllProduct,
   getProductByCategory,
+  searchProduct,
 };

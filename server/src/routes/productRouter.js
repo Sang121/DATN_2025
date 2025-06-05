@@ -19,12 +19,14 @@ router.get("/getProductByCategory/:category", productController.getProductByCate
 
 
 router.get("/getAllProduct", productController.getAllProduct);
+
+
 router.post(
   "/uploadImage",
   upload.array("images", 10),
   productController.uploadImage
 );
 //router.get('/category/:category',productController.getProductByCategory);
-// router.get('/search/:query',productController.searchProduct);
+ router.get('/search/:query',productController.searchProduct);
 
 module.exports = router;
