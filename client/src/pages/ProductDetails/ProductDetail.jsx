@@ -110,7 +110,7 @@ function ProductDetail() {
           </div>
           <div style={{ flex: 1, paddingLeft: 32 }}>
             <h2>{product.name}</h2>
-            <p>{product.description}</p>
+         
             <div>
               <strong>Giá:</strong> {product.price}$
             </div>
