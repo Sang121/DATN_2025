@@ -1,9 +1,10 @@
 import React from "react";
 import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ListProduct.module.css";
-import { Flex, Spin, Alert } from "antd"; // Import Spin và Alert từ antd
+import { Flex, Spin, Alert, Empty } from "antd";
 import { useQuery } from "@tanstack/react-query";
-import { getAllProduct } from "../../services/productService";
+import { getProductByCategory } from "../../services/productService";
+
 function ListProduct({ category }) {
   const {
     data: products,
@@ -12,27 +13,26 @@ function ListProduct({ category }) {
     error,
   } = useQuery({
     queryKey: ["products", category],
-    queryFn: () => getAllProduct(category),
+    queryFn: () => getProductByCategory(category),
     staleTime: 1000 * 60 * 5,
   });
+
   if (isLoading) {
     return (
-      <div>
-        <div className={styles.statusContainer}>
-          <Spin size="large" />
-          <p>Loading products...</p>
-        </div>
+      <div className={styles.statusContainer}>
+        <Spin size="large" tip="Đang tải sản phẩm..." />
       </div>
     );
   }
+
   if (isError) {
     return (
       <div className={styles.statusContainer}>
-        {/* Error.message lấy thông báo từ đối tượng lỗi */}
         <Alert
-          message="Error"
+          message="Lỗi"
           description={
-            error?.message || "Failed to load products. Please try again later."
+            error?.message ||
+            "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau."
           }
           type="error"
           showIcon
@@ -41,10 +41,10 @@ function ListProduct({ category }) {
     );
   }
 
-  if (!products || products.length === 0) {
+  if (!products?.data || products.data.length === 0) {
     return (
       <div className={styles.statusContainer}>
-        <p>No products found for this category. Please try a different one.</p>
+        <Empty description="Không có sản phẩm nào trong danh mục này" />
       </div>
     );
   }
@@ -52,11 +52,11 @@ function ListProduct({ category }) {
   return (
     <div>
       <Flex wrap gap="small" className={styles["list-product-container"]}>
-        {products.map((product) => (
+        {products.data.map((product) => (
           <ProductCard
             key={product._id}
             productId={product._id}
-            image={product.thumbnail}
+            image={product.images[0]}
             name={product.name}
             price={product.price}
             oldPrice={product.oldPrice}
