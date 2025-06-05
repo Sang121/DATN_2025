@@ -1,0 +1,165 @@
+/* UserUpdate.module.css */
+
+.userUpdateContainer {
+    /* Đổi tên class */
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    max-width: 800px;
+    margin: 40px auto;
+    font-family: 'Roboto', sans-serif;
+}
+
+.formTitle {
+    /* Đổi tên class */
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 28px !important;
+    color: #1890ff;
+}
+
+.titleIcon {
+    /* Đổi tên class */
+    font-size: 32px;
+    color: #1890ff;
+}
+
+/* Tùy chỉnh các Form.Item */
+.updateForm .ant-form-item-label>label {
+    /* Đổi tên class cha */
+    font-weight: 600;
+    color: #555;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+/* Tùy chỉnh Input, Select */
+.updateForm .ant-input-affix-wrapper,
+/* Đổi tên class cha */
+.updateForm .ant-select-selector {
+    border-radius: 8px;
+    height: 48px !important;
+    font-size: 16px;
+    border: 1px solid #d9d9d9;
+    transition: all 0.3s ease;
+    box-shadow: none !important;
+}
+
+.updateForm .ant-input-affix-wrapper:hover,
+.updateForm .ant-select-selector:hover {
+    border-color: #40a9ff !important;
+}
+
+.updateForm .ant-input-affix-wrapper-focused,
+.updateForm .ant-select-focused .ant-select-selector {
+    border-color: #1890ff !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+.formItemIcon {
+    /* Đổi tên class */
+    color: #a0a0a0;
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+/* Tùy chỉnh nút Cập nhật */
+.buttonContainer {
+    /* Đổi tên class */
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 0 !important;
+}
+
+.updateButton {
+    /* Đổi tên class */
+    background: linear-gradient(45deg, #1890ff, #40a9ff);
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    height: 50px;
+    padding: 0 30px;
+    box-shadow: 0 4px 15px rgba(24, 144, 255, 0.2);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: auto;
+    min-width: 220px;
+}
+
+.updateButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(24, 144, 255, 0.3);
+    opacity: 0.9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .userUpdateContainer {
+        padding: 25px 20px;
+        margin: 20px auto;
+    }
+
+    .formTitle {
+        font-size: 24px !important;
+        margin-bottom: 25px;
+    }
+
+    .titleIcon {
+        font-size: 28px;
+    }
+
+    .updateForm .ant-form-item-label>label {
+        font-size: 14px;
+    }
+
+    .updateForm .ant-input-affix-wrapper,
+    .updateForm .ant-select-selector {
+        height: 45px !important;
+        font-size: 15px;
+    }
+
+    .updateButton {
+        height: 48px;
+        font-size: 16px;
+        min-width: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .userUpdateContainer {
+        padding: 20px 15px;
+        margin: 15px auto;
+    }
+
+    .formTitle {
+        font-size: 22px !important;
+        margin-bottom: 20px;
+    }
+
+    .titleIcon {
+        font-size: 26px;
+    }
+
+    .updateForm .ant-input-affix-wrapper,
+    .updateForm .ant-select-selector {
+        height: 42px !important;
+        font-size: 14px;
+    }
+
+    .updateButton {
+        height: 45px;
+        font-size: 15px;
+        min-width: 160px;
+    }
+}
