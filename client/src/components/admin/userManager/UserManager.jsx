@@ -21,9 +21,16 @@ function UserManager() {
   const handleShowRegUser = () => {
     setShowRegUser(true);
   };
+
   const handleCloseRegUser = () => {
     setShowRegUser(false);
   };
+
+  const handleRegUserSuccess = () => {
+    setShowRegUser(false);
+    queryClient.invalidateQueries(["getAllUsers"]);
+  };
+
   const columns = [
     {
       title: "Stt",
@@ -133,9 +140,10 @@ function UserManager() {
                 Lưu
               </Button>
               <Button
-                onClick={() => handleUpdateUser(record)}
-                type="link"
+                onClick={() => setEditingRowId(null)}
+                type="primary"
                 danger
+                loading={updateUserMutation.isPending}
               >
                 Hủy
               </Button>
@@ -147,7 +155,7 @@ function UserManager() {
               </Button>
               <Button
                 onClick={() => handleDeleteUser(record._id)}
-                type="link"
+                type="primary"
                 danger
                 loading={deleteUserMutation.isPending}
               >
@@ -267,30 +275,32 @@ function UserManager() {
   }
 
   return (
-    <div onShowRegUser={handleShowRegUser}>
-      <h2>Quản lý người dùng</h2>
+    <div className={styles.wrapper}>
+      {!showRegUser ? (
+        <>
+          <div className={styles.header}>
+            <Title level={4}>Quản lý người dùng</Title>
+            <Button
+              type="primary"
+              icon={<UserAddOutlined />}
+              onClick={handleShowRegUser}
+            >
+              Thêm người dùng
+            </Button>
+          </div>
 
-      <RegUser open={showRegUser} onClose={handleCloseRegUser} />
-      <Button
-        style={{ marginBottom: 16 }}
-        onClick={() => {
-          handleShowRegUser();
-        }}
-      >
-        {" "}
-        <UserAddOutlined />
-        Thêm người dùng
-      </Button>
-
-      {/* <Table columns={columns} dataSource={users} /> */}
-      <Table
-        columns={[...columns]}
-        dataSource={users}
-        rowKey={(record) => record._id}
-        pagination={{ pageSize: 10 }} // Phân trang 10 mục mỗi trang
-        bordered
-        scroll={{ x: "max-content" }}
-      />
+          <Table
+            columns={[...columns]}
+            dataSource={users}
+            rowKey={(record) => record._id}
+            pagination={{ pageSize: 10 }}
+            bordered
+            scroll={{ x: "max-content" }}
+          />
+        </>
+      ) : (
+        <RegUser onSuccess={handleRegUserSuccess} />
+      )}
     </div>
   );
 }
