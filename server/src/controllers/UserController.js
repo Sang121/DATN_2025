@@ -89,9 +89,7 @@ const updateUser = async (req, res) => {
     // Trả về access_token trong body của response cho frontend
     return res.status(200).json({ ...restResponse, access_token });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+    return res.status(500).json({ message: error, error: error.message });
   }
 };
 
