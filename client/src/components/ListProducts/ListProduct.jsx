@@ -3,7 +3,6 @@ import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ListProduct.module.css";
 import { Flex, Spin, Alert } from "antd"; // Import Spin và Alert từ antd
 import { useQuery } from "@tanstack/react-query";
-import { fetchProducts } from "/src/components/fetchProducts.jsx";
 import { getAllProduct } from "../../services/productService";
 function ListProduct({ category }) {
   const {
