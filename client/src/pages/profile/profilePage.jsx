@@ -59,7 +59,6 @@ function ProfilePage() {
           <div className={styles.profileContent}>
             <div className={styles.mainProfile}>
               <div className={styles.infoLeft}>
-                <span className={styles.infoTitle}>Thông tin cá nhân</span>
                 <div
                   style={{
                     backgroundColor: "rgb(255, 255, 255)",
