@@ -9,19 +9,24 @@ const connectDB = require("./config/connect");
 const routes = require("./routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const path = require("path"); // Import path module
 
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Thêm dòng này
 app.use(express.json()); // để xử lý req.body
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+console.log(
+  "Serving static files from:",
+  path.join(__dirname, "..", "uploads")
+);
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
