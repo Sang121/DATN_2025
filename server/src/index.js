@@ -14,7 +14,7 @@ const path = require("path"); // Import path module
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.use(express.json()); // để xử lý req.body
+app.use(express.json()); 
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
