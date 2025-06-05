@@ -1,0 +1,218 @@
+/* Tệp: RegUser.module.css */
+
+.customModal .ant-modal-content {
+    border-radius: 16px !important;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    /* Đổ bóng mạnh hơn */
+}
+
+.signupContainer {
+    /* backdrop được thay thế bằng container để chứa nội dung modal */
+    position: relative;
+    /* Đảm bảo nút đóng nằm đúng vị trí */
+    padding: 24px;
+    /* Khoảng cách chung cho nội dung */
+    /* Nền gradient nhẹ */
+    border-radius: 16px;
+}
+
+.customCloseBtn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 20px;
+    /* Nhỏ hơn một chút */
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.3s ease, transform 0.3s ease;
+    /* Thêm hiệu ứng transform */
+    padding: 8px;
+    /* Tăng padding để dễ click */
+    border-radius: 50%;
+    /* Bo tròn nút */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.customCloseBtn:hover {
+    color: #ff4d4f;
+    /* Màu đỏ nổi bật */
+    transform: rotate(90deg);
+    /* Xoay khi hover */
+    background-color: rgba(255, 77, 79, 0.1);
+    /* Nền nhẹ khi hover */
+}
+
+.signupContent {
+    display: flex;
+    flex-direction: column;
+    /* Để đảm bảo form nằm dọc trong modal đơn */
+    align-items: center;
+    justify-content: center;
+}
+
+.signupLeft {
+    width: 100%;
+    /* Chiếm toàn bộ chiều rộng có sẵn */
+    padding: 0 15px;
+    /* Giảm padding ngang một chút */
+    text-align: center;
+    /* Căn giữa tiêu đề */
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    /* Khoảng cách giữa icon và tiêu đề */
+    margin-bottom: 20px;
+    color: #1890ff;
+    /* Màu xanh của Ant Design */
+}
+
+.headerIcon {
+    font-size: 32px;
+    /* Kích thước lớn hơn cho icon header */
+    color: #1890ff;
+}
+
+.headerTitle {
+    font-size: 28px;
+    /* Tiêu đề lớn và rõ ràng hơn */
+    font-weight: 700;
+    margin: 0;
+    color: #333;
+}
+
+.customDivider {
+    margin: 20px 0 30px 0 !important;
+    /* Tăng khoảng cách */
+    border-color: #d9d9d9 !important;
+    /* Màu đường kẻ */
+}
+
+.signupFormBlock {
+    /* Không cần nhiều thay đổi ở đây, form sẽ tự động căn giữa nếu .signupLeft text-align center */
+}
+
+.signupForm .ant-input-affix-wrapper,
+.signupForm .ant-input-affix-wrapper-focused {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: none !important;
+    /* Xóa box-shadow mặc định của Ant Design */
+}
+
+.signupForm .ant-input-affix-wrapper:hover {
+    border-color: #40a9ff !important;
+}
+
+.signupForm .ant-input-affix-wrapper.ant-input-affix-wrapper-focused {
+    border-color: #1890ff !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+    /* Đổ bóng khi focus */
+}
+
+.signupForm .ant-input-prefix {
+    color: #a0a0a0;
+    /* Màu xám nhẹ cho icon input */
+}
+
+.signupForm .ant-input,
+.signupForm .ant-input-password {
+    font-size: 16px;
+    padding: 10px 12px;
+    border-radius: 8px;
+}
+
+.submitBtn {
+    background: linear-gradient(45deg, #1890ff, #40a9ff);
+    /* Gradient cho nút */
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    /* Nút lớn hơn */
+    font-weight: 600;
+    height: 50px;
+    /* Chiều cao nút */
+    margin-top: 25px;
+    /* Khoảng cách trên */
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(24, 144, 255, 0.2);
+    /* Đổ bóng cho nút */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    /* Khoảng cách giữa icon và chữ */
+}
+
+.submitBtn:hover {
+    transform: translateY(-2px);
+    /* Hiệu ứng nhấc nhẹ khi hover */
+    box-shadow: 0 6px 20px rgba(24, 144, 255, 0.3);
+    /* Đổ bóng mạnh hơn khi hover */
+    opacity: 0.9;
+    /* Giảm độ trong suốt nhẹ */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+
+    /* Thay đổi breakpoint từ 700px sang 768px để phù hợp hơn */
+    .customModal .ant-modal-content {
+        border-radius: 12px !important;
+    }
+
+    .signupContainer {
+        padding: 15px;
+    }
+
+    .headerTitle {
+        font-size: 24px;
+    }
+
+    .headerIcon {
+        font-size: 28px;
+    }
+
+    .signupLeft {
+        padding: 0 10px;
+    }
+
+    .submitBtn {
+        height: 45px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .signupContainer {
+        padding: 10px;
+    }
+
+    .headerTitle {
+        font-size: 20px;
+    }
+
+    .headerIcon {
+        font-size: 24px;
+    }
+
+    .signupLeft {
+        padding: 0 5px;
+    }
+
+    .signupForm .ant-input,
+    .signupForm .ant-input-password {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+}
