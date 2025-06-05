@@ -1,5 +1,5 @@
+import axios from "axios";
 import axiosInstance from "../utils/axios";
-import { message as antdMessage } from "antd";
 export const signInUser = async (credentials) => {
   try {
     const response = await axiosInstance.post(`/user/signin`, credentials);
@@ -74,15 +74,45 @@ export const refreshToken = async () => {
 };
 
 export const updateUser = async (userId, userData) => {
+  console.log("id", userId, "data", userData);
   try {
-    const response = await axiosInstance.put(
-      `/user/update-user/${userId}`,
+    const response = await axios.put(
+      `${import.meta.env.VITE_API_URL}/user/update-user/${userId}`,
       userData
     );
+
     return response.data;
   } catch (error) {
     console.error(
       `Error updating user with ID ${userId}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+export const getAllUser = async () => {
+  try {
+    const response = await axiosInstance.get(`/user/getAllUser`);
+    console.log(response.data.data);
+    return response.data.data;
+  } catch (error) {
+    console.error(
+      `Error fetching user  :`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+export const deleteUser = async (userId) => {
+ try {
+    const response = await axiosInstance.delete(
+      `/user/delete-user/${userId.id}`
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error delete user  :`,
       error.response?.data || error.message
     );
     throw error;
