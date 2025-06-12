@@ -49,7 +49,6 @@ const loginUser = async (req, res) => {
 
     const loginData = { identifier, password };
 
-    console.log("loginData", loginData);
     const response = await UserService.loginUser(loginData);
     const { refresh_token, ...newResponse } = response;
     res.cookie("refresh_token", refresh_token, {
@@ -58,7 +57,6 @@ const loginUser = async (req, res) => {
       sameSite: "strict",
     });
 
-    console.log("response", newResponse);
     return res.status(201).json(newResponse);
   } catch (error) {
     return res.status(500).json({ message: "Server error when login", error });

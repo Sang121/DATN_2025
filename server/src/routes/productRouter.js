@@ -15,18 +15,23 @@ router.delete(
   authMiddleware,
   productController.deleteProduct
 );
-router.get("/getProductByCategory/:category", productController.getProductByCategory);
-
+router.get(
+  "/getProductByCategory/:category",
+  productController.getProductByCategory
+);
 
 router.get("/getAllProduct", productController.getAllProduct);
-
-
+router.delete(
+  "/deleteImage/:imageName",
+  authMiddleware,
+  productController.deleteImage
+);
 router.post(
   "/uploadImage",
   upload.array("images", 10),
   productController.uploadImage
 );
 //router.get('/category/:category',productController.getProductByCategory);
- router.get('/search/:query',productController.searchProduct);
+router.get("/search/:query", productController.searchProduct);
 
 module.exports = router;
