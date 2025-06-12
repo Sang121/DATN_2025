@@ -1,0 +1,94 @@
+.wrapper {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.product-list {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.status-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.pagination-wrapper {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Custom styles for Ant Design components */
+:global(.ant-table-thead > tr > th) {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+:global(.ant-table-tbody > tr:hover > td) {
+    background-color: #f0f7ff;
+}
+
+:global(.ant-btn-primary) {
+    background-color: #1890ff;
+}
+
+:global(.ant-btn-primary:hover) {
+    background-color: #40a9ff;
+}
+
+:global(.ant-btn-dangerous) {
+    background-color: #ff4d4f;
+}
+
+:global(.ant-btn-dangerous:hover) {
+    background-color: #ff7875;
+}
+
+:global(.ant-pagination-item-active) {
+    border-color: #1890ff;
+}
+
+:global(.ant-pagination-item-active a) {
+    color: #1890ff;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+    .wrapper {
+        padding: 12px;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .product-list {
+        padding: 8px;
+    }
+}
