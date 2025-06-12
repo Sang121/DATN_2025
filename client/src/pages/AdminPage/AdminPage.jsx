@@ -10,9 +10,8 @@ import {
 } from "@ant-design/icons";
 import styles from "./AdminPage.module.css";
 import { Col, Divider, Menu, Switch } from "antd";
-import UserManager from "../../components/admin/userManager/UserManager";
-import ProductManager from "../../components/admin/productManager/ProductManager";
-
+import UserManager from "./component/userManager/UserManager";
+import ProductManager from "./component/productManager/ProductManager";
 const items = [
   {
     key: "user",
@@ -35,7 +34,7 @@ const AdminPage = () => {
     <>
       <div className={styles["adminContainer"]}>
         <Col className={styles["mainContent"]}>
-          <Col xs={6} sm={6} md={6} lg={4}>
+          <Col xs={4} sm={4} md={3} lg={3}>
             <Menu
               mode="inline"
               className={styles["sideBar"]}
@@ -50,7 +49,9 @@ const AdminPage = () => {
                 <UserManager />
               </span>
             ) : (
-              <span><ProductManager/></span>
+              <span>
+                <ProductManager />
+              </span>
             )}
           </Col>
           {/* <div className={styles["content"]}>
