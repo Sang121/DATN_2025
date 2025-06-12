@@ -1,11 +1,7 @@
 import React from "react";
 import styles from "./ProductCard.module.css";
 import { Link } from "react-router-dom";
-import {
-  StarFilled,
-  ShoppingCartOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
+import { StarFilled, ShoppingCartOutlined } from "@ant-design/icons";
 
 function ProductCard({ productId, image, name, price, rating, discount }) {
   const newPrice = price - (price * discount) / 100;
@@ -13,8 +9,12 @@ function ProductCard({ productId, image, name, price, rating, discount }) {
     style: "currency",
     currency: "VND",
   }).format(newPrice);
+
   return (
     <div className={styles["product-card"]}>
+      {discount > 0 && (
+        <div className={styles["product-card-badge"]}>-{discount}%</div>
+      )}
       <Link to={`/products/${productId}`}>
         <img src={image} alt={name} className={styles["product-image"]} />
       </Link>
@@ -40,6 +40,7 @@ function ProductCard({ productId, image, name, price, rating, discount }) {
               key={index}
               style={{
                 color: index < Math.floor(rating) ? "#ffd700" : "#e8e8e8",
+                fontSize: "16px",
               }}
             />
           ))}
@@ -51,12 +52,14 @@ function ProductCard({ productId, image, name, price, rating, discount }) {
         <span className={styles["product-card-price-current"]}>
           {formattedPrice}
         </span>
-        <span className={styles["product-card-price-old"]}>
-          {new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(price)}
-        </span>
+        {discount > 0 && (
+          <span className={styles["product-card-price-old"]}>
+            {new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(price)}
+          </span>
+        )}
       </div>
       <button className={styles["product-card-btn"]}>
         {" "}
