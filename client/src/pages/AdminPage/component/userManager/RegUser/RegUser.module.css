@@ -1,0 +1,149 @@
+/* Tệp: RegUser.module.css */
+
+.customModal {
+  :global(.ant-modal-content) {
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  :global(.ant-modal-body) {
+    padding: 0;
+  }
+}
+
+.signupContainer {
+  position: relative;
+  background-color: #fff;
+  min-height: 600px;
+}
+
+.customCloseBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  z-index: 1;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.signupContent {
+  padding: 24px;
+}
+
+.signupLeft {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.formCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.formCard :global(.ant-card-body) {
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.headerIcon {
+  font-size: 24px;
+  color: #1890ff;
+}
+
+.headerTitle {
+  margin: 0 !important;
+  color: #333;
+}
+
+.customDivider {
+  margin: 16px 0;
+}
+
+.signupForm {
+  margin-top: 24px;
+}
+
+.signupForm :global(.ant-form-item-label) {
+  font-weight: 500;
+}
+
+.signupForm :global(.ant-input),
+.signupForm :global(.ant-input-password) {
+  border-radius: 4px;
+}
+
+.signupForm :global(.ant-input:hover),
+.signupForm :global(.ant-input-password:hover) {
+  border-color: #40a9ff;
+}
+
+.signupForm :global(.ant-input:focus),
+.signupForm :global(.ant-input-password-focused) {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.formActions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .formCard :global(.ant-card-body) {
+    padding: 16px;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+}
+
+/* Custom styles for Ant Design components */
+:global(.ant-btn-primary) {
+  background-color: #1890ff;
+}
+
+:global(.ant-btn-primary:hover) {
+  background-color: #40a9ff;
+}
+
+:global(.ant-btn-default:hover) {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+:global(.ant-form-item-required) {
+  color: #333;
+}
+
+:global(.ant-form-item-explain-error) {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
