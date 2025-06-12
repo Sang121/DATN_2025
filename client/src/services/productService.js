@@ -39,9 +39,11 @@ export const deleteProduct = async (id) => {
     throw error;
   }
 };
-export const getAllProduct = async () => {
+export const getAllProduct = async (limit, page) => {
   try {
-    let url = `${import.meta.env.VITE_API_URL}/product/getAllProduct?`;
+    let url = `${
+      import.meta.env.VITE_API_URL
+    }/product/getAllProduct?limit=${limit}&page=${page}`;
 
     const response = await axiosInstance.get(url);
     console.log("response getAllProduct", response);
@@ -79,9 +81,7 @@ export const getProductByCategory = async (category) => {
 };
 export const searchProduct = async (query) => {
   try {
-    const url = `${
-      import.meta.env.VITE_API_URL
-    }/product/search/${query}`;
+    const url = `${import.meta.env.VITE_API_URL}/product/search/${query}`;
     const response = await axiosInstance.get(url);
     return response.data;
   } catch (error) {
