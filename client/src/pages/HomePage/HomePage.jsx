@@ -7,7 +7,6 @@ import ImgAds from "../../components/imgAds/ImgAds";
 import ListProduct from "../../components/ListProducts/ListProduct";
 import FilterPrice from "../../components/FilterPrice/FilterPrice";
 function HomePage() {
-
   return (
     <div>
       <main>
@@ -23,17 +22,17 @@ function HomePage() {
               </div>
               <div className={styles["home-page-list"]}>
                 <h2>Thời trang nam</h2>
-                <ListProduct category={"Áo"} />
+                <ListProduct query={"Nam"} />
               </div>
               <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" />
               <div className={styles["home-page-list"]}>
                 <h2> Thời Trang Nữ</h2>
-                <ListProduct category={"Giày"} />
+                <ListProduct query={"Nữ"} />
               </div>
               <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" />
               <div className={styles["home-page-list"]}>
                 <h2> Phụ Kiện </h2>
-                <ListProduct category={"tops"} />
+                <ListProduct query={"Phụ kiện"} />
               </div>
             </div>
           </div>

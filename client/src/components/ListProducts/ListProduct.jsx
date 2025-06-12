@@ -3,20 +3,19 @@ import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ListProduct.module.css";
 import { Flex, Spin, Alert, Empty } from "antd";
 import { useQuery } from "@tanstack/react-query";
-import { getProductByCategory } from "../../services/productService";
+import { searchProduct } from "../../services/productService";
 
-function ListProduct({ category }) {
+function ListProduct({ query }) {
+  console.log(query);
   const {
     data: products,
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ["products", category],
-    queryFn: () => getProductByCategory(category),
-    staleTime: 1000 * 60 * 5,
+    queryKey: ["search", query],
+    queryFn: () => searchProduct(query),
   });
-
   if (isLoading) {
     return (
       <div className={styles.statusContainer}>
@@ -24,7 +23,6 @@ function ListProduct({ category }) {
       </div>
     );
   }
-
   if (isError) {
     return (
       <div className={styles.statusContainer}>
@@ -44,7 +42,12 @@ function ListProduct({ category }) {
   if (!products?.data || products.data.length === 0) {
     return (
       <div className={styles.statusContainer}>
-        <Empty description="Không có sản phẩm nào trong danh mục này" />
+        <Alert
+          message="Không có sản phẩm nào trong danh mục này"
+          description="Vui lòng chọn danh mục khác"
+          type="error"
+          showIcon
+        />
       </div>
     );
   }

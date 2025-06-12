@@ -82,7 +82,7 @@ function ProductDetail() {
         <div className={styles["product-detail-breadcrumb"]}>
           <h1>
             <a href="/">Trang chủ</a> /{" "}
-            <a href={`/category/${product.category}`}>{product.category}</a> /{" "}
+            <a href={`/search/${product.category}`}>{product.category}</a> /{" "}
             {product.name}
           </h1>
         </div>
@@ -111,8 +111,7 @@ function ProductDetail() {
           <div style={{ flex: 1, paddingLeft: 32 }}>
             <h2>{product.name}</h2>
             <div>
-              <strong>Giá:</strong>{" "}
-              {product.price?.toLocaleString("vi-VN")}đ
+              <strong>Giá:</strong> {product.price?.toLocaleString("vi-VN")}đ
               {product.oldPrice && (
                 <span className={styles.oldPrice}>
                   {product.oldPrice?.toLocaleString("vi-VN")}đ
@@ -181,7 +180,7 @@ function ProductDetail() {
       <div className={styles["product-detail-related"]}>
         <h2>Sản phẩm cùng danh mục</h2>
         <div className={styles["product-detail-related-list"]}>
-          {product.category && <ListProducts category={product.category} />}
+          {product.category && <ListProducts query={product.category} />}
         </div>
       </div>
     </div>

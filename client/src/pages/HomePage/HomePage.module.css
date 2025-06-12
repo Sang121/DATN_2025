@@ -9,13 +9,11 @@ element.style {}
 @media only screen and (min-width: 1440px) {
     .home-page-container {
         width: 1440px;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 .home-page-container {
-
-    padding-left: px;
-    padding-right: 24px;
-    margin-right: auto;
     margin-left: auto;
 }
 *, ::before, ::after {

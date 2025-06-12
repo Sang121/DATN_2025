@@ -10,15 +10,8 @@
 }
 .type-product-page-container {
     padding-left: 0;
-    padding-right: 24px;
     margin-right: auto;
     margin-left: auto;
-}
-
-*,
-::before,
-::after {
-    box-sizing: border-box;
 }
 
 div {
