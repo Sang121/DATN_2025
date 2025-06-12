@@ -3,57 +3,83 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
-const createProduct = (newProduct) => {
-  const {
-    name,
-    category,
-    gender,
-    price,
-    discount,
-    images,
-    stock,
-    description,
-    attributes,
-    size,
-    color,
-    brand,
-  } = newProduct;
-
+const createProduct = (productData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const checkProduct = await Product.findOne({
-        name: name,
-      });
-      if (checkProduct !== null) {
+      // Validate required fields
+      if (
+        !productData.name ||
+        !productData.category ||
+        !productData.gender ||
+        !productData.price ||
+        !productData.stock
+      ) {
         return resolve({
           status: "Err",
-          message: "Product already exist",
+          message: "Missing required fields",
           data: null,
         });
       }
-      const createProduct = await Product.create({
-        name,
-        category,
-        gender,
-        price,
-        discount,
-        images,
-        stock,
-        description,
-        attributes,
-        size,
-        color,
-        brand,
-      });
+
+      // Validate numeric fields
+      if (isNaN(productData.price) || productData.price <= 0) {
+        return resolve({
+          status: "Err",
+          message: "Price must be a positive number",
+          data: null,
+        });
+      }
+
+      if (
+        isNaN(productData.discount) ||
+        productData.discount < 0 ||
+        productData.discount > 100
+      ) {
+        return resolve({
+          status: "Err",
+          message: "Discount must be between 0 and 100",
+          data: null,
+        });
+      }
+
+      if (isNaN(productData.stock) || productData.stock < 0) {
+        return resolve({
+          status: "Err",
+          message: "Stock must be a non-negative number",
+          data: null,
+        });
+      }
+
+      // Check if product exists
+      const checkProduct = await Product.findOne({ name: productData.name });
+      if (checkProduct) {
+        return resolve({
+          status: "Err",
+          message: "Product already exists",
+          data: null,
+        });
+      }
+
+      // Create product
+      const createProduct = await Product.create(productData);
+
       if (createProduct) {
+        const processedProduct = processImageUrls(createProduct);
         return resolve({
           status: "Success",
           message: "Product created successfully",
-          data: createProduct,
+          data: processedProduct,
         });
+      } else {
+        throw new Error("Failed to create product - no data returned");
       }
     } catch (error) {
-      reject({ message: "Server error while create user", error });
+      console.error("Error creating product:", error);
+      reject({
+        status: "Err",
+        message: "Error creating product",
+        error: error.message || "Unknown error occurred",
+      });
     }
   });
 };
@@ -71,10 +97,8 @@ const updateProduct = (id, data) => {
       const updateProduct = await Product.findByIdAndUpdate(id, data, {
         new: true,
       });
-      resolve({ status: "Ok", message: "Success", data: updateProduct });
-      // }else{
-      //     reject({ message: 'User created Unsuccessfully' });
-      // }
+      const processedProduct = processImageUrls(updateProduct);
+      resolve({ status: "Ok", message: "Success", data: processedProduct });
     } catch (error) {
       reject({ message: "Server error while update product", error });
     }
@@ -124,12 +148,11 @@ const getAllProduct = (limit = 8, page = 1, sort, filter, q) => {
     try {
       let query = {};
 
-      // Xử lý filter theo category
+      // Xử lý  theo category
       if (filter) {
         query.category = filter;
       }
 
-      // Xử lý tìm kiếm (chỉ áp dụng khi không có filter)
       if (q && !filter) {
         query = {
           $or: [
@@ -143,7 +166,6 @@ const getAllProduct = (limit = 8, page = 1, sort, filter, q) => {
         };
       }
 
-      // Đếm tổng số sản phẩm thỏa mãn điều kiện
       const totalProduct = await Product.countDocuments(query);
 
       // Lấy danh sách sản phẩm với phân trang và sắp xếp
@@ -168,7 +190,7 @@ const getAllProduct = (limit = 8, page = 1, sort, filter, q) => {
   });
 };
 const deleteProduct = (id) => {
-  return new Prmise(async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const existingProduct = await Product.findById(id);
       if (!existingProduct) {
@@ -180,11 +202,40 @@ const deleteProduct = (id) => {
       await Product.findByIdAndDelete(id);
 
       resolve({ status: "Ok", message: "Delete product success" });
-      // }else{
-      //     reject({ message: 'User created Unsuccessfully' });
-      // }
     } catch (error) {
       reject({ message: "Server error when delete product", error });
+    }
+  });
+};
+const deleteImage = (imageName) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { imageName } = req.params;
+      const imagePath = path.join(__dirname, "../uploads", imageName);
+
+      // Kiểm tra file có tồn tại không
+      try {
+        await fs.access(imagePath);
+      } catch (error) {
+        return res.status(404).json({
+          status: "Err",
+          message: "Image file not found",
+        });
+      }
+
+      // Xóa file
+      await fs.unlink(imagePath);
+
+      res.json({
+        status: "Ok",
+        message: "Image deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      res.status(500).json({
+        status: "Err",
+        message: "Failed to delete image",
+      });
     }
   });
 };
@@ -194,10 +245,9 @@ const getProductByCategory = (category) => {
       const existingCategory = await Product.find({
         category: category,
       });
-      console.log(existingCategory);
       if (!existingCategory) {
         resolve({
-          status: "Ok",
+          status: "Err",
           message: "Category not found",
         });
       }
@@ -231,7 +281,6 @@ const searchProduct = (query) => {
           { brand: { $regex: query, $options: "i" } },
         ],
       });
-      console.log(productSearch);
       if (!productSearch) {
         resolve({
           status: "Ok",
@@ -259,4 +308,5 @@ module.exports = {
   getAllProduct,
   getProductByCategory,
   searchProduct,
+  deleteImage,
 };

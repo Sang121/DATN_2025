@@ -6,6 +6,15 @@ const BASE_URL =
 
 const createProduct = async (req, res) => {
   try {
+
+    // Validate request body
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({
+        status: "Err",
+        message: "No data received",
+      });
+    }
+
     const {
       name,
       category,
@@ -16,36 +25,39 @@ const createProduct = async (req, res) => {
       stock,
       description,
       attributes,
-      size,
-      color,
-      brand,
     } = req.body;
-    console.log("product", req.body);
 
-    //         const reg=/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    //         const isCheckEmail=reg.test(email);
-    if (
-      !name ||
-      !category ||
-      !gender ||
-      !price ||
-      !discount ||
-      !images ||
-      !stock ||
-      !description ||
-      !attributes
-    ) {
-      return res.status(200).json({
+    // Validate required fields
+    if (!name || !category || !gender || !price || !stock) {
+      return res.status(400).json({
         status: "Err",
-        message: "The input is required",
+        message: "Missing required fields",
       });
     }
-    const response = await productService.createProduct(req.body);
-    return res
-      .status(200)
-      .json({ response, message: "Create product success" });
+
+    // Convert numeric fields
+    const productData = {
+      name,
+      category,
+      gender,
+      price: Number(price),
+      discount: Number(discount || 0),
+      stock: Number(stock),
+      description: description || "",
+      attributes: attributes || {},
+      images: images || [],
+    };
+
+
+    const response = await productService.createProduct(productData);
+    return res.status(200).json(response);
   } catch (error) {
-    return res.status(500).json({ message: "Error creating product", error });
+    console.error("Error in createProduct controller:", error);
+    return res.status(500).json({
+      status: "Err",
+      message: "Error creating product",
+      error: error.message,
+    });
   }
 };
 const uploadImage = async (req, res) => {
@@ -64,7 +76,6 @@ const uploadImage = async (req, res) => {
       return `/${file.filename}`;
     });
 
-    // Bỏ resolve và reject không cần thiết
     return res.status(200).json({
       status: "Ok",
       message: "Upload image success",
@@ -83,7 +94,6 @@ const updateProduct = async (req, res) => {
   try {
     const productId = req.params.id;
     const data = req.body;
-    console.log("product");
     if (!productId) {
       return res.status(200).json({
         status: "Err",
@@ -97,20 +107,6 @@ const updateProduct = async (req, res) => {
       .status(404)
       .json({ message: "Server error when update product", error });
   }
-};
-const processImageUrls = (product) => {
-  const baseURL =
-    process.env.VITE_API_URL || `http://localhost:${process.env.PORT || 3001}`;
-  const productObject = product.toObject();
-
-  if (productObject.images && productObject.images.length > 0) {
-    productObject.images = productObject.images.map((imagePath) => {
-      const normalizedPath = imagePath.replace(/\\/g, "/");
-      return `${baseURL}/uploads/${normalizedPath}`;
-    });
-  }
-
-  return productObject;
 };
 
 const getDetailProduct = async (req, res) => {
@@ -138,7 +134,6 @@ const deleteProduct = async (req, res) => {
         message: "the productId is required",
       });
     }
-
     const response = await productService.deleteProduct(productId);
     return res
       .status(200)
@@ -147,6 +142,12 @@ const deleteProduct = async (req, res) => {
     return res.status(404).json({ message: "Server error", error });
   }
 };
+const deleteImage = async (req, res) => {
+  const imageName = req.params.imageName;
+  const response = await productService.deleteImage(imageName);
+  return res.status(200).json(response);
+};
+
 const getAllProduct = async (req, res) => {
   try {
     let { limit, page, sort, filter, q } = req.query;
@@ -193,4 +194,5 @@ module.exports = {
   uploadImage,
   getProductByCategory,
   searchProduct,
+  deleteImage,
 };
