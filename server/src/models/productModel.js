@@ -7,21 +7,21 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: [
-        "ao",
-        "quan",
-        "vay",
-        "dongHo",
-        "phuKien",
-        "giayDep",
-        "tuiXach",
-        "balo",
-        "khac",
+        "Áo",
+        "Quần",
+        "Váy",
+        "Đồng hồ",
+        "Phụ kiện",
+        "Giày dép",
+        "Túi xách",
+        "Balo",
+        "Khác",
       ],
     }, // Loại sản phẩm: áo, quần, váy, đồng hồ, phụ kiện, giày dép, túi xách
     gender: {
       type: String,
       required: true,
-      enum: ["nam", "nu", "unisex"],
+      enum: ["Nam", "Nữ", "Unisex"],
     }, // Giới tính: nam, nữ, unisex
     price: { type: Number, required: true }, // Giá\
     discount: { type: Number, default: 0.1 }, // Mức giảm giá
