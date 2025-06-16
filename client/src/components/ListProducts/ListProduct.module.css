@@ -1,8 +1,46 @@
 .list-product-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+ 
+  width: 100%;
   max-width: 1440px;
   margin: 0 auto;
+  padding: 24px;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.load-more-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 32px 0;
+}
+.load-more-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #1a94ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 120px;
+}
+.load-more-button:hover {
+  background-color: #0d84e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 148, 255, 0.2);
+}
+.load-more-button:active {
+  transform: translateY(0);
 }
 
 /* Responsive breakpoints */

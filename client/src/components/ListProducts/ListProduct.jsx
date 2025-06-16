@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ListProduct.module.css";
-import { Flex, Spin, Alert, Empty } from "antd";
+import { Flex, Spin, Alert } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { searchProduct } from "../../services/productService";
 
 function ListProduct({ query }) {
-  console.log(query);
+  const [visibleProducts, setVisibleProducts] = useState(8); // Bắt đầu với 8 sản phẩm
   const {
     data: products,
     isLoading,
@@ -16,6 +16,11 @@ function ListProduct({ query }) {
     queryKey: ["search", query],
     queryFn: () => searchProduct(query),
   });
+
+  const handleLoadMore = () => {
+    setVisibleProducts((prev) => prev * 2); // Nhân đôi số sản phẩm hiển thị
+  };
+
   if (isLoading) {
     return (
       <div className={styles.statusContainer}>
@@ -53,9 +58,10 @@ function ListProduct({ query }) {
   }
 
   return (
-    <div>
+    <div className={styles.container}>
       <Flex wrap gap="small" className={styles["list-product-container"]}>
-        {products.data.map((product) => (
+        {/* Chỉ hiển thị số lượng sản phẩm giới hạn */}
+        {products.data.slice(0, visibleProducts).map((product) => (
           <ProductCard
             key={product._id}
             productId={product._id}
@@ -69,6 +75,18 @@ function ListProduct({ query }) {
           />
         ))}
       </Flex>
+
+      {/* Hiển thị nút Load More nếu còn sản phẩm */}
+      {products.data.length > visibleProducts && (
+        <div className={styles["load-more-wrapper"]}>
+          <button
+            className={styles["load-more-button"]}
+            onClick={handleLoadMore}
+          >
+            Xem thêm
+          </button>
+        </div>
+      )}
     </div>
   );
 }
