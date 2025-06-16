@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
-import { Alert, Button, Spin } from "antd";
+import { Alert, Button, Spin, Rate, Tag } from "antd";
 import ListProducts from "../../components/ListProducts/ListProduct";
 import { useQuery } from "@tanstack/react-query";
 import { getDetailProduct } from "../../services/productService";
@@ -9,9 +9,13 @@ import { getDetailProduct } from "../../services/productService";
 function ProductDetail() {
   const { id } = useParams();
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("");
-  const sizes = ["S", "M", "L", "XL"];
+
+  // Thêm state để lưu trữ các màu và size có sẵn
+  const [availableColors, setAvailableColors] = useState([]);
+  const [availableSizes, setAvailableSizes] = useState([]);
 
   const {
     data: product,
@@ -38,6 +42,69 @@ function ProductDetail() {
       );
     }
   }, [isSuccess, product]);
+
+  // Hàm lấy các màu có sẵn cho size được chọn
+  const getColorsForSize = (size) => {
+    if (!product?.variants) return [];
+    return [
+      ...new Set(
+        product.variants.filter((v) => v.size === size).map((v) => v.color)
+      ),
+    ];
+  };
+
+  // Hàm lấy các size có sẵn cho màu được chọn
+  const getSizesForColor = (color) => {
+    if (!product?.variants) return [];
+    return [
+      ...new Set(
+        product.variants.filter((v) => v.color === color).map((v) => v.size)
+      ),
+    ];
+  };
+
+  // Hàm lấy số lượng tồn kho cho size và màu được chọn
+  const getStockForVariant = (size, color) => {
+    if (!product?.variants) return 0;
+    const variant = product.variants.find(
+      (v) => v.size === size && v.color === color
+    );
+    return variant?.stock || 0;
+  };
+
+  // Xử lý khi chọn size
+  const handleSizeSelect = (size) => {
+    setSelectedSize(size);
+    const availableColorsForSize = getColorsForSize(size);
+    setAvailableColors(availableColorsForSize);
+
+    // Nếu màu đã chọn không có trong size mới, reset màu
+    if (selectedColor && !availableColorsForSize.includes(selectedColor)) {
+      setSelectedColor("");
+    }
+  };
+
+  // Xử lý khi chọn màu
+  const handleColorSelect = (color) => {
+    setSelectedColor(color);
+    const availableSizesForColor = getSizesForColor(color);
+    setAvailableSizes(availableSizesForColor);
+
+    // Nếu size đã chọn không có trong màu mới, reset size
+    if (selectedSize && !availableSizesForColor.includes(selectedSize)) {
+      setSelectedSize("");
+    }
+  };
+
+  // Khởi tạo danh sách sizes và colors khi product load xong
+  useEffect(() => {
+    if (product?.variants) {
+      const allSizes = [...new Set(product.variants.map((v) => v.size))];
+      const allColors = [...new Set(product.variants.map((v) => v.color))];
+      setAvailableSizes(allSizes);
+      setAvailableColors(allColors);
+    }
+  }, [product]);
 
   if (isLoading) {
     return (
@@ -90,7 +157,7 @@ function ProductDetail() {
           <div className={styles["productImage"]}>
             <div className={styles["productImageThumb"]}>
               {/* Kiểm tra product.images trước khi map */}
-              {product.images?.slice(0, 3).map((img, idx) => (
+              {product.images?.slice(0, 7).map((img, idx) => (
                 <img
                   key={idx}
                   src={img}
@@ -117,31 +184,91 @@ function ProductDetail() {
                   {product.oldPrice?.toLocaleString("vi-VN")}đ
                 </span>
               )}
+              {product.discount > 0 && (
+                <Tag color="red" className={styles.discountTag}>
+                  -{product.discount}%
+                </Tag>
+              )}
             </div>
-            <div>
-              <strong>Brand:</strong> {product.brand}
-            </div>
-            <div>
-              <strong>Category:</strong> {product.category}
-            </div>
-            <div className={styles.sizeSelectBlock}>
-              <strong>Chọn size:</strong>
-              <div className={styles.sizeList}>
-                {sizes.map((size) => (
-                  <Button
-                    key={size}
-                    className={`${styles.sizeBtn} ${
-                      selectedSize === size ? styles.selected : ""
-                    }`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </Button>
-                ))}
+           
+
+            <div className={styles.productInfo}>
+              {/* Thêm đánh giá sản phẩm */}
+              <div className={styles.productRating}>
+                <Rate disabled defaultValue={4} />
+                <span>(120 đánh giá)</span>
+              </div>
+
+
+              {/* Cải thiện hiển thị variants */}
+              <div className={styles.variantSection}>
+                <div className={styles.sizeSection}>
+                  <div className={styles.sizeHeader}>
+                    <span>Chọn size:</span>
+                    <Button type="link">Hướng dẫn chọn size</Button>
+                  </div>
+                  <div className={styles.sizeList}>
+                    {/* Hiển thị tất cả sizes, disable những size không có sẵn cho màu đã chọn */}
+                    {[...new Set(product.variants.map((v) => v.size))].map(
+                      (size) => {
+                        const isAvailable =
+                          !selectedColor || availableSizes.includes(size);
+                        return (
+                          <Button
+                            key={size}
+                            className={`${styles.sizeBtn} ${
+                              selectedSize === size ? styles.selected : ""
+                            } ${!isAvailable ? styles.disabled : ""}`}
+                            onClick={() => handleSizeSelect(size)}
+                            disabled={!isAvailable}
+                          >
+                            {size}
+                          </Button>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+                <div className={styles.colorSection}>
+                  <div className={styles.colorHeader}>
+                    <span>Chọn màu:</span>
+                  </div>
+                  <div className={styles.sizeList}>
+                    {/* Hiển thị tất cả colors, disable những màu không có sẵn cho size đã chọn */}
+                    {[...new Set(product.variants.map((v) => v.color))].map(
+                      (color) => {
+                        const isAvailable =
+                          !selectedSize || availableColors.includes(color);
+                        return (
+                          <Button
+                            key={color}
+                            className={`${styles.sizeBtn} ${
+                              selectedColor === color ? styles.selected : ""
+                            } ${!isAvailable ? styles.disabled : ""}`}
+                            onClick={() => handleColorSelect(color)}
+                            disabled={!isAvailable}
+                          >
+                            {color}
+                          </Button>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Hiển thị số lượng tồn kho */}
+            <div className={styles.stockInfo}>
+              <strong>Số lượng tồn kho: </strong>
+              {selectedSize && selectedColor
+                ? getStockForVariant(selectedSize, selectedColor)
+                : "Vui lòng chọn size và màu"}
+            </div>
+
+            {/* Điều chỉnh số lượng */}
             <div className={styles.quantityBlock}>
-              <strong> Số lượng:</strong>
+              <strong>Số lượng:</strong>
               <div className={styles.quantityControl}>
                 <Button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -150,20 +277,34 @@ function ProductDetail() {
                 >
                   -
                 </Button>
-                <span className={styles.quantityValue}> {quantity} </span>
+                <span className={styles.quantityValue}>{quantity}</span>
                 <Button
-                  onClick={() => setQuantity((q) => q + 1)}
+                  onClick={() =>
+                    setQuantity((q) =>
+                      Math.min(
+                        q + 1,
+                        getStockForVariant(selectedSize, selectedColor)
+                      )
+                    )
+                  }
+                  disabled={
+                    !selectedSize ||
+                    !selectedColor ||
+                    quantity >= getStockForVariant(selectedSize, selectedColor)
+                  }
                   className={styles.quantityBtn}
                 >
                   +
                 </Button>
               </div>
             </div>
+
+            {/* Nút thêm vào giỏ hàng */}
             <div style={{ marginTop: 24 }}>
               <Button
                 type="primary"
                 size="large"
-                disabled={!selectedSize}
+                disabled={!selectedSize || !selectedColor}
                 onClick={() => {}}
               >
                 Thêm vào giỏ hàng

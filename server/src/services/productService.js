@@ -6,13 +6,15 @@ dotenv.config();
 const createProduct = (productData) => {
   return new Promise(async (resolve, reject) => {
     try {
+      console.log("Creating product with data:", productData);
       // Validate required fields
       if (
         !productData.name ||
         !productData.category ||
         !productData.gender ||
         !productData.price ||
-        !productData.stock
+        !Array.isArray(productData.variants) ||
+        !Array.isArray(productData.images)
       ) {
         return resolve({
           status: "Err",
@@ -42,14 +44,35 @@ const createProduct = (productData) => {
         });
       }
 
-      if (isNaN(productData.stock) || productData.stock < 0) {
+      if (isNaN(productData.variants.stock) < 0) {
         return resolve({
           status: "Err",
           message: "Stock must be a non-negative number",
           data: null,
         });
       }
+      if (
+        !productData.variants ||
+        !Array.isArray(productData.variants) ||
+        productData.variants.length === 0
+      ) {
+        return resolve({
+          status: "Err",
+          message: "Product variants are required",
+          data: null,
+        });
+      }
 
+      // Validate each variant
+      for (const variant of productData.variants) {
+        if (!variant.size || !variant.color || variant.stock < 0) {
+          return resolve({
+            status: "Err",
+            message: "Invalid variant data. Size, color and stock are required",
+            data: null,
+          });
+        }
+      }
       // Check if product exists
       const checkProduct = await Product.findOne({ name: productData.name });
       if (checkProduct) {

@@ -1,5 +1,20 @@
 const mongoose = require("mongoose");
-
+const variantSchema = new mongoose.Schema({
+  size: {
+    type: String,
+    required: true,
+    enum: ["S", "M", "L", "XL", "XXL"], // Các size có sẵn
+  },
+  color: {
+    type: String,
+    required: true,
+  },
+  stock: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+});
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true }, // Tên sản phẩm
@@ -27,9 +42,12 @@ const productSchema = new mongoose.Schema(
     discount: { type: Number, default: 0.1 }, // Mức giảm giá
     sold: { type: Number, default: 0 }, // Số lượng đã bán
     rating: { type: Number, default: 5 }, // Đánh giá
-    stock: { type: Number, default: 0 }, // Số lượng tồn kho
+    totalStock: { type: Number, default: 0 }, // Số lượng tồn kho
     description: { type: String }, // Mô tả sản phẩm
     images: [{ type: String }], // Danh sách URL hình ảnh
+    variants: [variantSchema], // Danh sách các biến thể sản phẩm (size, color, stock)
+    isFeatured: { type: Boolean, default: false }, // Sản phẩm nổi bật
+    isNew: { type: Boolean, default: false }, // Sản phẩm mới
     attributes: {
       type: Map,
       of: String,
@@ -43,5 +61,14 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+productSchema.pre("save", function (next) {
+  if (this.variants && this.variants.length > 0) {
+    this.totalStock = this.variants.reduce(
+      (sum, variant) => sum + variant.stock,
+      0
+    );
+  }
+  next();
+});
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;

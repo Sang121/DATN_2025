@@ -25,10 +25,11 @@ const createProduct = async (req, res) => {
       stock,
       description,
       attributes,
+      variants,
     } = req.body;
 
     // Validate required fields
-    if (!name || !category || !gender || !price || !stock) {
+    if (!name || !category || !gender || !price) {
       return res.status(400).json({
         status: "Err",
         message: "Missing required fields",
@@ -45,6 +46,7 @@ const createProduct = async (req, res) => {
       stock: Number(stock),
       description: description || "",
       attributes: attributes || {},
+      variants: req.body.variants || [],
       images: images || [],
     };
 

@@ -7,6 +7,7 @@ import {
   Select,
   Button,
   Card,
+  Table,
   Typography,
   Divider,
   Upload,
@@ -14,6 +15,7 @@ import {
   Row,
   Col,
   message,
+ 
 } from "antd";
 import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -38,28 +40,56 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
     gender: "",
     price: "",
     discount: "",
-    stock: "",
     description: "",
+
     images: [],
     tempImageUrls: [],
-    attributes: {
-      size: "",
-      color: "",
-      material: "",
-      brand: "",
-    },
+    variants: []
   });
 
+  const [variant, setVariant] = useState({
+    size: '',
+    color: '',
+    stock: 0
+  });
+
+  const addVariant = () => {
+    console.log("Adding variant:", variant);
+    console.log("Current product variants:", product);
+    if (!variant.size || !variant.color || variant.stock < 0) {
+      message.error('Vui lòng điền đầy đủ thông tin size, màu và số lượng');
+      return;
+    }
+
+    setProduct((prev) => ({
+      ...prev,
+      variants: [...(prev.variants || []), { ...variant }]
+    }));
+
+    // Reset variant state
+    setVariant({
+      size: '',
+      color: '',
+      stock: 0
+    });
+  };
+
   useEffect(() => {
-    if (mode === "edit" && productData) {
+    if (mode === "edit" && product) {
       setProduct({
-        ...productData,
+        ...product,
         tempImageUrls: [],
       });
-      form.setFieldsValue(productData);
+      form.setFieldsValue(product);
     }
-  }, [mode, productData, form]);
-
+  }, [mode, product, form]);
+  const removeVariant = (index) => {
+    if (!productData || !productData.variants) return;
+    setProduct((prev) => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index),
+    }));
+  };
   const categories = [
     { value: "Áo", label: "Áo" },
     { value: "Quần", label: "Quần" },
@@ -70,7 +100,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
     { value: "Ba Lô", label: "Ba Lô" },
     { value: "Khác", label: "Khác" },
   ];
-
+ 
   const genders = [
     { value: "Nam", label: "Nam" },
     { value: "Nữ", label: "Nữ" },
@@ -192,8 +222,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
         !product.name ||
         !product.category ||
         !product.gender ||
-        !product.price ||
-        !product.stock
+        !product.price 
       ) {
         message.error("Vui lòng điền đầy đủ thông tin bắt buộc");
         return;
@@ -213,9 +242,14 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
         message.error("Giảm giá phải từ 0 đến 100");
         return;
       }
+      console.log("Creating product with data:", product);
 
-      if (isNaN(Number(product.stock)) || Number(product.stock) < 0) {
+      if (isNaN(Number(product.variants.stock) < 0)) {
         message.error("Số lượng tồn kho không được âm");
+        return;
+      }
+      if (product.variants.length === 0) {
+        message.error("Vui lòng thêm ít nhất một biến thể sản phẩm");
         return;
       }
 
@@ -226,8 +260,12 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
         gender: product.gender,
         price: Number(product.price),
         discount: Number(product.discount || 0),
-        stock: Number(product.stock),
         description: product.description || "",
+        variants: product.variants.map((variant) => ({
+          size: variant.size,
+          color: variant.color,
+          stock: Number(variant.stock),
+        })),
         attributes: product.attributes || {},
         images: [],
       };
@@ -465,22 +503,90 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
                 />
               </Form.Item>
             </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label="Số lượng tồn kho"
-                name="stock"
-                rules={[{ required: true, message: "Vui lòng nhập số lượng" }]}
-              >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={0}
-                  onChange={(value) => handleChange("stock", value)}
-                />
-              </Form.Item>
-            </Col>
           </Row>
+          <Card title="Thêm biến thể sản phẩm">
+            <Row gutter={16}>
+              <Col span={6}>
+                <Form.Item label="Size">
+                  <Select
+                    value={variant.size}
+                    onChange={(value) =>
+                      setVariant((prev) => ({ ...prev, size: value }))
+                    }
+                  >
+                    <Option value="S">S</Option>
+                    <Option value="M">M</Option>
+                    <Option value="L">L</Option>
+                    <Option value="XL">XL</Option>
+                    <Option value="XXL">XXL</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="Màu sắc">
+                  <Select
+                    value={variant.color}
+                    onChange={(value) => setVariant((prev) => ({ ...prev, color: value }))}
+                  >
+                    <Option value="Đỏ">Đỏ</Option>
+                    <Option value="Xanh">Xanh</Option>
+                    <Option value="Vàng">Vàng</Option>
+                    <Option value="Đen">Đen</Option>
+                    <Option value="Trắng">Trắng</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="Số lượng">
+                  <InputNumber
+                    min={0}
+                    value={variant.stock}
+                    onChange={(value) =>
+                      setVariant((prev) => ({ ...prev, stock: value }))
+                    }
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Button type="primary" onClick={addVariant}>
+                  Thêm biến thể
+                </Button>
+              </Col>
+            </Row>
 
+            {/* Hiển thị danh sách biến thể */}
+            <Table
+              dataSource={product?.variants || []}
+              columns={[
+                {
+                  title: "Size",
+                  dataIndex: "size",
+                  key: "size",
+                },
+                {
+                  title: "Màu sắc",
+                  dataIndex: "color",
+                  key: "color",
+                },
+                {
+                  title: "Số lượng",
+                  dataIndex: "stock",
+                  key: "stock",
+                },
+                {
+                  title: "Thao tác",
+                  key: "action",
+                  render: (_, __, index) => (
+                    <Button
+                      type="link"
+                      icon={<DeleteOutlined />}
+                      onClick={() => removeVariant(index)}
+                    ></Button>
+                  ),
+                },
+              ]}
+            />
+          </Card>
           <Title level={4} style={{ marginTop: 24 }}>
             Mô tả sản phẩm
           </Title>
