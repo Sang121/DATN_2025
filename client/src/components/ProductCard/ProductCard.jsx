@@ -9,7 +9,10 @@ function ProductCard({ productId, image, name, price, rating, discount }) {
     style: "currency",
     currency: "VND",
   }).format(newPrice);
-
+const productPrice = {
+    newPrice: formattedPrice,
+    oldPrice: price?.toLocaleString("vi-VN"),
+  };
   return (
     <div className={styles["product-card"]}>
       {discount > 0 && (
@@ -29,43 +32,65 @@ function ProductCard({ productId, image, name, price, rating, discount }) {
             </span>
           ))}
         </div> */}
-        <Link to={`/products/${productId}`}>
-          <div className={styles["product-card-name"]}>{name}</div>
-        </Link>
-      </div>
-      <div className={styles["product-rating"]}>
-        <span className={styles["rating-stars"]}>
-          {[...Array(5)].map((_, index) => (
-            <StarFilled
-              key={index}
-              style={{
-                color: index < Math.floor(rating) ? "#ffd700" : "#e8e8e8",
-                fontSize: "16px",
-              }}
-            />
-          ))}
-        </span>
-        <span className={styles["rating-count"]}>({rating?.toFixed(1)})</span>
-      </div>
+        <div className="card">
+       
+          <Link to={`/products/${productId}`}>
+            <div className={styles["productName"]}>{name}</div>
+          </Link>
 
-      <div className={styles["product-card-price"]}>
-        <span className={styles["product-card-price-current"]}>
-          {formattedPrice}
-        </span>
-        {discount > 0 && (
-          <span className={styles["product-card-price-old"]}>
-            {new Intl.NumberFormat("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            }).format(price)}
-          </span>
-        )}
+          <div className={styles["product-rating"]}>
+            <span className={styles["rating-stars"]}>
+              {[...Array(5)].map((_, index) => (
+                <StarFilled
+                  key={index}
+                  style={{
+                    color: index < Math.floor(rating) ? "#ffd700" : "#e8e8e8",
+                    fontSize: "12px",
+                  }}
+                />
+              ))}
+            </span>
+            <span className={styles["rating-count"]}>
+              ({rating?.toFixed(1)})
+            </span>
+          </div>
+        
+         
+
+          {discount > 0 ? (
+            <div >
+              {/* Giá hiện tại */}
+              <div className={styles["productPrice"]}>
+                <span className={styles["red"]}>
+                  {productPrice.newPrice?.toLocaleString("vi-VN")}
+                </span>
+              </div>
+              <div className={styles["productOldPriceContainer"]}>
+                {/* Phần trăm giảm giá */}
+                <div className={styles["productDiscountRate"]}>{discount}%</div>
+
+                {/* Giá gốc */}
+                <div className={styles["productOldPrice"]}>
+                  <del>{productPrice.oldPrice?.toLocaleString("vi-VN")}đ</del>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              {price && (
+                <span className={styles["productPrice"]}>
+                  {price?.toLocaleString("vi-VN")}đ
+                </span>
+              )}
+              {discount > 0 && (
+                <Tag color="red" className={styles.discountTag}>
+                  -{discount}%
+                </Tag>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-      <button className={styles["product-card-btn"]}>
-        {" "}
-        <ShoppingCartOutlined />
-        Thêm vào giỏ
-      </button>
     </div>
   );
 }
