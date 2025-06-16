@@ -36,6 +36,7 @@
     "lodash.throttle": "^4.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-highlight-words": "^0.21.0",
     "react-hot-toast": "^2.5.2",
     "react-responsive": "^10.0.1",
     "react-router-dom": "^7.6.0",
