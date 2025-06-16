@@ -33,7 +33,7 @@ const cx = classNames.bind(styles);
 
 function AddProduct({ mode = "add", productData, onSuccess }) {
   const [tempImages, setTempImages] = useState([]);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm();  
   const [product, setProduct] = useState({
     name: "",
     category: "",
@@ -41,7 +41,6 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
     price: "",
     discount: "",
     description: "",
-
     images: [],
     tempImageUrls: [],
     variants: []
@@ -75,14 +74,14 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
   };
 
   useEffect(() => {
-    if (mode === "edit" && product) {
+    if (mode === "edit" && productData) {
       setProduct({
-        ...product,
+        ...productData,
         tempImageUrls: [],
       });
-      form.setFieldsValue(product);
+      form.setFieldsValue(productData);
     }
-  }, [mode, product, form]);
+  }, [mode, productData, form]);
   const removeVariant = (index) => {
     if (!productData || !productData.variants) return;
     setProduct((prev) => ({
@@ -215,6 +214,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
       message.error("Không thể xóa ảnh. Vui lòng thử lại sau.");
     }
   };
+  console.log("Current product state:", product);
   const handleSubmit = async () => {
     try {
       // Validate required fields
@@ -412,7 +412,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          initialValues={product}
+          initialValues={productData} // Thay vì product
         >
           <Title level={4}>Thông tin cơ bản</Title>
           <Divider />
