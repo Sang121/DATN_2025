@@ -72,30 +72,6 @@ function ProductDetail() {
     return variant?.stock || 0;
   };
 
-  // Xử lý khi chọn size
-  const handleSizeSelect = (size) => {
-    setSelectedSize(size);
-    const availableColorsForSize = getColorsForSize(size);
-    setAvailableColors(availableColorsForSize);
-
-    // Nếu màu đã chọn không có trong size mới, reset màu
-    if (selectedColor && !availableColorsForSize.includes(selectedColor)) {
-      setSelectedColor("");
-    }
-  };
-
-  // Xử lý khi chọn màu
-  const handleColorSelect = (color) => {
-    setSelectedColor(color);
-    const availableSizesForColor = getSizesForColor(color);
-    setAvailableSizes(availableSizesForColor);
-
-    // Nếu size đã chọn không có trong màu mới, reset size
-    if (selectedSize && !availableSizesForColor.includes(selectedSize)) {
-      setSelectedSize("");
-    }
-  };
-
   // Khởi tạo danh sách sizes và colors khi product load xong
   useEffect(() => {
     if (product?.variants) {
@@ -105,6 +81,50 @@ function ProductDetail() {
       setAvailableColors(allColors);
     }
   }, [product]);
+
+  // Sửa lại hàm xử lý khi chọn size
+  const handleSizeSelect = (size) => {
+    if (selectedSize === size) {
+      // Khi bỏ chọn size, reset cả size và color
+      setSelectedSize("");
+      setSelectedColor(""); // Reset color khi bỏ chọn size
+      // Reset lại tất cả các màu có sẵn
+      setAvailableColors(uniqueColors);
+      setAvailableSizes(uniqueSizes);
+    } else {
+      setSelectedSize(size);
+      // Nếu đã có màu được chọn, kiểm tra xem màu đó có hợp lệ với size mới không
+      if (selectedColor) {
+        const colorsForNewSize = getColorsForSize(size);
+        if (!colorsForNewSize.includes(selectedColor)) {
+          setSelectedColor(""); // Reset color nếu không hợp lệ với size mới
+        }
+      }
+      setAvailableColors(getColorsForSize(size));
+    }
+  };
+
+  // Sửa lại hàm xử lý khi chọn màu
+  const handleColorSelect = (color) => {
+    if (selectedColor === color) {
+      // Khi bỏ chọn màu, reset cả color và size
+      setSelectedColor("");
+      setSelectedSize(""); // Reset size khi bỏ chọn màu
+      // Reset lại tất cả các size có sẵn
+      setAvailableSizes(uniqueSizes);
+      setAvailableColors(uniqueColors);
+    } else {
+      setSelectedColor(color);
+      // Nếu đã có size được chọn, kiểm tra xem size đó có hợp lệ với màu mới không
+      if (selectedSize) {
+        const sizesForNewColor = getSizesForColor(color);
+        if (!sizesForNewColor.includes(selectedSize)) {
+          setSelectedSize(""); // Reset size nếu không hợp lệ với màu mới
+        }
+      }
+      setAvailableSizes(getSizesForColor(color));
+    }
+  };
 
   if (isLoading) {
     return (
@@ -143,6 +163,12 @@ function ProductDetail() {
     );
   }
 
+  const uniqueSizes = [...new Set(product.variants.map((v) => v.size))];
+  const uniqueColors = [...new Set(product.variants.map((v) => v.color))];
+  const productPrice = {
+    newPrice: product.price - (product.price * product.discount) / 100,
+    oldPrice: product.price,
+  };
   return (
     <div className={styles["product-detail-body"]}>
       <div className={styles["product-detail-container"]}>
@@ -176,29 +202,71 @@ function ProductDetail() {
             </div>
           </div>
           <div style={{ flex: 1, paddingLeft: 32 }}>
-            <h2>{product.name}</h2>
-            <div>
-              <strong>Giá:</strong> {product.price?.toLocaleString("vi-VN")}đ
-              {product.oldPrice && (
-                <span className={styles.oldPrice}>
-                  {product.oldPrice?.toLocaleString("vi-VN")}đ
-                </span>
-              )}
-              {product.discount > 0 && (
-                <Tag color="red" className={styles.discountTag}>
-                  -{product.discount}%
-                </Tag>
-              )}
+            <span className={styles['productName']}>{product.name}</span>
+            <div className={styles['productRating']}>
+              <Rate className={styles['ratingStar']} disabled defaultValue={4} />
+              <span className={styles['ratingCount']}>
+                {product.rating || 0} đánh giá
+              </span>
             </div>
-           
+            <div className={styles['productSold']}>
+              <span>({product.sold}) đã bán</span>
+            </div>
+            {product.discount > 0 ? (
+              <div className={styles.productPrice}>
+                {/* Giá hiện tại */}
+                <div className={styles.currentPrice}>
+                  <span>{productPrice.newPrice?.toLocaleString("vi-VN")}</span>
+                  <sup>₫</sup>
+                </div>
+
+                {/* Phần trăm giảm giá */}
+                <div className={styles.discountRate}>{product.discount}%</div>
+
+                {/* Icon giảm giá */}
+                <div className={styles.discountIcon}>
+                  <img
+                    src="https://salt.tikicdn.com/ts/upload/59/3f/08/2635c54cb215de11383507b2fe38bde3.png"
+                    width="14"
+                    height="14"
+                    alt="discount-icon"
+                  />
+                </div>
+
+                {/* Giá gốc */}
+                <div className={styles.originalPrice}>
+                  <del>{productPrice.oldPrice?.toLocaleString("vi-VN")}đ</del>
+                  <sup>₫</sup>
+                </div>
+
+                {/* Icon thông tin */}
+                <div className={styles.infoIcon}>
+                  <img
+                    src="https://salt.tikicdn.com/ts/upload/7b/3e/15/a6e1a274630e27840824d4aab203aaea.png"
+                    width="14"
+                    height="14"
+                    alt="info-icon"
+                    style={{ cursor: "pointer" }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                {product.price && (
+                  <span className={styles.price}>
+                    {product.price?.toLocaleString("vi-VN")}đ
+                  </span>
+                )}
+                {product.discount > 0 && (
+                  <Tag color="red" className={styles.discountTag}>
+                    -{product.discount}%
+                  </Tag>
+                )}
+              </div>
+            )}
 
             <div className={styles.productInfo}>
               {/* Thêm đánh giá sản phẩm */}
-              <div className={styles.productRating}>
-                <Rate disabled defaultValue={4} />
-                <span>(120 đánh giá)</span>
-              </div>
-
 
               {/* Cải thiện hiển thị variants */}
               <div className={styles.variantSection}>
@@ -209,24 +277,22 @@ function ProductDetail() {
                   </div>
                   <div className={styles.sizeList}>
                     {/* Hiển thị tất cả sizes, disable những size không có sẵn cho màu đã chọn */}
-                    {[...new Set(product.variants.map((v) => v.size))].map(
-                      (size) => {
-                        const isAvailable =
-                          !selectedColor || availableSizes.includes(size);
-                        return (
-                          <Button
-                            key={size}
-                            className={`${styles.sizeBtn} ${
-                              selectedSize === size ? styles.selected : ""
-                            } ${!isAvailable ? styles.disabled : ""}`}
-                            onClick={() => handleSizeSelect(size)}
-                            disabled={!isAvailable}
-                          >
-                            {size}
-                          </Button>
-                        );
-                      }
-                    )}
+                    {uniqueSizes.map((size) => {
+                      const isAvailable =
+                        !selectedColor || availableSizes.includes(size);
+                      return (
+                        <Button
+                          key={size}
+                          className={`${styles.sizeBtn} ${
+                            selectedSize === size ? styles.selected : ""
+                          } ${!isAvailable ? styles.disabled : ""}`}
+                          onClick={() => handleSizeSelect(size)}
+                          disabled={!isAvailable}
+                        >
+                          {size}
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
                 <div className={styles.colorSection}>
@@ -235,24 +301,22 @@ function ProductDetail() {
                   </div>
                   <div className={styles.sizeList}>
                     {/* Hiển thị tất cả colors, disable những màu không có sẵn cho size đã chọn */}
-                    {[...new Set(product.variants.map((v) => v.color))].map(
-                      (color) => {
-                        const isAvailable =
-                          !selectedSize || availableColors.includes(color);
-                        return (
-                          <Button
-                            key={color}
-                            className={`${styles.sizeBtn} ${
-                              selectedColor === color ? styles.selected : ""
-                            } ${!isAvailable ? styles.disabled : ""}`}
-                            onClick={() => handleColorSelect(color)}
-                            disabled={!isAvailable}
-                          >
-                            {color}
-                          </Button>
-                        );
-                      }
-                    )}
+                    {uniqueColors.map((color) => {
+                      const isAvailable =
+                        !selectedSize || availableColors.includes(color);
+                      return (
+                        <Button
+                          key={color}
+                          className={`${styles.sizeBtn} ${
+                            selectedColor === color ? styles.selected : ""
+                          } ${!isAvailable ? styles.disabled : ""}`}
+                          onClick={() => handleColorSelect(color)}
+                          disabled={!isAvailable}
+                        >
+                          {color}
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -314,7 +378,7 @@ function ProductDetail() {
         </div>
         <div className={styles["productDetail"]}>
           <h2>Thông tin chi tiết</h2>
-          <p>{product.description}</p>
+          {product.description}
           <h3>Thông số kỹ thuật</h3>
         </div>
       </div>
