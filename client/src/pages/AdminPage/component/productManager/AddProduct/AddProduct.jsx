@@ -504,7 +504,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
               </Form.Item>
             </Col>
           </Row>
-          <Card title="Thêm biến thể sản phẩm">
+          <Card title="Thêm loại sản phẩm">
             <Row gutter={16}>
               <Col span={6}>
                 <Form.Item label="Size">
@@ -549,7 +549,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
               </Col>
               <Col span={6}>
                 <Button type="primary" onClick={addVariant}>
-                  Thêm biến thể
+                  Thêm
                 </Button>
               </Col>
             </Row>
