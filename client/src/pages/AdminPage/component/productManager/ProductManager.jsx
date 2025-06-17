@@ -12,6 +12,8 @@ import {
   Input,
 } from "antd";
 import Highlighter from "react-highlight-words";
+import { FileExcelOutlined } from "@ant-design/icons";
+import * as XLSX from "xlsx";
 
 import { DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import AddProduct from "./AddProduct/AddProduct";
@@ -189,7 +191,6 @@ function ProductManager() {
       ),
   });
 
-
   const columns = [
     {
       title: "ID",
@@ -265,6 +266,63 @@ function ProductManager() {
     },
   ];
 
+  // Add export to Excel function
+  const handleExportExcel = async () => {
+    try {
+      // Get all products without pagination
+      const allProducts = await getAllProduct(1000, 1); // Adjust limit as needed
+
+      // Prepare data for export
+      const exportData = allProducts.data.map((product, index) => ({
+        "STT": index + 1,
+        "Mã SP": product._id,
+        "Tên sản phẩm": product.name,
+        "Giá": product.price,
+        "Khuyến mãi(%)": product.discount || "",
+        "Tổng tồn kho": product.totalStock,
+        "Đã bán": product.sold,
+        "Danh mục": product.category,
+        "Giới tính": product.gender,
+        "Variants": product.variants
+          .map((v) => `${v.size}-${v.color}: ${v.stock}`)
+          .join(", "),
+      }));
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(exportData);
+
+      // Set column widths
+      const colWidths = [
+        { wch: 5 }, // STT
+        { wch: 20 }, // Mã SP
+        { wch: 40 }, // Tên sản phẩm
+        { wch: 15 }, // Giá
+        { wch: 15 }, // Khuyến mãi(%)
+        { wch: 15 }, // Tổng tồn kho
+        { wch: 15 }, // Đã bán
+        { wch: 15 }, // Danh mục
+        { wch: 10 }, // Giới tính
+        { wch: 50 }, // Variants
+      ];
+      ws["!cols"] = colWidths;
+
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, "Danh sách sản phẩm");
+
+      // Generate filename with current date
+      const fileName = `danh_sach_san_pham_${new Date()
+        .toLocaleDateString("vi-VN")
+        .replace(/\//g, "-")}.xlsx`;
+
+      // Export file
+      XLSX.writeFile(wb, fileName);
+
+      message.success("Xuất file Excel thành công!");
+    } catch (error) {
+      message.error("Có lỗi khi xuất file Excel: " + error.message);
+    }
+  };
 
   return (
     <div className={cx("wrapper")}>
@@ -276,16 +334,28 @@ function ProductManager() {
             ? "Thêm sản phẩm"
             : "Chỉnh sửa sản phẩm"}
         </h4>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            setType(type === 0 ? 1 : 0);
-            setSelectedProduct(null);
-          }}
-        >
-          {type === 0 ? "Thêm sản phẩm" : "Quay lại"}
-        </Button>
+        <Space>
+          {type === 0 && (
+            <Button
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={handleExportExcel}
+              style={{ backgroundColor: "#52c41a" }}
+            >
+              Xuất Excel
+            </Button>
+          )}
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setType(type === 0 ? 1 : 0);
+              setSelectedProduct(null);
+            }}
+          >
+            {type === 0 ? "Thêm sản phẩm" : "Quay lại"}
+          </Button>
+        </Space>
       </div>
 
       {type === 0 ? (
