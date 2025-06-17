@@ -14,7 +14,7 @@ function UserUpdate() {
 
   React.useEffect(() => {
     form.setFieldsValue({
-      username: user.username,
+      fullName: user.fullName,
       gender: user.gender,
       email: user.email,
       phone: user.phone,
@@ -60,10 +60,10 @@ function UserUpdate() {
   });
 
   const onFinish = (values) => {
-    const { username, gender, email, phone, address } = values;
+    const { fullName, gender, email, phone, address } = values;
     updateUserMutation.mutate({
-      id: user._id, 
-      userData: { username, gender, email, phone, address },
+      id: user._id,
+      userData: { fullName, gender, email, phone, address },
     });
   };
 
@@ -76,7 +76,7 @@ function UserUpdate() {
       wrapperCol={{ span: 16 }}
       layout="horizontal"
       initialValues={{
-        username: user.username,
+        fullName: user.fullName,
         gender: user.gender,
         email: user.email,
         phone: user.phone,
@@ -85,11 +85,11 @@ function UserUpdate() {
     >
       <h2>Cập nhật thông tin tài khoản</h2>
       <Form.Item
-        label="Tên đăng nhập"
-        name="username"
-        rules={[{ required: true, message: "Tên đăng nhập là bắt buộc!" }]}
+        label="Họ và tên"
+        name="fullName"
+        rules={[{ required: true, message: "Họ và tên là bắt buộc!" }]}
       >
-        <Input placeholder="Tên đăng nhập" />
+        <Input placeholder="Họ và tên" />
       </Form.Item>
       <Form.Item
         label="Email"
