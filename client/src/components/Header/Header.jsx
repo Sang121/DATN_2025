@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateUser, logout } from "../../redux/slices/userSlice";
 import { logoutUser } from "../../services/userService";
 import { message as antdMessage } from "antd";
+
 import { searchProduct } from "../../services/productService";
 function Header({ onShowSignIn }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -24,7 +25,7 @@ function Header({ onShowSignIn }) {
   const user = useSelector((state) => state.user);
   const currentUsername = user.username;
   const currentIsLoggedIn = !!user.access_token;
-
+const order = useSelector((state) => state.order);
   useEffect(() => {
     if (user.username) {
       sessionStorage.setItem("username", user.username);
@@ -196,7 +197,7 @@ function Header({ onShowSignIn }) {
             <Link to="/cart" className={styles["action-item"]}>
               <FaShoppingCart className={styles["action-icon"]} />
               <span className={styles["cart-text"]}>Giỏ Hàng</span>
-              <span className={styles["cart-count"]}>3</span>
+              <span className={styles["cart-count"]}>{order.orderItems.length}</span>
             </Link>
             <Link to="/fitting_room" className={styles["action-item"]}>
               <FaPersonBooth className={styles["action-icon"]} />
