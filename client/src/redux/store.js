@@ -17,6 +17,7 @@ Store.subscribe(
   throttle(() => {
     saveState({
       user: Store.getState().user,
+      order: Store.getState().order,
     });
   }, 1000)
 );
