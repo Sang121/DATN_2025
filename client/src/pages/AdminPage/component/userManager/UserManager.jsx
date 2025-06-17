@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UserAddOutlined } from "@ant-design/icons";
+import { UserAddOutlined, FileExcelOutlined } from "@ant-design/icons";
 import { Button, Input, message, Switch, Typography } from "antd";
 import { Space, Table, Spin, Tag } from "antd";
 import {
@@ -10,6 +10,8 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import RegUser from "./RegUser/RegUser";
 import styles from "./userManager.module.css";
+import * as XLSX from "xlsx";
+
 const { Title } = Typography;
 
 function UserManager() {
@@ -22,9 +24,7 @@ function UserManager() {
     setShowRegUser(true);
   };
 
-  const handleCloseRegUser = () => {
-    setShowRegUser(false);
-  };
+ 
 
   const handleRegUserSuccess = () => {
     setShowRegUser(false);
@@ -255,6 +255,55 @@ function UserManager() {
     deleteUserMutation.mutate(id);
   };
 
+  // Thêm hàm xuất Excel
+  const handleExportExcel = () => {
+    // Chuẩn bị data để xuất
+    const exportData = users.map((user, index) => ({
+      "STT": index + 1,
+      "Họ và tên": user.username,
+      "Tên đăng nhập": user.username,
+      "Số điện thoại": user.phone,
+      "Email": user.email,
+      "Giới tính": user.gender,
+      "Địa chỉ": user.address,
+      "Vai trò": user.isAdmin ? "Admin" : "Người dùng",
+      "Tổng đơn hàng": user.totalOrder || 0,
+      "Ngày tạo": new Date(user.createdAt).toLocaleDateString("vi-VN"),
+    }));
+
+    // Tạo workbook và worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(exportData);
+
+    // Tùy chỉnh độ rộng cột
+    const colWidths = [
+      { wch: 5 }, // STT
+      { wch: 25 }, // Họ và tên
+      { wch: 15 }, // Tên đăng nhập
+      { wch: 15 }, // Số điện thoại
+      { wch: 30 }, // Email
+      { wch: 10 }, // Giới tính
+      { wch: 40 }, // Địa chỉ
+      { wch: 15 }, // Vai trò
+      { wch: 15 }, // Tổng đơn hàng
+      { wch: 20 }, // Ngày tạo
+    ];
+    ws["!cols"] = colWidths;
+
+    // Thêm worksheet vào workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Danh sách người dùng");
+
+    // Tạo tên file với timestamp
+    const fileName = `danh_sach_nguoi_dung_${new Date()
+      .toLocaleDateString("vi-VN")
+      .replace(/\//g, "-")}.xlsx`;
+
+    // Xuất file
+    XLSX.writeFile(wb, fileName);
+
+    message.success("Xuất file Excel thành công!");
+  };
+
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
@@ -278,13 +327,23 @@ function UserManager() {
         <>
           <div className={styles.header}>
             <Title level={4}>Quản lý người dùng</Title>
-            <Button
-              type="primary"
-              icon={<UserAddOutlined />}
-              onClick={handleShowRegUser}
-            >
-              Thêm người dùng
-            </Button>
+            <Space>
+              <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={handleExportExcel}
+                style={{ backgroundColor: "#52c41a" }}
+              >
+                Xuất Excel
+              </Button>
+              <Button
+                type="primary"
+                icon={<UserAddOutlined />}
+                onClick={handleShowRegUser}
+              >
+                Thêm người dùng
+              </Button>
+            </Space>
           </div>
 
           <Table

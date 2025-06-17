@@ -156,7 +156,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .header h4 {
@@ -219,4 +219,10 @@
         gap: 16px;
         align-items: flex-start;
     }
+}
+
+/* Thêm hover effect cho nút Export */
+.header button:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
