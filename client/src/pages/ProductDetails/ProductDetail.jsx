@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
-import { Alert, Button, Spin, Rate, Tag } from "antd";
+import { Alert, Button, Spin, Rate, Tag, message } from "antd";
 import ListProducts from "../../components/ListProducts/ListProduct";
 import { useQuery } from "@tanstack/react-query";
 import { getDetailProduct } from "../../services/productService";
-
+import { useDispatch } from "react-redux";
+import { addOrderItem } from "../../redux/slices/orderSlice";
 function ProductDetail() {
   const { id } = useParams();
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("");
-
-  // Thêm state để lưu trữ các màu và size có sẵn
   const [availableColors, setAvailableColors] = useState([]);
   const [availableSizes, setAvailableSizes] = useState([]);
+  const userId = sessionStorage.getItem("userId") || null;
+  const dispatch = useDispatch();
 
   const {
     data: product,
@@ -49,6 +50,7 @@ function ProductDetail() {
     return [
       ...new Set(
         product.variants.filter((v) => v.size === size).map((v) => v.color)
+
       ),
     ];
   };
@@ -61,6 +63,13 @@ function ProductDetail() {
         product.variants.filter((v) => v.color === color).map((v) => v.size)
       ),
     ];
+  };
+  const getIdForVariant = (size, color) => {
+    if (!product?.variants) return null;
+    const variant = product.variants.find(
+      (v) => v.size === size && v.color === color
+    );
+    return variant?._id || null;
   };
 
   // Hàm lấy số lượng tồn kho cho size và màu được chọn
@@ -83,6 +92,51 @@ function ProductDetail() {
   }, [product]);
 
   // Sửa lại hàm xử lý khi chọn size
+
+  if (isLoading) {
+    return (
+      <div
+        className={styles.statusContainer}
+        style={{ display: "flex", textalign: "center" }}
+      >
+        <Spin size="large" />
+        <p>Loading product details...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className={styles.statusContainer}>
+        <Alert
+          message="Error"
+          description={
+            error?.message ||
+            "Failed to load product details. Please try again later."
+          }
+          type="error"
+          showIcon
+        />
+      </div>
+    );
+  }
+
+  // Nếu không loading, không lỗi và product là null (không tìm thấy sản phẩm)
+  if (!product) {
+    return (
+      <div className={styles.statusContainer}>
+        <p>Product not found.</p>
+      </div>
+    );
+  }
+
+  const productPrice = {
+    newPrice: product.price - (product.price * product.discount) / 100,
+    oldPrice: product.price,
+  };
+
+  const uniqueSizes = [...new Set(product.variants.map((v) => v.size))];
+  const uniqueColors = [...new Set(product.variants.map((v) => v.color))];
   const handleSizeSelect = (size) => {
     if (selectedSize === size) {
       // Khi bỏ chọn size, reset cả size và color
@@ -125,49 +179,45 @@ function ProductDetail() {
       setAvailableSizes(getSizesForColor(color));
     }
   };
-
-  if (isLoading) {
-    return (
-      <div
-        className={styles.statusContainer}
-        style={{ display: "flex", textalign: "center" }}
-      >
-        <Spin size="large" />
-        <p>Loading product details...</p>
-      </div>
+  const handleAddToCart = (size, color, quantity) => {
+    if (userId === undefined) {
+      message.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
+      return;
+    }
+    // {
+    //   type: "addOrderItem",
+    //   payload: {
+    //     name: product.name,
+    //     amount: quantity,
+    //     price: productPrice.newPrice,
+    //     image: selectedImage,
+    //     variant: {
+    //       size: selectedSize,
+    //       color: selectedColor,
+    //       stock: getStockForVariant(selectedSize, selectedColor),
+    //     },
+    //     product: product._id,
+    //   },
+    // }
+    console.log("product id", getIdForVariant(selectedSize, selectedColor));
+    dispatch(
+      addOrderItem({
+        id: getIdForVariant(selectedSize, selectedColor),
+        name: product.name,
+        amount: quantity,
+        originalPrice: productPrice.oldPrice,
+        price: productPrice.newPrice,
+        image: selectedImage,
+        isDiscount: product.discount > 0,
+        variant: {
+          size: selectedSize,
+          color: selectedColor,
+          stock: getStockForVariant(selectedSize, selectedColor),
+        },
+        isUpdate: false,
+      })
     );
-  }
-
-  if (isError) {
-    return (
-      <div className={styles.statusContainer}>
-        <Alert
-          message="Error"
-          description={
-            error?.message ||
-            "Failed to load product details. Please try again later."
-          }
-          type="error"
-          showIcon
-        />
-      </div>
-    );
-  }
-
-  // Nếu không loading, không lỗi và product là null (không tìm thấy sản phẩm)
-  if (!product) {
-    return (
-      <div className={styles.statusContainer}>
-        <p>Product not found.</p>
-      </div>
-    );
-  }
-
-  const uniqueSizes = [...new Set(product.variants.map((v) => v.size))];
-  const uniqueColors = [...new Set(product.variants.map((v) => v.color))];
-  const productPrice = {
-    newPrice: product.price - (product.price * product.discount) / 100,
-    oldPrice: product.price,
+    message.success("Sản phẩm đã được thêm vào giỏ hàng");
   };
   return (
     <div className={styles["product-detail-body"]}>
@@ -202,21 +252,25 @@ function ProductDetail() {
             </div>
           </div>
           <div style={{ flex: 1, paddingLeft: 32 }}>
-            <span className={styles['productName']}>{product.name}</span>
-            <div className={styles['productRating']}>
-              <Rate className={styles['ratingStar']} disabled defaultValue={4} />
-              <span className={styles['ratingCount']}>
+            <span className={styles["productName"]}>{product.name}</span>
+            <div className={styles["productRating"]}>
+              <Rate
+                className={styles["ratingStar"]}
+                disabled
+                defaultValue={4}
+              />
+              <span className={styles["ratingCount"]}>
                 {product.rating || 0} đánh giá
               </span>
             </div>
-            <div className={styles['productSold']}>
+            <div className={styles["productSold"]}>
               <span>({product.sold}) đã bán</span>
             </div>
             {product.discount > 0 ? (
               <div className={styles.productPrice}>
                 {/* Giá hiện tại */}
                 <div className={styles.currentPrice}>
-                  <span>{productPrice.newPrice?.toLocaleString("vi-VN")}</span>
+                  <span>{Math.round(productPrice.newPrice)?.toLocaleString("vi-VN")}</span>
                   <sup>₫</sup>
                 </div>
 
@@ -235,7 +289,7 @@ function ProductDetail() {
 
                 {/* Giá gốc */}
                 <div className={styles.originalPrice}>
-                  <del>{productPrice.oldPrice?.toLocaleString("vi-VN")}đ</del>
+                  <del>{Math.round(productPrice.oldPrice)?.toLocaleString("vi-VN")}đ</del>
                   <sup>₫</sup>
                 </div>
 
@@ -369,7 +423,9 @@ function ProductDetail() {
                 type="primary"
                 size="large"
                 disabled={!selectedSize || !selectedColor}
-                onClick={() => {}}
+                onClick={() =>
+                  handleAddToCart(selectedSize, selectedColor, quantity)
+                }
               >
                 Thêm vào giỏ hàng
               </Button>
