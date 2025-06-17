@@ -16,6 +16,8 @@ const modelUser = new Schema(
     avatar: { type: String, default: null },
     gender: { type: String, enum: ["male", "female", "other"] },
     typeLogin: { type: String, enum: ["email", "google"] },
+    totalOrder: { type: Number, default: 0 },
+    isAuthenticated: { type: Boolean, default: false },
   },
   {
     timestamps: true,
