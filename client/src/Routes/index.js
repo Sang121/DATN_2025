@@ -9,6 +9,7 @@ import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import SearchPage from "../pages/search/SearchPage";
 import ProfilePage from "../pages/profile/profilePage";
 import AdminPage from "../pages/AdminPage/AdminPage";
+import CartPage from "../pages/cartPage/cartPage";
 export const routes = [
   {
     path: "/",
@@ -70,6 +71,12 @@ export const routes = [
     page: AdminPage,
     isShowHeader: true,
     isPrivate: true,
+  },
+  {
+    path: "/cart",
+    page: CartPage,
+    isShowHeader: true,
+    isPrivate: false,
   },
   {
     path: "/*",
