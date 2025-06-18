@@ -13,14 +13,14 @@ import { Link } from "react-router-dom"; //
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { signUpUser } from "../../services/userService";
 
-function SignUpPage({ open, onClose, onSwitchToSignIn }) {
+function SignUpPage({ open, onClose, onSwitchToSignIn, onLoginSuccess }) {
   const [form] = Form.useForm();
 
   const queryClient = useQueryClient();
 
   const signUpMutation = useMutation({
     mutationFn: signUpUser,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log("Registration successful:", data);
       // Hiển thị thông báo thành công bằng antd.message
       antdMessage.success(
@@ -29,6 +29,18 @@ function SignUpPage({ open, onClose, onSwitchToSignIn }) {
       form.resetFields();
       onSwitchToSignIn();
       onClose();
+
+      // Gọi callback onLoginSuccess nếu có
+      if (onLoginSuccess) {
+        // Chuyển đổi dữ liệu người dùng nếu cần thiết
+        const userDataToDispatch = {
+          id: data.user.id,
+          username: data.user.username,
+          email: data.user.email,
+          // Thêm các trường khác nếu cần thiết
+        };
+        onLoginSuccess(userDataToDispatch);
+      }
     },
     onError: (error) => {
       console.error("Registration failed:", error.response.data.error.message);
