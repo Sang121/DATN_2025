@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
-const { FaPhone } = require('react-icons/fa');
+const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema(
   {
-    orderItems: [
+    items: [
       {
         name: { type: String, required: true }, // Tên sản phẩm,
         amount: { type: Number, required: true }, // Số lượng sản phẩm,
+        originalPrice: { type: Number, required: true }, // Giá gốc sản phẩm,
         price: { type: Number, required: true }, // Giá sản phẩm,
         image: { type: String, required: true }, // Hình ảnh sản phẩm,
         variant: {
@@ -31,16 +31,16 @@ const orderSchema = new mongoose.Schema(
         },
       },
     ],
-    shippingAddress: {
+    shippingInfo: {
       fullName: { type: String, required: true }, // Tên người nhận,
       address: { type: String, required: true }, // Địa chỉ giao hàng,
-      city: { type: String, required: true }, // Thành phố,
       phone: { type: String, required: true }, // Số điện thoại,
-      country: { type: String, required: true }, // Quốc gia,
     },
+
+    deliveryMethod: { type: String, required: true }, // Phương thức giao hàng,
     paymentMethod: { type: String, required: true }, // Phương thức thanh toán,
     itemsPrice: { type: Number, required: true }, // Giá trị sản phẩm,
-    shippingPrice: { type: Number, required: true }, // Giá trị vận chuyển,
+    totalDiscount: { type: Number, required: true }, // Giá trị giảm giá,
     taxPrice: { type: Number, required: true }, // Giá trị thuế,
     totalPrice: { type: Number, required: true }, // Tổng giá trị đơn hàng,
     isPaid: { type: Boolean, default: false }, // Trạng thái thanh toán,
@@ -57,6 +57,6 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-const Order = mongoose.model('Order', orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 
 module.exports = Order;
