@@ -45,7 +45,6 @@ const orderSlice = createSlice({
       state.shippingInfo = action.payload;
     },
     updateOrder: (state, action) => {
-      console.log("Updating order with payload:", action.payload);
       state.items = action.payload.items;
       state.user = action.payload.user;
       state.itemsPrice = action.payload.itemsPrice;
@@ -72,6 +71,15 @@ const orderSlice = createSlice({
         user: state.user,
       };
     },
+    clearOrder: (state) => {
+      const orderItemsToKeep = state.orderItems.filter(
+        (item) => !state.items.some((orderedItem) => orderedItem.id === item.id)
+      );
+      return {
+        ...initialState,
+        orderItems: orderItemsToKeep,
+      };
+    },
   },
 });
 
@@ -82,5 +90,6 @@ export const {
   removeOrderItem,
   updateOrder,
   clearImmediateOrder,
+  clearOrder,
 } = orderSlice.actions;
 export default orderSlice.reducer;
