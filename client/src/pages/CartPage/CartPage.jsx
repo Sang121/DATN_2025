@@ -6,15 +6,27 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   updateOrderItem,
   removeOrderItem,
+  updateShippingInfo,
+  updateOrder,
 } from "../../redux/slices/orderSlice";
+import ChangeInfo from "../../utils/changeInfo";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function CartPage() {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [quantities, setQuantities] = useState({});
-
-  const cartItems = useSelector((state) => state.order.orderItems);
-  const dispatch = useDispatch();
+  const [quantities, setQuantities] = useState([]);
+  const [isChangeInfoOpen, setIsChangeInfoOpen] = useState(false);
   const user = useSelector((state) => state.user);
+  const order = useSelector((state) => state.order);
+  const cartItems = order.orderItems;
+  const [shippingInfo, setShippingInfo] = useState({
+    fullName: order.shippingInfo.fullName,
+    phone: order.shippingInfo.phone,
+    address: order.shippingInfo.address,
+  });
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   const summaryItem = selectedItems.reduce((acc, item) => {
     const itemData = cartItems.find((cartItem) => cartItem.id === item);
@@ -63,7 +75,6 @@ function CartPage() {
         ...quantities,
         [itemId]: newQuantity,
       });
-      console.log("Updated quantities:", newQuantity);
       // Dispatch an action to update the quantity in the Redux store
       dispatch(
         updateOrderItem({
@@ -81,6 +92,48 @@ function CartPage() {
   };
   const handleRemoveItem = (itemId) => {
     dispatch(removeOrderItem(itemId));
+  };
+  const handleChangeInfo = () => {
+    setIsChangeInfoOpen(true);
+  };
+
+  const handleCloseChangeInfo = () => {
+    setIsChangeInfoOpen(false);
+  };
+
+  const handleUpdateShippingInfo = (values) => {
+    setShippingInfo(values);
+    dispatch(updateShippingInfo(values)); // Update shipping info in Redux store
+  };
+  const handleCheckout = () => {
+    if (selectedItems.length === 0) {
+      message.error("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+      return;
+    }
+    if (
+      !shippingInfo.fullName ||
+      !shippingInfo.phone ||
+      !shippingInfo.address
+    ) {
+      message.error(
+        "Vui lòng cập nhật thông tin giao hàng trước khi thanh toán."
+      );
+      return;
+    }
+    dispatch(
+      updateOrder({
+        user: user._id,
+        items: selectedItems.map((id) =>
+          cartItems.find((item) => item.id === id)
+        ),
+        itemsPrice: summaryItem,
+
+        taxPrice: summaryVAT,
+        totalDiscount: summaryDiscount,
+        totalPrice: summaryItem - summaryDiscount + summaryVAT,
+      })
+    );
+    navigate("/payment");
   };
   return (
     <div className={styles.cartContainer}>
@@ -174,9 +227,18 @@ function CartPage() {
         <Card className={styles.orderSummary}>
           <h3>Giao tới</h3>
           <div className={styles.deliveryInfo}>
-            <div className={styles.customerName}>{user.fullName}</div>
-            <div className={styles.customerPhone}>{user.phone}</div>
-            <div className={styles.customerAddress}>{user.address}</div>
+            <div className={styles.customerName}>{shippingInfo.fullName}</div>
+            <div className={styles.customerPhone}>{shippingInfo.phone}</div>
+            <div className={styles.customerAddress}>{shippingInfo.address}</div>
+            <div className={styles.changeAddress}>
+              <Button
+                type="link"
+                onClick={handleChangeInfo}
+                className={styles.changeAddressButton}
+              >
+                Thay đổi thông tin nhận hàng
+              </Button>
+            </div>
           </div>
 
           <div className={styles.summary}>
@@ -200,11 +262,21 @@ function CartPage() {
             </div>
           </div>
 
-          <Button type="primary" className={styles.checkoutButton}>
+          <Button
+            type="primary"
+            onClick={handleCheckout}
+            className={styles.checkoutButton}
+          >
             Thanh Toán ({selectedItems.length} sản phẩm)
           </Button>
         </Card>
       </div>
+      <ChangeInfo
+        isOpen={isChangeInfoOpen}
+        onClose={handleCloseChangeInfo}
+        defaultInfo={user}
+        onSubmit={handleUpdateShippingInfo}
+      />
     </div>
   );
 }
