@@ -175,7 +175,6 @@ export const getDetailProduct = async (productId) => {
       axiosInstance.get(url),
       timeout(5000),
     ]);
-    console.log("responsed", response);
     return response.data.data;
   } catch (error) {
     if (error.response) {

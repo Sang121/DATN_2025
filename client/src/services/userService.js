@@ -61,7 +61,6 @@ export const logoutUser = async (userId) => {
 export const refreshToken = async () => {
   try {
     const response = await axiosInstance.get(`/user/refreshToken`);
-    console.log("Token refreshed successfully (userService):", response.data);
     return response.data;
   } catch (error) {
     const errorMessage =
