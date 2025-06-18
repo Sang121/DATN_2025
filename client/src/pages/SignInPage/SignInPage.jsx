@@ -15,6 +15,7 @@ import { signInUser } from "../../services/userService";
 import { getDetailUser } from "../../services/userService";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../../redux/slices/userSlice";
+import { updateShippingInfo } from "../../redux/slices/orderSlice";
 function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
@@ -61,6 +62,11 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
       };
 
       dispatch(updateUser(userDataToDispatch)); // Cập nhật Redux store
+      dispatch(updateShippingInfo({
+        fullName: userDataToDispatch.fullName,
+        phone: userDataToDispatch.phone,
+        address: userDataToDispatch.address,
+      }));
       if (onLoginSuccess) {
         onLoginSuccess(userDataToDispatch);
       }
