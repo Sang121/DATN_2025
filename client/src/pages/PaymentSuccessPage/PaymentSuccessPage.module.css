@@ -1,0 +1,104 @@
+.container {
+    min-height: 100vh;
+    background-color: #f5f5fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.content {
+    background: white;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    width: 100%;
+    max-width: 600px;
+}
+
+.successIcon {
+    color: #52c41a;
+    font-size: 72px;
+}
+
+.orderInfo {
+    margin: 24px 0;
+    text-align: center;
+}
+
+.orderId {
+    color: #1890ff;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.totalAmount {
+    color: #ff4d4f;
+    font-weight: 600;
+    font-size: 18px;
+    margin-left: 8px;
+}
+
+.thankYou {
+    margin-top: 16px;
+    color: #52c41a;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.orderButton {
+    background-color: #1890ff;
+    border-color: #1890ff;
+    height: 40px;
+    padding: 0 32px;
+    font-size: 16px;
+}
+
+.orderButton:hover {
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+}
+
+.continueButton {
+    height: 40px;
+    padding: 0 32px;
+    font-size: 16px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .content {
+        padding: 24px;
+    }
+
+    .successIcon {
+        font-size: 56px;
+    }
+
+    :global(.ant-result-extra) {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .orderButton,
+    .continueButton {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 16px;
+    }
+
+    .content {
+        padding: 16px;
+    }
+
+    .orderInfo {
+        margin: 16px 0;
+    }
+
+    .totalAmount {
+        font-size: 16px;
+    } }
