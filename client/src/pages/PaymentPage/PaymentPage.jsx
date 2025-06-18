@@ -10,10 +10,12 @@ import { useNavigate } from 'react-router-dom';
 function PaymentPage() {
   const order = useSelector((state) => state.order);
   const [paymentMethod, setPaymentMethod] = useState('COD');
-  const [deliveryMethod, setDeliveryMethod] = useState('standard');
+  const [deliveryMethod, setDeliveryMethod] = useState('GHTK');
   const navigate = useNavigate();
 
 const dispatch = useDispatch();
+
+
   const paymentMethods = [
     { value: 'COD', label: 'Thanh toán tiền mặt', icon: '💵' },
     { value: 'VNPAY', label: 'Quét Mã QR từ ứng dụng ngân hàng', icon: '🏦' },
@@ -39,6 +41,7 @@ const dispatch = useDispatch();
       totalPrice: order.totalPrice,
       user: order.user,
     };
+    console.log("Order Data:", orderData);
     const res = await createOrder(orderData);
     if (res.status === 'Success') {
       
