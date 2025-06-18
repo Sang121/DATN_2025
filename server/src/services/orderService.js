@@ -15,13 +15,12 @@ const createOrder = (orderData) => {
         !orderData.deliveryMethod ||
         !orderData.itemsPrice ||
         !orderData.taxPrice ||
-        !orderData.totalDiscount ||
         !orderData.totalPrice ||
         !orderData.user
       ) {
         return reject({
           status: "Err",
-          message: "Missing required fields",
+          message: "Missing required fields service",
           data: null,
         });
       }
@@ -43,13 +42,6 @@ const createOrder = (orderData) => {
         });
       }
 
-      if (isNaN(orderData.totalDiscount) || orderData.totalDiscount < 0) {
-        return reject({
-          status: "Err",
-          message: "Total discount must be a positive number",
-          data: null,
-        });
-      }
 
       if (
         !orderData.items ||

@@ -35,6 +35,7 @@ const orderSchema = new mongoose.Schema(
       fullName: { type: String, required: true }, // Tên người nhận,
       address: { type: String, required: true }, // Địa chỉ giao hàng,
       phone: { type: String, required: true }, // Số điện thoại,
+      email: { type: String, required: true }, // Email người nhận,
     },
 
     deliveryMethod: { type: String, required: true }, // Phương thức giao hàng,
