@@ -50,7 +50,6 @@ function ProductDetail() {
     return [
       ...new Set(
         product.variants.filter((v) => v.size === size).map((v) => v.color)
-
       ),
     ];
   };
@@ -184,21 +183,7 @@ function ProductDetail() {
       message.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
     }
-    // {
-    //   type: "addOrderItem",
-    //   payload: {
-    //     name: product.name,
-    //     amount: quantity,
-    //     price: productPrice.newPrice,
-    //     image: selectedImage,
-    //     variant: {
-    //       size: selectedSize,
-    //       color: selectedColor,
-    //       stock: getStockForVariant(selectedSize, selectedColor),
-    //     },
-    //     product: product._id,
-    //   },
-    // }
+    
     console.log("product id", getIdForVariant(selectedSize, selectedColor));
     dispatch(
       addOrderItem({
@@ -214,6 +199,7 @@ function ProductDetail() {
           color: selectedColor,
           stock: getStockForVariant(selectedSize, selectedColor),
         },
+        product: product._id,
         isUpdate: false,
       })
     );
@@ -270,7 +256,9 @@ function ProductDetail() {
               <div className={styles.productPrice}>
                 {/* Giá hiện tại */}
                 <div className={styles.currentPrice}>
-                  <span>{Math.round(productPrice.newPrice)?.toLocaleString("vi-VN")}</span>
+                  <span>
+                    {Math.round(productPrice.newPrice)?.toLocaleString("vi-VN")}
+                  </span>
                   <sup>₫</sup>
                 </div>
 
@@ -289,7 +277,10 @@ function ProductDetail() {
 
                 {/* Giá gốc */}
                 <div className={styles.originalPrice}>
-                  <del>{Math.round(productPrice.oldPrice)?.toLocaleString("vi-VN")}đ</del>
+                  <del>
+                    {Math.round(productPrice.oldPrice)?.toLocaleString("vi-VN")}
+                    đ
+                  </del>
                   <sup>₫</sup>
                 </div>
 
