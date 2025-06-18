@@ -24,7 +24,6 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
   const signInMutation = useMutation({
     mutationFn: signInUser,
     onSuccess: async (data) => {
-      console.log("Login successful:", data);
       const access_token = data.access_token;
       sessionStorage.setItem("access_token", access_token);
 
@@ -41,8 +40,6 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
       let userDetail = null;
       if (userId) {
         const res = await getDetailUser(userId, access_token);
-        console.log("userId:", userId, " access_token:", access_token);
-        console.log("User detail:", res.data);
         userDetail = res.data;
       } else {
         console.error("Không thể lấy userId từ token", userDetail);
@@ -60,21 +57,25 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
         isAdmin: userDetail?.isAdmin || false,
         access_token: access_token,
       };
-
       dispatch(updateUser(userDataToDispatch)); // Cập nhật Redux store
-      dispatch(updateShippingInfo({
-        fullName: userDataToDispatch.fullName,
-        phone: userDataToDispatch.phone,
-        address: userDataToDispatch.address,
-      }));
+      dispatch(
+        updateShippingInfo({
+          fullName: userDataToDispatch.fullName,
+          phone: userDataToDispatch.phone,
+          address: userDataToDispatch.address,
+          email: userDataToDispatch.email,
+        })
+      );
       if (onLoginSuccess) {
         onLoginSuccess(userDataToDispatch);
-      }
 
+      }
       form.resetFields();
       onClose();
       queryClient.invalidateQueries({ queryKey: ["userData"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+   
+ 
     },
 
     onError: (error) => {
@@ -92,6 +93,7 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
 
   const onFinish = (values) => {
     signInMutation.mutate(values);
+    
   };
 
   return (
