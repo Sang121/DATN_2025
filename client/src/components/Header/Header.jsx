@@ -13,6 +13,7 @@ import { Row, Col, Drawer, Popover } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser, logout } from "../../redux/slices/userSlice";
+import { clearOrder } from "../../redux/slices/orderSlice";
 import { logoutUser } from "../../services/userService";
 import { message as antdMessage } from "antd";
 
@@ -58,6 +59,8 @@ const order = useSelector((state) => state.order);
           dispatch(updateUser(parsedState.user));
         } else {
           dispatch(logout());
+          
+
         }
       }
       if (e.key === "access_token" && !e.newValue) {
@@ -80,6 +83,8 @@ const order = useSelector((state) => state.order);
   const handleLogout = () => {
     sessionStorage.clear();
     dispatch(logout());
+    dispatch(clearOrder());
+
     logoutUser()
       .then(() => {
         console.log("Logout successful");
