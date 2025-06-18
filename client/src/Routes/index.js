@@ -66,6 +66,7 @@ export const routes = [
     page: ProfilePage,
     isShowHeader: true,
     isPrivate: false,
+    isAuthRequired: true,
   },
   {
     path: "/system/admin",
@@ -84,12 +85,14 @@ export const routes = [
     page: PaymentPage,
     isShowHeader: true,
     isPrivate: false,
+    isAuthRequired: true,
   },
   {
     path: "/payment-success",
     page: PaymentSuccessPage,
     isShowHeader: true,
     isPrivate: false,
+    isAuthRequired: true,
   },
   {
     path: "/*",
