@@ -15,10 +15,12 @@ function App() {
           {routes.map((route, index) => {
             const Page = route.page;
             const checkAuth = !route.isPrivate || user.isAdmin;
+            const isLogin = !route.isAuthRequired || user.access_token;
             const Layout = route.isShowHeader ? DefauPage : Fragment;
 
             return (
               route.path &&
+              isLogin &&
               checkAuth && (
                 <Route
                   key={index}
