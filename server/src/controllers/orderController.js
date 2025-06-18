@@ -26,10 +26,10 @@ const createOrder = async (req, res) => {
       user,
     } = req.body;
     // Validate required fields
-    if (!items || !shippingInfo || !paymentMethod || !deliveryMethod || !itemsPrice || !totalDiscount || !taxPrice || !totalPrice || !user) {
+    if (!items || !shippingInfo || !paymentMethod || !deliveryMethod || !itemsPrice  || !taxPrice || !totalPrice || !user) {
       return res.status(400).json({
         status: "Err",
-        message: "Missing required fields",
+        message: "Missing required fields controller",
       });
     }
 
