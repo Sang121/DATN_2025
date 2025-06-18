@@ -1,26 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  orderItems: [ 
-   
-  ],
-  shippingAddress: {
-    fullName: "",
-    address: "",
-    city: "",
-    phone: "",
-    country: "",
-  },
+  orderItems: [],
+  shippingInfo: {},
+  items: [],
   paymentMethod: "",
   itemsPrice: 0,
   shippingPrice: 0,
   taxPrice: 0,
+  totalDiscount: 0,
   totalPrice: 0,
   isPaid: false,
   paidAt: "",
   isDelivered: false,
   deliveredAt: "",
-  user: "", 
+  user: "",
 };
 
 const orderSlice = createSlice({
@@ -47,6 +41,18 @@ const orderSlice = createSlice({
         existingItem.amount = newItem.amount;
       }
     },
+    updateShippingInfo: (state, action) => {
+      state.shippingInfo = action.payload;
+    },
+    updateOrder: (state, action) => {
+      console.log("Updating order with payload:", action.payload);
+      state.items = action.payload.items;
+      state.user = action.payload.user;
+      state.itemsPrice = action.payload.itemsPrice;
+      state.taxPrice = action.payload.taxPrice;
+      state.totalPrice = action.payload.totalPrice;
+      state.totalDiscount = action.payload.totalDiscount;
+    },
     removeOrderItem: (state, action) => {
       const id = action.payload;
       const existingItem = state.orderItems.find((item) => item.id === id);
@@ -54,9 +60,27 @@ const orderSlice = createSlice({
         state.orderItems = state.orderItems.filter((item) => item.id !== id);
       }
     },
-    // You can add more reducers here
+    clearImmediateOrder: (state) => {
+      const orderItemsToKeep = state.orderItems.filter(
+        (item) => !state.items.some((orderedItem) => orderedItem.id === item.id)
+      );
+
+      return {
+        ...initialState,
+        orderItems: orderItemsToKeep,
+        shippingInfo: state.shippingInfo,
+        user: state.user,
+      };
+    },
   },
 });
 
-export const { addOrderItem, updateOrderItem, removeOrderItem } = orderSlice.actions;
+export const {
+  addOrderItem,
+  updateOrderItem,
+  updateShippingInfo,
+  removeOrderItem,
+  updateOrder,
+  clearImmediateOrder,
+} = orderSlice.actions;
 export default orderSlice.reducer;
