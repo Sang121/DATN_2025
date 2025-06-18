@@ -159,6 +159,41 @@
   text-decoration: underline;
 }
 
+.loginRequired {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.loginRequired p {
+  margin-bottom: 12px;
+  color: #666;
+}
+
+.emptyDeliveryInfo {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.emptyDeliveryInfo p {
+  margin-bottom: 12px;
+  color: #666;
+}
+
+.updateInfoButton {
+  margin-top: 8px;
+}
+
+.checkoutButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 992px) {
   .cartContent {
     grid-template-columns: 1fr;

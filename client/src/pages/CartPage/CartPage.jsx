@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Checkbox, Input, Button, Space, Card, message, Col } from "antd";
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import styles from "./CartPage.module.css";
@@ -10,23 +10,49 @@ import {
   updateOrder,
 } from "../../redux/slices/orderSlice";
 import ChangeInfo from "../../utils/changeInfo";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import SignInPage from "../SignInPage/SignInPage";
+import SignUpPage from "../SignUpPage/SignUpPage";
 
 function CartPage() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [quantities, setQuantities] = useState([]);
   const [isChangeInfoOpen, setIsChangeInfoOpen] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(false);
   const user = useSelector((state) => state.user);
   const order = useSelector((state) => state.order);
   const cartItems = order.orderItems;
-  const [shippingInfo, setShippingInfo] = useState({
-    fullName: order.shippingInfo.fullName,
-    phone: order.shippingInfo.phone,
-    address: order.shippingInfo.address,
-  });
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+
+  const [shippingInfo, setShippingInfo] = useState(() => {
+    const orderShipping = order.shippingInfo || {};
+    const userInfo = user || {};
+
+    return {
+      fullName: orderShipping.fullName || userInfo.fullName || "",
+      phone: orderShipping.phone || userInfo.phone || "",
+      address: orderShipping.address || userInfo.address || "",
+      email: orderShipping.email || userInfo.email || "",
+    };
+  });
+
+  useEffect(() => {
+    if (
+      user &&
+      (!shippingInfo.fullName || !shippingInfo.phone || !shippingInfo.address)
+    ) {
+      const updatedInfo = {
+        fullName: order.shippingInfo?.fullName || user.fullName || "",
+        phone: order.shippingInfo?.phone || user.phone || "",
+        address: order.shippingInfo?.address || user.address || "",
+        email: order.shippingInfo?.email || user.email || "",
+      };
+      setShippingInfo(updatedInfo);
+    }
+  }, [user, order.shippingInfo]);
 
   const summaryItem = selectedItems.reduce((acc, item) => {
     const itemData = cartItems.find((cartItem) => cartItem.id === item);
@@ -75,7 +101,6 @@ function CartPage() {
         ...quantities,
         [itemId]: newQuantity,
       });
-      // Dispatch an action to update the quantity in the Redux store
       dispatch(
         updateOrderItem({
           ...cartItems.find((item) => item.id === itemId),
@@ -86,7 +111,6 @@ function CartPage() {
   };
 
   const formatPrice = (price) => {
-    // Làm tròn đến số nguyên gần nhất
     const roundedPrice = Math.round(price);
     return new Intl.NumberFormat("vi-VN").format(roundedPrice) + "đ";
   };
@@ -103,38 +127,150 @@ function CartPage() {
 
   const handleUpdateShippingInfo = (values) => {
     setShippingInfo(values);
-    dispatch(updateShippingInfo(values)); // Update shipping info in Redux store
+    dispatch(updateShippingInfo(values));
+    message.success("Cập nhật thông tin thành công!");
   };
+
+  const processItemsImages = (items) => {
+    return items.map((item) => {
+      const processedItem = { ...item };
+
+      if (processedItem.image) {
+        processedItem.image = processedItem.image.replace(
+          "http://localhost:3001/uploads/",
+          ""
+        );
+      } else {
+        console.log("Item image is missing:", processedItem);
+      }
+      return processedItem;
+    });
+  };
+  const hasShippingInfo =
+    shippingInfo.fullName && shippingInfo.phone && shippingInfo.address;
+  const isUserLoggedIn = user && user.isAuthenticated !== false;
+
+  const handleSwitchToSignUp = () => {
+    setShowSignIn(false);
+    setShowSignUp(true);
+  };
+
+  const handleSwitchToSignIn = () => {
+    setShowSignUp(false);
+    setShowSignIn(true);
+  };
+
+  const handleShowSignIn = () => {
+    setShowSignIn(true);
+  };
+
+  const handleLoginSuccess = (userData) => {
+    if (userData) {
+      setShippingInfo({
+        fullName: userData.fullName || "",
+        phone: userData.phone || "",
+        address: userData.address || "",
+        email: userData.email || "",
+      });
+
+      setShowSignIn(false);
+      setShowSignUp(false);
+
+      message.success("Đăng nhập thành công!");
+    }
+  };
+
+  const renderShippingSection = () => {
+    if (!isUserLoggedIn) {
+      return (
+        <div className={styles.loginRequired}>
+          <p>Vui lòng đăng nhập để xem thông tin giao hàng</p>
+          <Button type="primary" onClick={handleShowSignIn}>
+            Đăng nhập
+          </Button>
+        </div>
+      );
+    }
+
+    if (!hasShippingInfo) {
+      return (
+        <div className={styles.emptyDeliveryInfo}>
+          <p>Chưa có thông tin giao hàng</p>
+          <Button
+            type="primary"
+            onClick={handleChangeInfo}
+            className={styles.updateInfoButton}
+          >
+            Cập nhật thông tin giao hàng
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.deliveryInfo}>
+        <h3>Giao tới</h3>
+        <div className={styles.customerName}>{shippingInfo.fullName}</div>
+        <div className={styles.customerPhone}>{shippingInfo.phone}</div>
+        <div className={styles.customerAddress}>{shippingInfo.address}</div>
+        <div className={styles.changeAddress}>
+          <Button
+            type="link"
+            onClick={handleChangeInfo}
+            className={styles.changeAddressButton}
+          >
+            Thay đổi thông tin nhận hàng
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   const handleCheckout = () => {
+    if (!isUserLoggedIn) {
+      message.error("Vui lòng đăng nhập để thanh toán.");
+      handleShowSignIn();
+      return;
+    }
+
     if (selectedItems.length === 0) {
       message.error("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
       return;
     }
-    if (
-      !shippingInfo.fullName ||
-      !shippingInfo.phone ||
-      !shippingInfo.address
-    ) {
+
+    if (!hasShippingInfo) {
       message.error(
         "Vui lòng cập nhật thông tin giao hàng trước khi thanh toán."
       );
+      handleChangeInfo();
       return;
     }
-    dispatch(
-      updateOrder({
-        user: user._id,
-        items: selectedItems.map((id) =>
-          cartItems.find((item) => item.id === id)
-        ),
-        itemsPrice: summaryItem,
 
-        taxPrice: summaryVAT,
-        totalDiscount: summaryDiscount,
-        totalPrice: summaryItem - summaryDiscount + summaryVAT,
-      })
-    );
-    navigate("/payment");
+    try {
+      const selectedCartItems = selectedItems.map((id) =>
+        cartItems.find((item) => item.id === id)
+      );
+      const processedItems = processItemsImages(selectedCartItems);
+      console.log("Processed items:", processedItems);
+      dispatch(
+        updateOrder({
+          user: user._id,
+          items: processedItems,
+          itemsPrice: summaryItem,
+          taxPrice: summaryVAT,
+          totalDiscount: summaryDiscount,
+          totalPrice: summaryItem - summaryDiscount + summaryVAT,
+          shippingInfo: shippingInfo,
+        })
+      );
+
+      navigate("/payment");
+    } catch (error) {
+      console.error("Error updating order:", error);
+      message.error("Có lỗi xảy ra khi xử lý đơn hàng.");
+    }
   };
+
   return (
     <div className={styles.cartContainer}>
       <div className={styles.cartContent}>
@@ -223,23 +359,12 @@ function CartPage() {
               />
             </div>
           ))}
+          {cartItems.length === 0 && (
+            <div className={styles.emptyCart}>Giỏ hàng của bạn đang trống</div>
+          )}
         </Card>
         <Card className={styles.orderSummary}>
-          <h3>Giao tới</h3>
-          <div className={styles.deliveryInfo}>
-            <div className={styles.customerName}>{shippingInfo.fullName}</div>
-            <div className={styles.customerPhone}>{shippingInfo.phone}</div>
-            <div className={styles.customerAddress}>{shippingInfo.address}</div>
-            <div className={styles.changeAddress}>
-              <Button
-                type="link"
-                onClick={handleChangeInfo}
-                className={styles.changeAddressButton}
-              >
-                Thay đổi thông tin nhận hàng
-              </Button>
-            </div>
-          </div>
+          {renderShippingSection()}
 
           <div className={styles.summary}>
             <div className={styles.summaryItem}>
@@ -266,15 +391,30 @@ function CartPage() {
             type="primary"
             onClick={handleCheckout}
             className={styles.checkoutButton}
+            disabled={!isUserLoggedIn || selectedItems.length === 0}
           >
             Thanh Toán ({selectedItems.length} sản phẩm)
           </Button>
         </Card>
       </div>
+
+      <SignInPage
+        open={showSignIn}
+        onClose={() => setShowSignIn(false)}
+        onSwitchToSignUp={handleSwitchToSignUp}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      <SignUpPage
+        open={showSignUp}
+        onClose={() => setShowSignUp(false)}
+        onSwitchToSignIn={handleSwitchToSignIn}
+      />
+
       <ChangeInfo
         isOpen={isChangeInfoOpen}
         onClose={handleCloseChangeInfo}
-        defaultInfo={user}
+        defaultInfo={shippingInfo}
         onSubmit={handleUpdateShippingInfo}
       />
     </div>
