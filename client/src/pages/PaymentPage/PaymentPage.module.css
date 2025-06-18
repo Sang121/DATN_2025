@@ -1,0 +1,326 @@
+.cartContainer {
+  padding: 20px;
+  background-color: #f5f5fa;
+  min-height: 100vh;
+}
+
+.cartContent {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 3fr 1fr;
+}
+
+.cartList {
+  background: white;
+  padding: 16px;
+}
+
+.cartHeader {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr 40px;
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+}
+
+.cartItem {
+  display: grid;
+  grid-template-columns: 40px 100px 2fr 1fr 1fr 1fr 40px;
+  padding: 16px;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.itemInfo {
+  padding: 0 16px;
+}
+
+
+.itemImage{
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.itemName {
+  font-size: 14px;
+  margin-top: 4px;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+.itemVariant{
+  font-size: 12px;
+  color: #808089;
+}
+.currentPrice {
+  
+  font-weight: 500;
+}
+.discountedPrice{
+    color: #ff424e;
+
+}
+.totalPrice{
+  color: rgb(255, 66, 78);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 150%;
+    white-space: nowrap;
+    
+}
+.originalPrice {
+  text-decoration: line-through;
+  color: #808089;
+  font-size: 12px;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  
+}
+
+.quantityControl input {
+  width: 50px;
+  text-align: center;
+}
+
+.orderSummary {
+  background: white;
+  position: sticky;
+  top: 20px;
+}
+
+.deliveryInfo {
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.customerName {
+  font-weight: 500;
+}
+
+.customerPhone {
+  color: #808089;
+}
+
+.summary {
+  padding: 16px;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+.fee {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #5a5a5f; 
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.totalAmount {
+  color: #ff424e;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.checkoutButton {
+  width: 100%;
+  height: 40px;
+  margin-top: 16px;
+}
+
+.changeAddressButton {
+  padding: 0;
+  height: auto;
+  color: #1890ff;
+}
+
+.changeAddressButton:hover {
+  color: #40a9ff;
+  text-decoration: underline;
+}
+
+.paymentContainer {
+  padding: 20px;
+  background-color: #f5f5fa;
+  min-height: 100vh;
+}
+
+.paymentContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  background: white;
+  border-radius: 8px;
+}
+
+.deliveryOptions,
+.paymentOptions {
+  width: 100%;
+}
+
+.deliveryTime {
+  color: #00ab56;
+  margin: 0 8px;
+}
+
+.freeShipping {
+  color: #00ab56;
+  background-color: #e8f6ee;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.orderSummary {
+  background: white;
+  border-radius: 8px;
+  position: sticky;
+  top: 20px;
+}
+
+.deliveryInfo {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.customerName {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.customerPhone {
+  color: #808089;
+  margin-bottom: 4px;
+}
+
+.address {
+  font-size: 14px;
+  color: #38383d;
+}
+
+.summary {
+  padding: 16px;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.fee {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: #808089;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.totalAmount {
+  color: #ff424e;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.checkoutButton {
+  width: 100%;
+  height: 48px;
+  font-size: 16px;
+  margin-top: 16px;
+  background-color: #ff424e;
+  border: none;
+}
+
+.checkoutButton:hover {
+  background-color: #ff2f3d;
+}
+
+@media (max-width: 992px) {
+  .cartContent {
+    grid-template-columns: 1fr;
+  }
+  
+  .paymentContent {
+    grid-template-columns: 1fr;
+  }
+  
+  .orderSummary {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .cartItem {
+    grid-template-columns: 40px 80px 1fr;
+    gap: 12px;
+  }
+
+  .cartHeader {
+    display: none;
+  }
+
+  .itemPrice, .quantityControl, .totalPrice {
+    grid-column: 2 / -1;
+  }
+  
+  .paymentContainer {
+    padding: 10px;
+  }
+  
+  .deliveryTime,
+  .freeShipping {
+    display: block;
+    margin: 4px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .cartContainer {
+    padding: 10px;
+  }
+  
+  .section {
+    padding: 12px;
+  }
+  
+  .totalAmount {
+    font-size: 18px;
+  }
+}
