@@ -3,7 +3,7 @@ import styles from "./ProductCard.module.css";
 import { Link } from "react-router-dom";
 import { StarFilled, ShoppingCartOutlined } from "@ant-design/icons";
 
-function ProductCard({ productId, image, name, price, sold, rating, discount }) {
+function ProductCard({ productId, image, name, price, sold, discount }) {
   const newPrice = price - (price * discount) / 100;
   const formattedPrice = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -16,7 +16,10 @@ const productPrice = {
   return (
     <div className={styles["product-card"]}>
       {discount > 0 && (
-        <div className={styles["product-card-badge"]}>-{discount}%</div>
+        <div className={styles["product-card-discount"]}>-{discount}%</div>
+      )}
+      {sold > 20 && (
+        <div className={styles["product-card-badge"]}>Bán chạy</div>
       )}
       <Link to={`/products/${productId}`}>
         <img src={image} alt={name} className={styles["product-image"]} />
@@ -89,7 +92,7 @@ const productPrice = {
           <div className={styles["product-sold"]}>
             <span className={styles["sold-count"]}>
               {" "}
-              Đã bán {sold} sản phẩm
+              Đã bán {sold ? sold : 0 } sản phẩm
             </span>
           </div>
         </div>
