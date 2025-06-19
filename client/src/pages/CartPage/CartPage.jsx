@@ -42,7 +42,7 @@ function CartPage() {
   useEffect(() => {
     if (
       user &&
-      (!shippingInfo.fullName || !shippingInfo.phone || !shippingInfo.address)
+      (!shippingInfo.fullName || !shippingInfo.phone || !shippingInfo.address || !shippingInfo.email)
     ) {
       const updatedInfo = {
         fullName: order.shippingInfo?.fullName || user.fullName || "",
@@ -52,6 +52,7 @@ function CartPage() {
       };
       setShippingInfo(updatedInfo);
     }
+
   }, [user, order.shippingInfo]);
 
   const summaryItem = selectedItems.reduce((acc, item) => {
@@ -147,7 +148,10 @@ function CartPage() {
     });
   };
   const hasShippingInfo =
-    shippingInfo.fullName && shippingInfo.phone && shippingInfo.address;
+    shippingInfo.fullName &&
+    shippingInfo.phone &&
+    shippingInfo.address &&
+    shippingInfo.email;
   const isUserLoggedIn = user && user.isAuthenticated !== false;
 
   const handleSwitchToSignUp = () => {
@@ -262,7 +266,6 @@ function CartPage() {
       });
 
       const processedItems = processItemsImages(selectedCartItems);
-
       dispatch(
         updateOrder({
           user: user._id,
