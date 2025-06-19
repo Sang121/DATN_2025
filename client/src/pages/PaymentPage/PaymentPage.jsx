@@ -65,13 +65,13 @@ function PaymentPage() {
       message.error("Đặt hàng thất bại, vui lòng thử lại sau.");
     }
   };
-  if (!order.shippingInfo || !order.items || order.items.length === 0) {
-    message.warning("Bạn chưa có sản phẩm để thanh toán, vui lòng thêm sản phẩm.");
+  // if (!order.shippingInfo || !order.items || order.items.length === 0) {
+  //   message.warning("Bạn chưa có sản phẩm để thanh toán, vui lòng thêm sản phẩm.");
 
-    navigate("/cart");
-    return null;
+  //   navigate("/cart");
+  //   return null;
     
-  }
+  // }
   return (
     <div className={styles.paymentContainer}>
       <div className={styles.paymentContent}>
