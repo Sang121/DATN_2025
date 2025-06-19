@@ -15,7 +15,6 @@ import {
   Row,
   Col,
   message,
- 
 } from "antd";
 import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -33,7 +32,7 @@ const cx = classNames.bind(styles);
 
 function AddProduct({ mode = "add", productData, onSuccess }) {
   const [tempImages, setTempImages] = useState([]);
-  const [form] = Form.useForm();  
+  const [form] = Form.useForm();
   const [product, setProduct] = useState({
     name: "",
     category: "",
@@ -43,33 +42,60 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
     description: "",
     images: [],
     tempImageUrls: [],
-    variants: []
+    variants: [],
   });
 
   const [variant, setVariant] = useState({
-    size: '',
-    color: '',
-    stock: 0
+    size: "",
+    color: "",
+    stock: 0,
   });
-
   const addVariant = () => {
-    console.log("Adding variant:", variant);
-    console.log("Current product variants:", product);
     if (!variant.size || !variant.color || variant.stock < 0) {
-      message.error('Vui lòng điền đầy đủ thông tin size, màu và số lượng');
+      message.error("Vui lòng điền đầy đủ thông tin size, màu và số lượng");
       return;
     }
 
-    setProduct((prev) => ({
-      ...prev,
-      variants: [...(prev.variants || []), { ...variant }]
-    }));
+    setProduct((prev) => {
+      const existingVariants = prev.variants || [];
+
+      // Kiểm tra xem variant với size và color này đã tồn tại chưa
+      const existingVariantIndex = existingVariants.findIndex(
+        (v) => v.size === variant.size && v.color === variant.color
+      );
+
+      if (existingVariantIndex !== -1) {
+        // Nếu đã tồn tại, cộng thêm stock
+        const updatedVariants = [...existingVariants];
+        updatedVariants[existingVariantIndex] = {
+          ...updatedVariants[existingVariantIndex],
+          stock:
+            (updatedVariants[existingVariantIndex].stock || 0) + variant.stock,
+        };
+
+        message.success(
+          `Đã cập nhật số lượng cho sản phẩm ${variant.size} - ${variant.color}. ` +
+            `Tổng tồn kho: ${updatedVariants[existingVariantIndex].stock}`
+        );
+
+        return {
+          ...prev,
+          variants: updatedVariants,
+        };
+      } else {
+        // Nếu chưa tồn tại, thêm variant mới
+        return {
+          ...prev,
+          variants: [...existingVariants, { ...variant }],
+        };
+      }
+    });
 
     // Reset variant state
     setVariant({
-      size: '',
-      color: '',
-      stock: 0
+      size: "",
+      color: "",
+      stock: 0,
     });
   };
 
@@ -99,11 +125,11 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
     { value: "Ba Lô", label: "Ba Lô" },
     { value: "Khác", label: "Khác" },
   ];
- 
+
   const genders = [
     { value: "Nam", label: "Nam" },
     { value: "Nữ", label: "Nữ" },
-    { value: "Nam Nữ", label: "Unisex" },
+    { value: "Unisex", label: "Unisex" },
   ];
 
   const handleChange = (name, value) => {
@@ -222,7 +248,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
         !product.name ||
         !product.category ||
         !product.gender ||
-        !product.price 
+        !product.price
       ) {
         message.error("Vui lòng điền đầy đủ thông tin bắt buộc");
         return;
@@ -242,7 +268,6 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
         message.error("Giảm giá phải từ 0 đến 100");
         return;
       }
-      console.log("Creating product with data:", product);
 
       if (isNaN(Number(product.variants.stock) < 0)) {
         message.error("Số lượng tồn kho không được âm");
@@ -251,9 +276,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
       if (product.variants.length === 0) {
         message.error("Vui lòng thêm ít nhất một biến thể sản phẩm");
         return;
-      }
-
-      // Prepare product data
+      } // Prepare product data
       const productData = {
         name: product.name,
         category: product.category,
@@ -264,11 +287,19 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
         variants: product.variants.map((variant) => ({
           size: variant.size,
           color: variant.color,
-          stock: Number(variant.stock),
+          stock: Number(variant.stock || 0),
+          sold: Number(variant.sold || 0),
         })),
         attributes: product.attributes || {},
         images: [],
       };
+
+      console.log("Submitting product data:", productData);
+      console.log("Variants being sent:", productData.variants);
+      console.log(
+        "Total stock calculated:",
+        productData.variants.reduce((sum, v) => sum + v.stock, 0)
+      );
 
       // Handle images
       if (mode === "edit") {
@@ -311,11 +342,14 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
 
         // Chuẩn bị dữ liệu cập nhật
         productData.images = finalImages;
-
         const res = await updateProduct(product._id, productData);
+
+        console.log("Update response:", res);
 
         if (res.status === "Ok") {
           message.success("Cập nhật sản phẩm thành công");
+          console.log("Updated product data:", res.data);
+          console.log("New totalStock:", res.data?.totalStock);
           if (onSuccess) {
             onSuccess();
           }
@@ -526,7 +560,9 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
                 <Form.Item label="Màu sắc">
                   <Select
                     value={variant.color}
-                    onChange={(value) => setVariant((prev) => ({ ...prev, color: value }))}
+                    onChange={(value) =>
+                      setVariant((prev) => ({ ...prev, color: value }))
+                    }
                   >
                     <Option value="Đỏ">Đỏ</Option>
                     <Option value="Xanh">Xanh</Option>
@@ -552,36 +588,74 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
                   Thêm
                 </Button>
               </Col>
-            </Row>
-
+            </Row>{" "}
             {/* Hiển thị danh sách biến thể */}
+            <div style={{ marginBottom: 16 }}>
+              <Text strong>
+                Tổng số lượng tồn kho:{" "}
+                <span style={{ color: "#1890ff", fontSize: "16px" }}>
+                  {(product?.variants || []).reduce(
+                    (sum, variant) => sum + (variant.stock || 0),
+                    0
+                  )}
+                </span>
+              </Text>
+            </div>
             <Table
               dataSource={product?.variants || []}
+              pagination={false}
+              size="small"
               columns={[
                 {
                   title: "Size",
                   dataIndex: "size",
                   key: "size",
+                  width: 80,
                 },
                 {
                   title: "Màu sắc",
                   dataIndex: "color",
                   key: "color",
+                  width: 100,
                 },
                 {
                   title: "Số lượng",
                   dataIndex: "stock",
                   key: "stock",
+                  width: 120,
+                  render: (stock, record, index) => (
+                    <InputNumber
+                      min={0}
+                      value={stock}
+                      size="small"
+                      onChange={(value) => {
+                        setProduct((prev) => {
+                          const updatedVariants = [...(prev.variants || [])];
+                          updatedVariants[index] = {
+                            ...updatedVariants[index],
+                            stock: value || 0,
+                          };
+                          return {
+                            ...prev,
+                            variants: updatedVariants,
+                          };
+                        });
+                      }}
+                    />
+                  ),
                 },
                 {
                   title: "Thao tác",
                   key: "action",
+                  width: 80,
                   render: (_, __, index) => (
                     <Button
                       type="link"
                       icon={<DeleteOutlined />}
                       onClick={() => removeVariant(index)}
-                    ></Button>
+                      danger
+                      size="small"
+                    />
                   ),
                 },
               ]}

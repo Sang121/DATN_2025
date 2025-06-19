@@ -245,13 +245,24 @@ function CartPage() {
       handleChangeInfo();
       return;
     }
-
     try {
-      const selectedCartItems = selectedItems.map((id) =>
-        cartItems.find((item) => item.id === id)
-      );
+      const selectedCartItems = selectedItems.map((id) => {
+        const cartItem = cartItems.find((item) => item.id === id);
+        console.log("Cart item structure:", cartItem); // Debug log
+
+        return {
+          ...cartItem,
+          // Đảm bảo structure đúng theo orderModel yêu cầu
+          variant: {
+            size: cartItem.variant?.size || cartItem.size,
+            color: cartItem.variant?.color || cartItem.color,
+            stock: cartItem.variant?.stock || cartItem.stock,
+          },
+        };
+      });
+
       const processedItems = processItemsImages(selectedCartItems);
-      console.log("Processed items:", processedItems);
+
       dispatch(
         updateOrder({
           user: user._id,

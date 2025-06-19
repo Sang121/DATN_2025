@@ -41,7 +41,6 @@ const dispatch = useDispatch();
       totalPrice: order.totalPrice,
       user: order.user,
     };
-    console.log("Order Data:", orderData);
     const res = await createOrder(orderData);
     if (res.status === 'Success') {
       
