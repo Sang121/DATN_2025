@@ -3,7 +3,7 @@ import styles from "./ProductCard.module.css";
 import { Link } from "react-router-dom";
 import { StarFilled, ShoppingCartOutlined } from "@ant-design/icons";
 
-function ProductCard({ productId, image, name, price, rating, discount }) {
+function ProductCard({ productId, image, name, price, sold, rating, discount }) {
   const newPrice = price - (price * discount) / 100;
   const formattedPrice = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -33,12 +33,11 @@ const productPrice = {
           ))}
         </div> */}
         <div className="card">
-       
           <Link to={`/products/${productId}`}>
             <div className={styles["productName"]}>{name}</div>
           </Link>
 
-          <div className={styles["product-rating"]}>
+          {/* <div className={styles["product-rating"]}>
             <span className={styles["rating-stars"]}>
               {[...Array(5)].map((_, index) => (
                 <StarFilled
@@ -53,25 +52,23 @@ const productPrice = {
             <span className={styles["rating-count"]}>
               ({rating?.toFixed(1)})
             </span>
-          </div>
-        
-         
+       
+          </div> */}
 
           {discount > 0 ? (
-            <div >
+            <div>
               {/* Giá hiện tại */}
               <div className={styles["productPrice"]}>
                 <span className={styles["red"]}>
                   {productPrice.newPrice?.toLocaleString("vi-VN")}
                 </span>
-              </div>
-              <div className={styles["productOldPriceContainer"]}>
-                {/* Phần trăm giảm giá */}
-                <div className={styles["productDiscountRate"]}>{discount}%</div>
 
-                {/* Giá gốc */}
-                <div className={styles["productOldPrice"]}>
-                  <del>{productPrice.oldPrice?.toLocaleString("vi-VN")}đ</del>
+                <div className={styles["productOldPriceContainer"]}>
+                
+                  {/* Giá gốc */}
+                  <div className={styles["productOldPrice"]}>
+                    <del>{productPrice.oldPrice?.toLocaleString("vi-VN")}đ</del>
+                  </div>
                 </div>
               </div>
             </div>
@@ -89,6 +86,12 @@ const productPrice = {
               )}
             </div>
           )}
+          <div className={styles["product-sold"]}>
+            <span className={styles["sold-count"]}>
+              {" "}
+              Đã bán {sold} sản phẩm
+            </span>
+          </div>
         </div>
       </div>
     </div>
