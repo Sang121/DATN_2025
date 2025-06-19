@@ -153,11 +153,11 @@ const updateProductStock = async (orderItems) => {
       }
     } // BƯỚC 2: Cập nhật stock và sold sau khi đã validate
     for (const item of orderItems) {
+      console.log("tems", item);
       const product = await Product.findOneAndUpdate(
         {
           _id: item.product,
-          "variants.size": item.variant.size,
-          "variants.color": item.variant.color,
+          "variants._id": item.id,
         },
         {
           $inc: {
@@ -176,7 +176,7 @@ const updateProductStock = async (orderItems) => {
 
       if (!product) {
         throw new Error(
-          `Failed to update product ${item.product} variant (${item.variant.size}, ${item.variant.color})`
+          `Failed to update product ${item.product} ${item.variant._id} variant (${item.variant.size}, ${item.variant.color})`
         );
       }
     }

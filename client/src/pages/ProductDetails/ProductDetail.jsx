@@ -183,8 +183,6 @@ function ProductDetail() {
       message.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
     }
-    
-    console.log("product id", getIdForVariant(selectedSize, selectedColor));
     dispatch(
       addOrderItem({
         id: getIdForVariant(selectedSize, selectedColor),
@@ -195,6 +193,7 @@ function ProductDetail() {
         image: selectedImage,
         isDiscount: product.discount > 0,
         variant: {
+          idVariant: getIdForVariant(selectedSize, selectedColor),
           size: selectedSize,
           color: selectedColor,
           stock: getStockForVariant(selectedSize, selectedColor),
