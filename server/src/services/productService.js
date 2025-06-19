@@ -322,6 +322,127 @@ const searchProduct = (query) => {
     }
   });
 };
+const removeVariant = (productId, variantId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Tìm product trước để validate
+      const existingProduct = await Product.findById(productId);
+      if (!existingProduct) {
+        return reject({
+          status: "Err",
+          message: "Product not found",
+          data: null,
+        });
+      }
+
+      // Kiểm tra variant có tồn tại không
+      const variantExists = existingProduct.variants.some(
+        (variant) => variant._id.toString() === variantId.toString()
+      );
+
+      if (!variantExists) {
+        return reject({
+          status: "Err",
+          message: "Variant not found",
+          data: null,
+        });
+      }      // Xóa variant
+      const updatedProduct = await Product.findByIdAndUpdate(
+        productId,
+        {
+          $pull: { variants: { _id: variantId } }
+        },
+        { new: true }
+      );
+
+      if (!updatedProduct) {
+        throw new Error("Failed to remove variant");
+      }
+
+      // Sử dụng method recalculateStock để tự động cập nhật
+      await updatedProduct.recalculateStock();
+
+      // Lấy lại product sau khi đã cập nhật
+      const finalProduct = await Product.findById(productId);
+      const processedProduct = processImageUrls(finalProduct);
+
+      resolve({
+        status: "Success",
+        message: "Variant removed successfully",
+        data: processedProduct,
+      });
+    } catch (error) {
+      console.error("Error removing variant:", error);
+      reject({
+        status: "Err",
+        message: "Error removing variant",
+        error: error.message || "Unknown error occurred",
+      });
+    }
+  });
+};
+
+const addVariant = (productId, variantData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Validate variant data
+      if (!variantData.size || !variantData.color || variantData.stock < 0) {
+        return reject({
+          status: "Err",
+          message: "Invalid variant data. Size, color and stock are required",
+          data: null,
+        });
+      }
+
+      // Tìm product
+      const existingProduct = await Product.findById(productId);
+      if (!existingProduct) {
+        return reject({
+          status: "Err",
+          message: "Product not found",
+          data: null,
+        });
+      }
+
+      // Kiểm tra variant đã tồn tại chưa (same size + color)
+      const duplicateVariant = existingProduct.variants.some(
+        (variant) => variant.size === variantData.size && variant.color === variantData.color
+      );
+
+      if (duplicateVariant) {
+        return reject({
+          status: "Err",
+          message: `Variant with size ${variantData.size} and color ${variantData.color} already exists`,
+          data: null,
+        });
+      }
+
+      // Thêm variant mới
+      const updatedProduct = await Product.findByIdAndUpdate(
+        productId,
+        {
+          $push: { variants: variantData }
+        },
+        { new: true }
+      );
+
+      const processedProduct = processImageUrls(updatedProduct);
+
+      resolve({
+        status: "Success",
+        message: "Variant added successfully",
+        data: processedProduct,
+      });
+    } catch (error) {
+      console.error("Error adding variant:", error);
+      reject({
+        status: "Err",
+        message: "Error adding variant",
+        error: error.message || "Unknown error occurred",
+      });
+    }
+  });
+};
 
 module.exports = {
   createProduct,
@@ -332,4 +453,6 @@ module.exports = {
   getProductByCategory,
   searchProduct,
   deleteImage,
+  removeVariant,
+  addVariant,
 };
