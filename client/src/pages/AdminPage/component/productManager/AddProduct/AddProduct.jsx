@@ -160,11 +160,29 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
       }));
     }
   };
-
   const handleEditorChange = (content) => {
+    // Xử lý content để loại bỏ thẻ p rỗng không cần thiết
+    let cleanContent = content;
+
+    // Loại bỏ thẻ p rỗng
+    cleanContent = cleanContent.replace(/<p><\/p>/g, "");
+    cleanContent = cleanContent.replace(/<p>&nbsp;<\/p>/g, "");
+    cleanContent = cleanContent.replace(/<p>\s*<\/p>/g, "");
+
+    // Nếu chỉ còn lại thẻ p đơn giản, có thể loại bỏ
+    if (cleanContent.match(/^<p>(.*?)<\/p>$/s)) {
+      const innerContent = cleanContent
+        .replace(/^<p>(.*?)<\/p>$/s, "$1")
+        .trim();
+      // Chỉ loại bỏ thẻ p nếu nội dung đơn giản (không có formatting phức tạp)
+      if (!innerContent.includes("<") || innerContent.match(/^[^<]*$/)) {
+        cleanContent = innerContent;
+      }
+    }
+
     setProduct((prev) => ({
       ...prev,
-      description: content,
+      description: cleanContent,
     }));
   };
 
@@ -527,7 +545,6 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
               <Form.Item
                 label="Giảm giá (%)"
                 name="discount"
-                rules={[{ required: true, message: "Vui lòng nhập giảm giá" }]}
               >
                 <InputNumber
                   style={{ width: "100%" }}
@@ -653,7 +670,6 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
                       type="link"
                       icon={<DeleteOutlined />}
                       onClick={() => removeVariant(index)}
-                      danger
                       size="small"
                     />
                   ),
@@ -670,11 +686,27 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
             name="description"
             rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
           >
+            {" "}
             <Editor
               apiKey="hfm046cu8943idr5fja0r5l2vzk9l8vkj5cp3hx2ka26l84x"
               init={{
                 height: 300,
                 menubar: false,
+                // Cấu hình để tránh tự động thêm thẻ P
+                forced_root_block: false,
+                force_br_newlines: true,
+                force_p_newlines: false,
+                remove_trailing_brs: true,
+                // Cấu hình để xử lý content tốt hơn
+                setup: (editor) => {
+                  editor.on("init", () => {
+                    // Xóa thẻ p rỗng khi init
+                    const content = editor.getContent();
+                    if (content === "<p></p>" || content === "<p>&nbsp;</p>") {
+                      editor.setContent("");
+                    }
+                  });
+                },
                 plugins: [
                   "advlist autolink lists link image charmap print preview anchor",
                   "searchreplace visualblocks code fullscreen",

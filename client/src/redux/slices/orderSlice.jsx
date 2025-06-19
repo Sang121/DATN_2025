@@ -51,6 +51,8 @@ const orderSlice = createSlice({
       state.taxPrice = action.payload.taxPrice;
       state.totalPrice = action.payload.totalPrice;
       state.totalDiscount = action.payload.totalDiscount;
+      state.shippingInfo = action.payload.shippingInfo;
+
     },
     removeOrderItem: (state, action) => {
       const id = action.payload;
