@@ -1,65 +1,77 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Card, Radio, Button, Space, Row, Col, message } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
-import styles from './PaymentPage.module.css';
-import  {createOrder}  from '../../services/orderService';
-import { clearImmediateOrder } from '../../redux/slices/orderSlice';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Card, Radio, Button, Space, Row, Col, message } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import styles from "./PaymentPage.module.css";
+import { createOrder } from "../../services/orderService";
+import { clearImmediateOrder } from "../../redux/slices/orderSlice";
+import { useNavigate } from "react-router-dom";
 
 function PaymentPage() {
   const order = useSelector((state) => state.order);
-  const [paymentMethod, setPaymentMethod] = useState('COD');
-  const [deliveryMethod, setDeliveryMethod] = useState('GHTK');
+  const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [deliveryMethod, setDeliveryMethod] = useState("GHTK");
   const navigate = useNavigate();
 
-const dispatch = useDispatch();
-
+  const dispatch = useDispatch();
 
   const paymentMethods = [
-    { value: 'COD', label: 'Thanh toán tiền mặt', icon: '💵' },
-    { value: 'VNPAY', label: 'Quét Mã QR từ ứng dụng ngân hàng', icon: '🏦' },
-    { value: 'MOMO', label: 'Ví Momo', icon: '📱' },
-    { value: 'ZALOPAY', label: 'Ví ZaloPay', icon: '💰' },
-    { value: 'VIETTEL', label: 'Viettel Money', icon: '📲' },
+    { value: "COD", label: "Thanh toán tiền mặt", icon: "💵" },
+    { value: "VNPAY", label: "Quét Mã QR từ ứng dụng ngân hàng", icon: "🏦" },
+    { value: "MOMO", label: "Ví Momo", icon: "📱" },
+    { value: "ZALOPAY", label: "Ví ZaloPay", icon: "💰" },
+    { value: "VIETTEL", label: "Viettel Money", icon: "📲" },
   ];
-  
+
   const handleCheckout = async () => {
-    if (!order.shippingInfo.fullName || !order.shippingInfo.phone || !order.shippingInfo.address) {
-      message.error("Vui lòng cập nhật thông tin giao hàng trước khi thanh toán.");
+    if (
+      !order.shippingInfo.fullName ||
+      !order.shippingInfo.phone ||
+      !order.shippingInfo.address ||
+      !order.shippingInfo.email
+    ) {
+      message.error(
+        "Vui lòng cập nhật thông tin giao hàng trước khi thanh toán."
+      );
       return;
     }
-   try{ 
-    const orderData = {
-      items: order.items,
-      shippingInfo: order.shippingInfo,
-      paymentMethod: paymentMethod,
-      deliveryMethod: deliveryMethod,
-      itemsPrice: order.itemsPrice,
-      totalDiscount: order.totalDiscount,
-      taxPrice: order.taxPrice,
-      totalPrice: order.totalPrice,
-      user: order.user,
-    };
-    const res = await createOrder(orderData);
-    if (res.status === 'Success') {
-      
-      dispatch(clearImmediateOrder());
-      message.success("Đặt hàng thành công!");
-      navigate("/payment-success", {
-        state: {
-          orderId: res.data._id,
-          totalAmount: order.totalPrice,
-        },
-      });
+    try {
+      const orderData = {
+        items: order.items,
+        shippingInfo: order.shippingInfo,
+        paymentMethod: paymentMethod,
+        deliveryMethod: deliveryMethod,
+        itemsPrice: order.itemsPrice,
+        totalDiscount: order.totalDiscount,
+        taxPrice: order.taxPrice,
+        totalPrice: order.totalPrice,
+        user: order.user,
+      };
+      const res = await createOrder(orderData);
+      if (res.status === "Success") {
+        dispatch(clearImmediateOrder());
+        message.success("Đặt hàng thành công!");
+        navigate("/payment-success", {
+          state: {
+            orderId: res.data._id,
+            totalAmount: order.totalPrice,
+          },
+        });
 
-      // Redirect to order confirmation page or clear cart
-    }} catch (error) {
+        // Redirect to order confirmation page or clear cart
+      }
+    } catch (error) {
       console.error("Error creating order:", error);
       message.error("Đặt hàng thất bại, vui lòng thử lại sau.");
     }
-
   };
+  if (!order.shippingInfo || !order.items || order.items.length === 0) {
+    message.warning("Bạn chưa có sản phẩm để thanh toán, vui lòng thêm sản phẩm.");
+
+    navigate("/cart");
+    return null;
+    
+  }
   return (
     <div className={styles.paymentContainer}>
       <div className={styles.paymentContent}>
@@ -124,6 +136,7 @@ const dispatch = useDispatch();
               {order.shippingInfo.phone}
             </div>
             <div className={styles.address}>{order.shippingInfo.address}</div>
+            <div className={styles.email}>Email: {order.shippingInfo.email}</div>
           </div>
 
           <div className={styles.summary}>
