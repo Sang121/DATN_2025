@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, Suspense } from "react";
 import { Button, Flex } from "antd";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { routes } from "./Routes/index.js";
@@ -11,30 +11,32 @@ function App() {
   return (
     <div>
       <Router>
-        <Routes>
-          {routes.map((route, index) => {
-            const Page = route.page;
-            const checkAuth = !route.isPrivate || user.isAdmin;
-            const isLogin = !route.isAuthRequired || user.access_token;
-            const Layout = route.isShowHeader ? DefauPage : Fragment;
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            {routes.map((route, index) => {
+              const Page = route.page;
+              const checkAuth = !route.isPrivate || user.isAdmin;
+              const isLogin = !route.isAuthRequired || user.access_token;
+              const Layout = route.isShowHeader ? DefauPage : Fragment;
 
-            return (
-              route.path &&
-              isLogin &&
-              checkAuth && (
-                <Route
-                  key={index}
-                  path={route.path}
-                  element={
-                    <Layout>
-                      <Page />
-                    </Layout>
-                  }
-                />
-              )
-            );
-          })}
-        </Routes>
+              return (
+                route.path &&
+                isLogin &&
+                checkAuth && (
+                  <Route
+                    key={index}
+                    path={route.path}
+                    element={
+                      <Layout>
+                        <Page />
+                      </Layout>
+                    }
+                  />
+                )
+              );
+            })}
+          </Routes>
+        </Suspense>
       </Router>
     </div>
   );
