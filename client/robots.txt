@@ -1,0 +1,23 @@
+# Allow all crawlers
+User-agent: *
+
+# Allow access to public pages
+Allow: /
+Allow: /product/
+Allow: /products
+Allow: /search
+Allow: /type
+
+# Disallow access to private or sensitive pages
+Disallow: /admin
+Disallow: /cart
+Disallow: /profile
+Disallow: /payment
+Disallow: /payment-success
+Disallow: /payment-failed
+Disallow: /payment-result
+Disallow: /signin
+Disallow: /signup
+Disallow: /virtual-try-on
+
+# Sitemap location (update with your actual sitemap URL)
