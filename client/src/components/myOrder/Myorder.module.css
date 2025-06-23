@@ -1,0 +1,81 @@
+.orderContainer {
+    padding: 24px;
+    background-color: #ffffff;
+    border-radius: 8px;
+  }
+  
+  .title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1a1a1a;
+  }
+  
+  .orderCard {
+    margin-bottom: 16px;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    transition: box-shadow 0.3s;
+  }
+  
+  .orderCard:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #8c8c8c;
+  }
+  
+  .orderId {
+    font-weight: 600;
+    color: #1890ff;
+  }
+  
+  .productItem {
+    display: flex;
+    margin-bottom: 16px;
+  }
+  
+  .productImage {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 16px;
+  }
+  
+  .productInfo {
+    flex: 1;
+  }
+  
+  .productName {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  .productPrice {
+    color: #595959;
+  }
+  
+  .orderFooter {
+    text-align: right;
+  }
+  
+  .totalAmount {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  .totalAmount span {
+    color: #ff4d4f;
+  }
+  
+  .actionButtons button {
+    margin-left: 8px;
+  }
+  
