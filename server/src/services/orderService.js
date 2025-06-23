@@ -7,8 +7,6 @@ dotenv.config();
 const createOrder = (orderData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("Creating order with data:", orderData);
-
       if (
         !orderData.items ||
         !orderData.shippingInfo ||
@@ -25,7 +23,6 @@ const createOrder = (orderData) => {
           data: null,
         });
       }
-
       // Validate numeric fields
       if (isNaN(orderData.itemsPrice) || orderData.itemsPrice <= 0) {
         return reject({
@@ -69,7 +66,6 @@ const createOrder = (orderData) => {
             data: null,
           });
         }
-        console.log("item", item);
 
         // Validate variant information
         if (!item.variant || !item.variant.size || !item.variant.color) {
@@ -97,7 +93,6 @@ const createOrder = (orderData) => {
         throw new Error("Failed to create order - no data returned");
       }
     } catch (error) {
-      console.error("Error creating order:");
       reject({
         status: "Err",
         message: "Error creating order",
@@ -106,7 +101,6 @@ const createOrder = (orderData) => {
     }
   });
 };
-
 // Hàm cập nhật stock và sold của product variants
 const updateProductStock = async (orderItems) => {
   try {
@@ -118,28 +112,14 @@ const updateProductStock = async (orderItems) => {
       if (!product) {
         throw new Error(`Product ${item.product} not found`);
       }
-      console.log("Product found:", product.name);
-      console.log(
-        "Looking for variant - Size:",
-        item.variant.size,
-        ", Color:",
-        item.variant.color
-      );
 
       // Tìm variant bằng size + color thay vì ID
       const variant = product.variants.find(
         (v) => v.size === item.variant.size && v.color === item.variant.color
       );
 
-      console.log("Found variant by size+color:", variant);
-
       if (!variant) {
-        console.log("Available variants:");
-        product.variants.forEach((v, index) => {
-          console.log(
-            `  ${index}: Size=${v.size}, Color=${v.color}, Stock=${v.stock}`
-          );
-        });
+        product.variants.forEach((v, index) => {});
         throw new Error(
           `Variant (${item.variant.size}, ${item.variant.color}) not found in product ${item.product}`
         );
@@ -153,7 +133,6 @@ const updateProductStock = async (orderItems) => {
       }
     } // BƯỚC 2: Cập nhật stock và sold sau khi đã validate
     for (const item of orderItems) {
-      console.log("tems", item);
       const product = await Product.findOneAndUpdate(
         {
           _id: item.product,
@@ -168,10 +147,6 @@ const updateProductStock = async (orderItems) => {
           },
         },
         { new: true }
-      );
-
-      console.log(
-        `Updated stock for product ${item.product}, variant ${item.variant.size}-${item.variant.color}, amount: -${item.amount}`
       );
 
       if (!product) {

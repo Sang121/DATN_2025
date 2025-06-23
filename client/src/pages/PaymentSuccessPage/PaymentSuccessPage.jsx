@@ -1,25 +1,52 @@
-import React from "react";
-import { Button, message, Result } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Result } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircleFilled, ShoppingOutlined } from "@ant-design/icons";
 import styles from "./PaymentSuccessPage.module.css";
+import { useDispatch } from "react-redux";
+import { clearImmediateOrder } from "../../redux/slices/orderSlice";
 
 function PaymentSuccessPage() {
+  const dispatch = useDispatch();
+
   const location = useLocation();
   const navigate = useNavigate();
-  const { orderId, totalAmount } = location.state || {};
-  if (!orderId || !totalAmount) {
-    message.error("Thông tin đơn hàng không hợp lệ.");
-    navigate("/");
-    return null;
+  const [orderId, setOrderId] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const code = location.state?.code;
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const vnp_ResponseCode = searchParams.get("vnp_ResponseCode") || code;
+    const vnp_TxnRef = searchParams.get("vnp_TxnRef");
+    const vnp_Amount = searchParams.get("vnp_Amount");
+
+    if (vnp_ResponseCode === "00") {
+      setOrderId(vnp_TxnRef);
+      setTotalAmount(vnp_Amount / 100); // Convert back from cents
+      setPaymentSuccess(true);
+      dispatch(clearImmediateOrder());
+    } else if (vnp_ResponseCode === "01") {
+      setOrderId(location.state?.orderId);
+      setTotalAmount(location.state?.totalAmount); // Convert back from cents
+      setPaymentSuccess(true);
+      dispatch(clearImmediateOrder());
+    } else {
+      navigate("/payment-failed");
+    }
+  }, [location, navigate]);
+
+  if (!paymentSuccess) {
+    return null; // Or a loading spinner while we check the payment status
   }
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <Result
           icon={<CheckCircleFilled className={styles.successIcon} />}
           status="success"
-          title="Đặt hàng thành công!"
+          title="Thanh toán thành công!"
           subTitle={
             <div className={styles.orderInfo}>
               <p>

@@ -1,0 +1,26 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background-color: #f0f2f5;
+  }
+  
+  .content {
+    text-align: center;
+    background: #fff;
+    padding: 48px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+  
+  .errorIcon {
+    color: #ff4d4f !important;
+    font-size: 72px !important;
+    margin-bottom: 24px;
+  }
+  
+  .actionButton {
+    margin: 0 8px;
+  }
+  

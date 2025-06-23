@@ -1,26 +1,24 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { Card, Radio, Button, Space, Row, Col, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import styles from "./PaymentPage.module.css";
-import { createOrder } from "../../services/orderService";
-import { clearImmediateOrder } from "../../redux/slices/orderSlice";
+import { create_payment_url, createOrder } from "../../services/orderService";
 import { useNavigate } from "react-router-dom";
-
+import vnpayLogo from "../../assets/VnpayLogo.png"; // Ensure you have this logo in your assets
 function PaymentPage() {
   const order = useSelector((state) => state.order);
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [deliveryMethod, setDeliveryMethod] = useState("GHTK");
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
 
   const paymentMethods = [
-    { value: "COD", label: "Thanh toán tiền mặt", icon: "💵" },
-    { value: "VNPAY", label: "Quét Mã QR từ ứng dụng ngân hàng", icon: "🏦" },
-    { value: "MOMO", label: "Ví Momo", icon: "📱" },
-    { value: "ZALOPAY", label: "Ví ZaloPay", icon: "💰" },
-    { value: "VIETTEL", label: "Viettel Money", icon: "📲" },
+    { value: "COD", label: "Thanh toán khi nhận hàng"},
+    { value: "VNPAY", logo: vnpayLogo },
+    // { value: "MOMO", label: "Ví Momo", icon: "📱" },
+    // { value: "ZALOPAY", label: "Ví ZaloPay", icon: "💰" },
+    // { value: "VIETTEL", label: "Viettel Money", icon: "📲" },
   ];
 
   const handleCheckout = async () => {
@@ -47,18 +45,52 @@ function PaymentPage() {
         totalPrice: order.totalPrice,
         user: order.user,
       };
-      const res = await createOrder(orderData);
-      if (res.status === "Success") {
-        dispatch(clearImmediateOrder());
-        message.success("Đặt hàng thành công!");
-        navigate("/payment-success", {
-          state: {
-            orderId: res.data._id,
-            totalAmount: order.totalPrice,
-          },
-        });
 
-        // Redirect to order confirmation page or clear cart
+      // --- Handle non-VNPAY payments (like COD) ---
+      if (paymentMethod !== "VNPAY") {
+        const res = await createOrder(orderData);
+        if (res.status === "Success") {
+      
+          message.success("Đặt hàng thành công!");
+          navigate("/payment-success", {
+            state: {
+              orderId: res.data._id,
+              totalAmount: order.totalPrice,
+              code:"01"
+            },
+          });
+        } else {
+          message.error(res.message || "Đặt hàng thất bại, vui lòng thử lại.");
+        }
+        return; // Stop execution here for non-VNPAY
+      }
+
+      // --- VNPAY Payment Flow ---
+      if (paymentMethod === "VNPAY") {
+        // Step 1: Create order in DB to get a unique ID
+        const res = await createOrder(orderData);
+        if (res.status !== "Success" || !res.data?._id) {
+          message.error("Không thể tạo đơn hàng. Vui lòng thử lại.");
+          return;
+        }
+
+        const newOrderId = res.data._id;
+        // Step 2: Prepare data and get payment URL from server
+        const paymentData = {
+          amount: `${orderData.totalPrice}`,
+          orderId: newOrderId,
+          bankCode: "", // Explicitly set bankCode
+        };
+        console.log("Payment Data:", paymentData);
+
+        const resPayment = await create_payment_url(paymentData);
+
+        if (resPayment && resPayment.vnpUrl) {
+          // Step 3: Redirect user to VNPay Gateway
+          window.location.href = resPayment.vnpUrl;
+        } else {
+          message.error("Không thể lấy được URL thanh toán. Vui lòng thử lại.");
+        }
       }
     } catch (error) {
       console.error("Error creating order:", error);
@@ -70,7 +102,7 @@ function PaymentPage() {
 
   //   navigate("/cart");
   //   return null;
-    
+
   // }
   return (
     <div className={styles.paymentContainer}>
@@ -115,7 +147,7 @@ function PaymentPage() {
                 {paymentMethods.map((method) => (
                   <Radio key={method.value} value={method.value}>
                     <Space>
-                      <span>{method.icon}</span>
+                      <img src={method.logo} alt={method.label}  className={styles.paymentLogo} />
                       <span>{method.label}</span>
                     </Space>
                   </Radio>
@@ -136,7 +168,9 @@ function PaymentPage() {
               {order.shippingInfo.phone}
             </div>
             <div className={styles.address}>{order.shippingInfo.address}</div>
-            <div className={styles.email}>Email: {order.shippingInfo.email}</div>
+            <div className={styles.email}>
+              Email: {order.shippingInfo.email}
+            </div>
           </div>
 
           <div className={styles.summary}>

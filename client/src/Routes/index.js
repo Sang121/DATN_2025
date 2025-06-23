@@ -3,8 +3,12 @@ import { lazy } from "react";
 const HomePage = lazy(() => import("../pages/HomePage/HomePage"));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage/NotFoundPage"));
 const ProductPage = lazy(() => import("../pages/productPage/ProductPage"));
-const ProductDetail = lazy(() => import("../pages/ProductDetails/ProductDetail"));
-const TypeProductPage = lazy(() => import("../pages/TypeProductPage/TypeProductPage"));
+const ProductDetail = lazy(() =>
+  import("../pages/ProductDetails/ProductDetail")
+);
+const TypeProductPage = lazy(() =>
+  import("../pages/TypeProductPage/TypeProductPage")
+);
 const SignInPage = lazy(() => import("../pages/SignInPage/SignInPage"));
 const SignUpPage = lazy(() => import("../pages/SignUpPage/SignUpPage"));
 const SearchPage = lazy(() => import("../pages/search/SearchPage"));
@@ -12,7 +16,12 @@ const ProfilePage = lazy(() => import("../pages/profile/profilePage"));
 const AdminPage = lazy(() => import("../pages/AdminPage/AdminPage"));
 const CartPage = lazy(() => import("../pages/CartPage/CartPage"));
 const PaymentPage = lazy(() => import("../pages/PaymentPage/PaymentPage"));
-const PaymentSuccessPage = lazy(() => import("../pages/PaymentSuccessPage/PaymentSuccessPage"));
+const PaymentSuccessPage = lazy(() =>
+  import("../pages/PaymentSuccessPage/PaymentSuccessPage")
+);
+const PaymentFailedPage = lazy(() =>
+  import("../pages/PaymentFailedPage/PaymentFailedPage")
+);
 
 export const routes = [
   {
@@ -98,9 +107,16 @@ export const routes = [
     isAuthRequired: true,
   },
   {
-    path: "/*",
-    page: NotFoundPage,
+    path: "/payment-failed",
+    page: PaymentFailedPage,
     isShowHeader: true,
+    isPrivate: false,
+    isAuthRequired: true,
+  },
+  {
+    path: "*",
+    page: NotFoundPage,
+    isShowHeader: false,
     isPrivate: false,
   },
 ];

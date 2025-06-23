@@ -13,7 +13,6 @@ const createOrder = async (req, res) => {
         message: "No data received",
       });
     }
-
     const {
       items,
       shippingInfo,
@@ -49,7 +48,6 @@ const createOrder = async (req, res) => {
     const response = await orderService.createOrder(orderData);
     return res.status(200).json(response);
   } catch (error) {
-    console.error("Error in createOrder controller:", error);
     return res.status(500).json({
       status: "Err",
       message: "Error creating order",
@@ -59,6 +57,5 @@ const createOrder = async (req, res) => {
 };
 module.exports = {
   createOrder,
-
 };
   

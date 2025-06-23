@@ -232,7 +232,13 @@ function ProductDetail() {
                 />
               ))}
             </div>
+
             <div className={styles["productImageMain"]}>
+              {product.totalStock <= 0 && (
+                <div className={styles["product-card-badge-out-of-stock"]}>
+            
+                </div>
+              )}
               <img src={selectedImage} alt={product.name} />
             </div>
           </div>
@@ -409,16 +415,31 @@ function ProductDetail() {
 
             {/* Nút thêm vào giỏ hàng */}
             <div style={{ marginTop: 24 }}>
-              <Button
-                type="primary"
-                size="large"
-                disabled={!selectedSize || !selectedColor}
-                onClick={() =>
-                  handleAddToCart(selectedSize, selectedColor, quantity)
-                }
-              >
-                Thêm vào giỏ hàng
-              </Button>
+              {product.totalStock > 0 ? (
+                <Button
+                  type="primary"
+                  size="large"
+                  disabled={!selectedSize || !selectedColor}
+                  onClick={() =>
+                    handleAddToCart(selectedSize, selectedColor, quantity)
+                  }
+                >
+                  Thêm vào giỏ hàng
+                </Button>
+              ) : (
+                <Button
+                  type="primary"
+                  size="large"
+                  disabled={
+                    product.totalStock <= 0 || !selectedSize || !selectedColor
+                  }
+                  onClick={() =>
+                    handleAddToCart(selectedSize, selectedColor, quantity)
+                  }
+                >
+                  Thêm vào giỏ hàng
+                </Button>
+              )}
             </div>
           </div>
         </div>

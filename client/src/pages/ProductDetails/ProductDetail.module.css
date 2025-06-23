@@ -108,6 +108,31 @@
   border: 1.5px solid #e0e0e0;
   transition: transform 0.3s;
 }
+.product-card-badge-out-of-stock {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.5);
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 25%;
+  color: black;
+  font-size: 18px;
+  border-radius: 0 6px 6px 0;
+  padding: 4px 10px;
+  z-index: 2;
+ 
+}
+.product-card-badge-out-of-stock::before {
+  content: "Hết hàng";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+}
+
+
 .productImageMain img:hover {
   transform: scale(1.05);
 }

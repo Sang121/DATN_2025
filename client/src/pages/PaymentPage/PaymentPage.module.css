@@ -172,7 +172,9 @@
   grid-template-columns: 2fr 1fr;
   gap: 20px;
 }
-
+.paymentLogo{
+  
+}
 .mainContent {
   display: flex;
   flex-direction: column;
