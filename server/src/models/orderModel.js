@@ -48,6 +48,17 @@ const orderSchema = new mongoose.Schema(
     paidAt: { type: Date }, // Thời gian thanh toán,
     isDelivered: { type: Boolean, default: false }, // Trạng thái giao hàng,
     deliveredAt: { type: Date }, // Thời gian giao hàng,
+    orderStatus: {
+      type: String,
+      enum: [
+        "pending",
+        "processing",
+        "delivered",
+        "cancelled",
+        "payment_failed",
+      ],
+      default: "pending",
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
