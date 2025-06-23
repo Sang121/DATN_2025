@@ -24,7 +24,7 @@ const productPrice = {
           <div className={styles["product-card-badge"]}>Bán chạy</div>
         ) : null
       ) : (
-        <div className={styles["product-card-badge-out-of-stock"]}>Hết hàng</div>
+        <div className={styles["product-card-badge-out-of-stock"]}></div>
       )}
       <Link to={`/products/${productId}`}>
         <img src={image} alt={name} className={styles["product-image"]} />
