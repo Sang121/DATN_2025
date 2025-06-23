@@ -22,6 +22,9 @@ const PaymentSuccessPage = lazy(() =>
 const PaymentFailedPage = lazy(() =>
   import("../pages/PaymentFailedPage/PaymentFailedPage")
 );
+const OrderDetailPage = lazy(() =>
+  import("../pages/OrderDetailPage/OrderDetailPage")
+);
 
 export const routes = [
   {
@@ -112,6 +115,12 @@ export const routes = [
     isShowHeader: true,
     isPrivate: false,
     isAuthRequired: true,
+  },
+  {
+    path: "/order/:orderId",
+    page: OrderDetailPage,
+    isShowHeader: true,
+    isPrivate: false,
   },
   {
     path: "*",

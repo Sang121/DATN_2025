@@ -234,7 +234,7 @@ export const searchProduct = async (query) => {
 };
 
 export const deleteImage = (imageName) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise( async (resolve, reject) => {
     try {
       const imagePath = path.join("../uploads", imageName);
 
