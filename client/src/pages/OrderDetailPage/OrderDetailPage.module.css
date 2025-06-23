@@ -1,0 +1,92 @@
+.container {
+    padding: 24px;
+    background-color: #f9fafb;
+}
+
+.title {
+    margin-bottom: 24px !important;
+    color: #333;
+    text-align: center;
+}
+
+.headerCard {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.headerContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.headerCard .ant-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orderSteps {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.contentCard {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    height: 100%;
+}
+
+.productItem .ant-list-item-meta {
+    align-items: center;
+}
+
+.productName {
+    font-weight: 600;
+    font-size: 1.05em;
+    color: #1a1a1a;
+}
+
+.priceInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.priceDetails .ant-descriptions-item-label {
+    font-weight: 500;
+}
+
+.priceDetails .ant-descriptions-item-content {
+    font-weight: 600;
+    text-align: right;
+}
+
+.actions {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #f0f0f0;
+    text-align: right;
+}
+
+.section {
+    margin-bottom: 16px;
+}
+
+.totalPrice {
+    color: #ff4d4f;
+    margin-bottom: 0 !important;
+}
+
+.actionButtons {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
