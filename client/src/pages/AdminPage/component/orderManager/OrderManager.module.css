@@ -1,0 +1,15 @@
+.orderManagerContainer {
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 300px; /* Ensure it has some height */
+}
+
+/* Add any other specific styles you need */
