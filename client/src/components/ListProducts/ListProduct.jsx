@@ -69,6 +69,7 @@ function ListProduct({ query }) {
             name={product.name}
             price={product.price}
             sold={product.sold}
+            totalStock={product.totalStock}
             oldPrice={product.oldPrice}
             rating={product.rating}
             discount={product.discount}
