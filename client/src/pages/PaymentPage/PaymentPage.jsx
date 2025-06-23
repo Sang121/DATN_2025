@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Card, Radio, Button, Space, Row, Col, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import styles from "./PaymentPage.module.css";
@@ -12,9 +12,8 @@ function PaymentPage() {
   const [deliveryMethod, setDeliveryMethod] = useState("GHTK");
   const navigate = useNavigate();
 
-
   const paymentMethods = [
-    { value: "COD", label: "Thanh toán khi nhận hàng"},
+    { value: "COD", label: "Thanh toán khi nhận hàng" },
     { value: "VNPAY", logo: vnpayLogo },
     // { value: "MOMO", label: "Ví Momo", icon: "📱" },
     // { value: "ZALOPAY", label: "Ví ZaloPay", icon: "💰" },
@@ -50,13 +49,12 @@ function PaymentPage() {
       if (paymentMethod !== "VNPAY") {
         const res = await createOrder(orderData);
         if (res.status === "Success") {
-      
           message.success("Đặt hàng thành công!");
           navigate("/payment-success", {
             state: {
               orderId: res.data._id,
               totalAmount: order.totalPrice,
-              code:"01"
+              code: "01",
             },
           });
         } else {
@@ -147,7 +145,11 @@ function PaymentPage() {
                 {paymentMethods.map((method) => (
                   <Radio key={method.value} value={method.value}>
                     <Space>
-                      <img src={method.logo} alt={method.label}  className={styles.paymentLogo} />
+                      <img
+                        src={method.logo}
+                        alt={method.label}
+                        className={styles.paymentLogo}
+                      />
                       <span>{method.label}</span>
                     </Space>
                   </Radio>

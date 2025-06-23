@@ -11,8 +11,9 @@ function PaymentFailedPage() {
   // Extract error information from query parameters if available
   const searchParams = new URLSearchParams(location.search);
   const errorCode = searchParams.get("vnp_ResponseCode");
-  const message = searchParams.get("vnp_Message") || "Thanh toán không thành công. Vui lòng thử lại.";
-
+  const message =
+    searchParams.get("vnp_Message") ||
+    "Thanh toán không thành công. Vui lòng thử lại.";
 
   return (
     <div className={styles.container}>

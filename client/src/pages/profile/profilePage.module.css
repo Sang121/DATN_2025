@@ -1,5 +1,6 @@
 main{
     background-color: rgb(245, 245, 250);
+    margin-bottom: 10px;
 }
 .profileContainer {
     width: 1270px;
@@ -21,7 +22,6 @@ html{
         text-size-adjust: 100%;
 }
 .breadcrumbContainer{
-    background-color: rgb(245, 245, 250);
     width: 1270px;
         padding-right: 15px;
         margin-right: auto;
@@ -31,7 +31,10 @@ html{
     display: flex;
         -webkit-box-align: center;
         align-items: center;
-}
+        margin-bottom: 24px;
+        
+        }
+
 .breadcrumbItem{
     position: relative;
         display: flex;
@@ -40,7 +43,7 @@ html{
         -webkit-box-align: center;
         align-items: center;
         height: 40px;
-        font-size: 14px;
+       
         line-height: 20px;
         font-weight: 300;
         white-space: nowrap;
@@ -48,7 +51,9 @@ html{
 .sidebar{
     width: 250px;
         margin-right: 17px;
-        margin-top: 20px;
+       padding: 10px;
+        background-color: rgb(255, 255, 255);
+        border-radius: 8px;
 }
 .sidebarHeader{
     display: flex;
@@ -56,12 +61,14 @@ html{
         align-items: center;
         padding-left: 7px;
         margin: 0px 0px 12px;
+        text-align: center;
+        margin-bottom: 24px;
 }
 ul{
     margin: 0px;
         padding: 0px;
         list-style: none;
-        font-size: 13px;
+      
 }
 li{
     display: list-item;
@@ -128,4 +135,36 @@ li>a.active{
         line-height: 24px;
         font-weight: 400;
         color: rgb(100, 100, 109);
+}
+.pageContainer {
+    padding: 24px;
+    background-color: #f9fafb;
+    min-height: 80vh;
+}
+
+.layoutContainer {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden; /* To keep border-radius on children */
+}
+
+.sider {
+    background: #fff !important;
+    padding: 24px;
+    border-right: 1px solid #f0f0f0;
+}
+
+.menu .ant-menu-item {
+    font-size: 16px;
+    margin-bottom: 8px !important;
+}
+
+.menu .ant-menu-item-selected {
+    background-color: #e6f7ff !important;
+}
+
+.content {
+    padding: 24px;
+    background: #fff;
 }

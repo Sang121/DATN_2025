@@ -1,83 +1,75 @@
-import React from "react";
-import styles from "./profilePage.module.css";
+import React, { useState } from "react";
+import { Layout, Menu, Breadcrumb, Avatar, Typography } from "antd";
+import { UserOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { Button, Form, Input, Radio } from "antd";
+import styles from "./profilePage.module.css";
 import UserUpdate from "../../components/updateUser/userUpdate";
+import MyOrder from "../../components/myOrder/MyOrder";
+
+const { Content, Sider } = Layout;
+const { Title, Text } = Typography;
 
 function ProfilePage() {
+  const [activeView, setActiveView] = useState("profile");
   const user = JSON.parse(sessionStorage.getItem("userState"))?.user || {};
+
+  const menuItems = [
+    { key: "profile", label: "Thông tin tài khoản", icon: <UserOutlined /> },
+    {
+      key: "orders",
+      label: "Đơn hàng của tôi",
+      icon: <UnorderedListOutlined />,
+    },
+  ];
+
+  const renderContent = () => {
+    switch (activeView) {
+      case "profile":
+        return <UserUpdate />;
+      case "orders":
+        return <MyOrder />;
+      default:
+        return <UserUpdate />;
+    }
+  };
+
+  const handleMenuClick = (e) => {
+    setActiveView(e.key);
+  };
+
   return (
-    <main>
-      <div className={styles.profileContainer}>
-        <div className={styles.profile}>
-          <div className={styles.breadcrumbContainer}>
-            <div className={styles.breadcrumb}>
-              <Link className={styles.breadcrumbItem} to="/">
-                Trang Chủ
-              </Link>
-              <span className={styles.icon}>
-                <svg
-                  width="6"
-                  height="11"
-                  viewBox="0 0 6 11"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill="#808089"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M0.646447 0.646447C0.841709 0.451184 1.15829 0.451184 1.35355 0.646447L6.35355 5.64645C6.54882 5.84171 6.54882 6.15829 6.35355 6.35355L1.35355 11.3536C1.15829 11.5488 0.841709 11.5488 0.646447 11.3536C0.451184 11.1583 0.451184 10.8417 0.646447 10.6464L5.29289 6L0.646447 1.35355C0.451184 1.15829 0.451184 0.841709 0.646447 0.646447Z"
-                  ></path>
-                </svg>
-              </span>
-              <Link
-                to="#"
-                className={styles.breadcrumbItem}
-                data-view-id="breadcrumb_item"
-                data-view-index="1"
-              >
-                <span title="Thông tin tài khoản">Thông tin tài khoản</span>
-              </Link>
-            </div>
+    <div className={styles.pageContainer}>
+      <Breadcrumb className={styles.breadcrumb}>
+        <Breadcrumb.Item>
+          <Link to="/">Trang Chủ</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>Tài khoản</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          {activeView === "profile"
+            ? "Thông tin tài khoản"
+            : "Đơn hàng của tôi"}
+        </Breadcrumb.Item>
+      </Breadcrumb>
+      <Layout className={styles.layoutContainer}>
+        <Sider width={250} className={styles.sider}>
+          <div className={styles.siderHeader}>
+            <Avatar size={64} icon={<UserOutlined />} src={user.avatar} />
+            <Title level={5} style={{ marginTop: 16, marginBottom: 0 }}>
+              {user.fullName || user.username}
+            </Title>
+            <Text type="secondary">{user.email}</Text>
           </div>
-          <div className={styles.sidebar}>
-            <div children={styles.sidebarHeader}>
-              <span className={styles.accountInfo}>
-                Tài khoản của: <strong> {user.username}</strong>
-              </span>
-            </div>
-            <ul>
-              <li>
-                <a>Thông tin tài khoản</a>
-              </li>
-              <li>
-                <a> Quản lý đơn hàng</a>
-              </li>
-            </ul>
-          </div>
-          <div className={styles.profileContent}>
-            <div className={styles.mainProfile}>
-              <div className={styles.infoLeft}>
-                <div
-                  style={{
-                    backgroundColor: "rgb(255, 255, 255)",
-                    borderRadius: "4px",
-                    marginTop: "16px",
-                  }}
-                >
-                  <UserUpdate />
-                </div>
-              </div>
-              {/* <div className={styles.vertical}></div>
-              <div className={styles.infoRight}>
-                <h2>Email và số điện thoại</h2>
-              </div> */}
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+          <Menu
+            mode="inline"
+            selectedKeys={[activeView]}
+            onClick={handleMenuClick}
+            items={menuItems}
+            className={styles.menu}
+          />
+        </Sider>
+        <Content className={styles.content}>{renderContent()}</Content>
+      </Layout>
+    </div>
   );
 }
 
