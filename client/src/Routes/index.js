@@ -25,6 +25,10 @@ const PaymentFailedPage = lazy(() =>
 const OrderDetailPage = lazy(() =>
   import("../pages/OrderDetailPage/OrderDetailPage")
 );
+const MyOrdersPage = lazy(() => import("../components/myOrder/MyOrder"));
+const AdminOrderDetail = lazy(() =>
+  import("../pages/AdminPage/component/adminOrderDetail/AdminOrderDetail")
+);
 
 export const routes = [
   {
@@ -90,6 +94,12 @@ export const routes = [
     isPrivate: true,
   },
   {
+    path: "/system/orderDetails/:orderId",
+    page: AdminOrderDetail,
+    isShowHeader: true,
+    isPrivate: true,
+  },
+  {
     path: "/cart",
     page: CartPage,
     isShowHeader: true,
@@ -116,11 +126,23 @@ export const routes = [
     isPrivate: false,
     isAuthRequired: true,
   },
+
   {
-    path: "/order/:orderId",
+    path: "/order-details/:orderId",
     page: OrderDetailPage,
     isShowHeader: true,
-    isPrivate: false,
+  },
+  {
+    path: "/admin/order-details/:orderId",
+    page: AdminOrderDetail,
+    isShowHeader: true,
+    isPrivate: true, // Chỉ admin mới có thể truy cập
+  },
+  {
+    path: "/profile/my-order",
+    page: MyOrdersPage,
+    isShowHeader: true,
+    isPrivate: true,
   },
   {
     path: "*",
