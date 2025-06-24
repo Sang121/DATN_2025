@@ -160,6 +160,25 @@ const logoutUser = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+const checkToken = async (req, res) => {
+  try {
+    // Nếu middleware đã xác thực thành công, chỉ cần trả về thông tin người dùng
+    return res.status(200).json({
+      status: "Ok",
+      message: "Token is valid",
+      userData: {
+        id: req.user.id,
+        isAdmin: req.user.isAdmin,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "Error",
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -169,4 +188,5 @@ module.exports = {
   getDetailUser,
   refreshToken,
   logoutUser,
+  checkToken,
 };

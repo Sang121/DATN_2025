@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const orderController = require("../controllers/orderController");
-const authMiddleware = require("../middleware/authMiddleware");
+const authAdminMiddleware = require("../middleware/authAdminMiddleware");
 const authUserMiddleware = require("../middleware/authUserMiddleware");
 
-router.post("/createOrder", authMiddleware, orderController.createOrder);
+router.post("/createOrder", authUserMiddleware, orderController.createOrder);
 router.get(
   "/getOrdersByUserId/:userId",
   authUserMiddleware,
@@ -17,7 +17,7 @@ router.get(
 );
 router.get(
   "/getAllOrders",
-  authMiddleware,
+  authAdminMiddleware,
   (req, res, next) => {
     if (!req.user.isAdmin) {
       return res
@@ -43,7 +43,7 @@ router.put(
 
 router.put(
   "/updateOrderStatus/:orderId",
-  authMiddleware,
+  authAdminMiddleware,
   (req, res, next) => {
     if (!req.user.isAdmin) {
       return res
@@ -57,7 +57,7 @@ router.put(
 
 router.put(
   "/updatePaymentStatus/:orderId",
-  authMiddleware,
+  authAdminMiddleware,
   (req, res, next) => {
     if (!req.user.isAdmin) {
       return res
@@ -73,5 +73,11 @@ router.put(
 router.post("/create_payment_url", orderController.createPaymentUrl);
 router.get("/vnpay_return", orderController.vnpayReturn);
 router.get("/vnpay_ipn", orderController.vnpayIpn);
+router.post("/vnpay_ipn", orderController.vnpayIpn); // Thêm route POST cho IPN
+router.post(
+  "/updateOrderAfterPayment",
+  authUserMiddleware,
+  orderController.updateOrderAfterPaymentClient
+);
 
 module.exports = router;

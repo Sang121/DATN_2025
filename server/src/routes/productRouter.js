@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/productController");
-const authMiddleware = require("../middleware/authMiddleware");
+const authAdminMiddleware = require("../middleware/authAdminMiddleware");
 const { upload } = require("../middleware/uploadMiddleware");
-router.post("/createProduct", productController.createProduct);
+router.post("/createProduct",authAdminMiddleware, productController.createProduct);
 router.put(
   "/updateProduct/:id",
-  authMiddleware,
+  authAdminMiddleware,
   productController.updateProduct
 );
 router.get("/getDetailProduct/:id", productController.getDetailProduct);
 router.delete(
   "/deleteProduct/:id",
-  authMiddleware,
+  authAdminMiddleware,
   productController.deleteProduct
 );
 router.get(
@@ -23,7 +23,7 @@ router.get(
 router.get("/getAllProduct", productController.getAllProduct);
 router.delete(
   "/deleteImage/:imageName",
-  authMiddleware,
+  authAdminMiddleware,
   productController.deleteImage
 );
 router.post(
