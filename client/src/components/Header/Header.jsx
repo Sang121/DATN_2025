@@ -1,32 +1,63 @@
 // src/components/Header/Header.jsx
 import React, { useState, useEffect } from "react";
 import {
-  FaSearch,
-  FaUserCircle,
-  FaShoppingCart,
-  FaPersonBooth,
-  FaSignOutAlt,
-  FaBars,
-} from "react-icons/fa";
+  ShoppingCartOutlined,
+  UserOutlined,
+  SearchOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  AppstoreOutlined,
+  ShoppingOutlined,
+  HomeOutlined,
+  UserSwitchOutlined,
+  SettingOutlined,
+  LoginOutlined,
+  DashboardOutlined,
+  ExperimentOutlined,
+} from "@ant-design/icons";
 import styles from "./Header.module.css";
-import { Row, Col, Drawer, Popover } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Layout,
+  Input,
+  Row,
+  Col,
+  Badge,
+  Avatar,
+  Dropdown,
+  Space,
+  Drawer,
+  Button,
+  Menu,
+  Divider,
+  message,
+  Tooltip,
+  Typography,
+} from "antd";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser, logout } from "../../redux/slices/userSlice";
 import { clearOrder } from "../../redux/slices/orderSlice";
 import { logoutUser } from "../../services/userService";
-import { message as antdMessage } from "antd";
 
-import { searchProduct } from "../../services/productService";
-function Header({ onShowSignIn }) {
+const { Header } = Layout;
+const { Text } = Typography;
+const { Search } = Input;
+
+function AppHeader({ onShowSignIn }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  // Đã xóa biến searchTerm không sử dụng
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
+
   const user = useSelector((state) => state.user);
-  const currentUsername = user.username;
-  const currentIsLoggedIn = !!user.access_token;
-const order = useSelector((state) => state.order);
+  const order = useSelector((state) => state.order);
+  const cartItemCount = order?.orderItems?.length || 0;
+
+  const isLoggedIn = !!user.access_token;
+
+  // Xử lý lưu thông tin đăng nhập vào sessionStorage
   useEffect(() => {
     if (user.username) {
       sessionStorage.setItem("username", user.username);
@@ -48,8 +79,9 @@ const order = useSelector((state) => state.order);
     } else {
       sessionStorage.removeItem("refresh_token");
     }
-  }, [user.refresh_token]);
+  }, [user]);
 
+  // Xử lý sự kiện thay đổi sessionStorage
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === "userState") {
@@ -59,8 +91,6 @@ const order = useSelector((state) => state.order);
           dispatch(updateUser(parsedState.user));
         } else {
           dispatch(logout());
-          
-
         }
       }
       if (e.key === "access_token" && !e.newValue) {
@@ -72,14 +102,32 @@ const order = useSelector((state) => state.order);
       window.removeEventListener("storage", handleStorageChange);
     };
   }, [dispatch]);
-  const handleSearch = () => {
-    const trimmedSearchTerm = searchTerm.trim();
+
+  // Xử lý sự kiện scroll để thay đổi giao diện khi cuộn trang
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  // Xử lý tìm kiếm
+  const handleSearch = (value) => {
+    const trimmedSearchTerm = value.trim();
     if (trimmedSearchTerm) {
-     
       navigate(`/search/${encodeURIComponent(trimmedSearchTerm)}`);
       setDrawerOpen(false);
     }
   };
+
+  // Xử lý đăng xuất
   const handleLogout = () => {
     sessionStorage.clear();
     dispatch(logout());
@@ -87,195 +135,288 @@ const order = useSelector((state) => state.order);
 
     logoutUser()
       .then(() => {
-        console.log("Logout successful");
-        antdMessage.success("Đăng xuất thành công!");
+        message.success("Đăng xuất thành công!");
         setDrawerOpen(false);
         navigate("/");
       })
       .catch((error) => {
         console.error("Logout failed:", error);
+        message.error("Đăng xuất thất bại");
       });
   };
 
+  // Xử lý đăng nhập thành công
   const handleLoginSuccess = (userData) => {
     if (userData) {
       dispatch(updateUser(userData));
     }
   };
 
+  // Menu người dùng
+  const userMenu = (
+    <Menu>
+      <Menu.Item key="profile" icon={<UserOutlined />}>
+        <Link to="/profile">Thông tin tài khoản</Link>
+      </Menu.Item>
+      <Menu.Item key="orders" icon={<ShoppingOutlined />}>
+        <Link to="/profile/my-order">Đơn hàng của tôi</Link>
+      </Menu.Item>
+      {user?.isAdmin && (
+        <Menu.Item key="admin" icon={<DashboardOutlined />}>
+          <Link to="/system/admin">Quản lý hệ thống</Link>
+        </Menu.Item>
+      )}
+      <Menu.Divider />
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+        Đăng xuất
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
-    <header className={styles.header}>
-      <div className={styles["header-container"]}>
-        <Row
-          align="middle"
-          gutter={[16, 16]}
-          style={{ width: "100%" }}
-          className={styles["header-row"]}
+    <Header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
+      <Row
+        className={styles.headerRow}
+        align="middle"
+        justify="space-between"
+        wrap={false}
+      >
+        {/* Logo - Hiển thị trên mọi thiết bị */}
+        <Col xs={14} sm={8} md={5} lg={4} xl={4}>
+          <Link to="/" className={styles.logoLink}>
+            <div className={styles.logo}>Ecommerce</div>
+          </Link>
+        </Col>
+
+        {/* Thanh tìm kiếm - Ẩn trên mobile */}
+        <Col xs={0} sm={8} md={8} lg={10} xl={10} className={styles.searchCol}>
+          <Search
+            placeholder="Tìm sản phẩm, danh mục hay thương hiệu..."
+            enterButton={
+              <Button type="primary" icon={<SearchOutlined />}>
+                Tìm kiếm
+              </Button>
+            }
+            size="large"
+            onSearch={handleSearch}
+            className={styles.searchInput}
+            allowClear
+          />
+        </Col>
+
+        {/* Navigation Menu - Hiển thị trên desktop */}
+        <Col xs={0} sm={0} md={9} lg={8} xl={8} className={styles.navLinks}>
+          {isLoggedIn ? (
+            <Space size="large">
+              <Tooltip title="Phòng thử đồ">
+                <Link to="/fitting_room" className={styles.navLink}>
+                  <Badge className={styles.navItem}>
+                    <ExperimentOutlined className={styles.navIcon} />
+                    <Text className={styles.navText}>Phòng thử đồ</Text>
+                  </Badge>
+                </Link>
+              </Tooltip>
+
+              <Tooltip title="Giỏ hàng">
+                <Link to="/cart" className={styles.navLink}>
+                  <Badge
+                    count={cartItemCount}
+                    overflowCount={99}
+                    className={styles.navItem}
+                  >
+                    <ShoppingCartOutlined className={styles.navIcon} />
+                    <Text className={styles.navText}>Giỏ hàng</Text>
+                  </Badge>
+                </Link>
+              </Tooltip>
+
+              <Dropdown
+                overlay={userMenu}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <div className={styles.userDropdown}>
+                  <Avatar
+                    size="small"
+                    className={styles.avatar}
+                    icon={<UserOutlined />}
+                  />
+                  <Text className={styles.userName}>
+                    {user.username || "Tài khoản"}
+                  </Text>
+                </div>
+              </Dropdown>
+            </Space>
+          ) : (
+            <Space size="large">
+              <Link to="/fitting_room" className={styles.navLink}>
+                <Badge className={styles.navItem}>
+                  <ExperimentOutlined className={styles.navIcon} />
+                  <Text className={styles.navText}>Phòng thử đồ</Text>
+                </Badge>
+              </Link>
+
+              <Link to="/cart" className={styles.navLink}>
+                <Badge
+                  count={cartItemCount}
+                  overflowCount={99}
+                  className={styles.navItem}
+                >
+                  <ShoppingCartOutlined className={styles.navIcon} />
+                  <Text className={styles.navText}>Giỏ hàng</Text>
+                </Badge>
+              </Link>
+
+              <Button
+                type="text"
+                icon={<LoginOutlined />}
+                className={styles.loginButton}
+                onClick={() => onShowSignIn(handleLoginSuccess)}
+              >
+                Đăng nhập
+              </Button>
+            </Space>
+          )}
+        </Col>        {/* Menu icon cho mobile */}
+        <Col
+          xs={10}
+          sm={8}
+          md={0}
+          lg={0}
+          xl={0}
+          className={styles.mobileMenuCol}
         >
-          <Col xs={20} sm={8} md={6} lg={3} className={styles.logo}>
-            <Link to="/" className={styles["logo-link"]}>
-              Ecommerce
+          <Space>
+            <Link to="/cart">
+              <Badge count={cartItemCount} size="small">
+                <Button
+                  type="text"
+                  icon={<ShoppingCartOutlined />}
+                  className={styles.iconButton}
+                />
+              </Badge>
             </Link>
-          </Col>
 
-          <Col
-            xs={0}
-            sm={16}
-            md={12}
-            lg={9}
-            className={styles["search-bar-container"]}
-          >
-            <input
+            <Button
               type="text"
-              placeholder="Tìm sản phẩm, danh mục hay thương hiệu mong muốn..."
-              className={styles["search-input"]}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
-            <button className={styles["search-button"]} onClick={handleSearch}>
-              <FaSearch className={styles["search-icon"]} />
-              Tìm kiếm
-            </button>
-          </Col>
-
-          <Col
-            xs={0}
-            sm={0}
-            md={6}
-            lg={10}
-            className={styles["actions-container"]}
-            style={{ justifyContent: "flex-end" }}
-          >
-            {currentIsLoggedIn ? (
-              <div className={styles["action-item"]}>
-                <FaUserCircle className={styles["action-icon"]} />
-                <div className={styles["account-text-container"]}>
-                  <Popover
-                    content={
-                      <div className={styles["popover-content"]}>
-                        <Link to="/profile" className={styles["account-link"]}>
-                          <span className={styles["account-btn"]}>
-                            Thông tin tài khoản
-                          </span>
-                        </Link>
-                        {user?.isAdmin && (
-                          <Link
-                            to="/system/admin"
-                            className={styles["account-link"]}
-                          >
-                            <span className={styles["account-btn"]}>
-                              Quản lý hệ thống
-                            </span>
-                          </Link>
-                        )}
-                        <span
-                          onClick={handleLogout}
-                          className={styles["logout-btn"]}
-                        >
-                          {" "}
-                          <FaSignOutAlt className={styles["action-icon"]} />
-                        </span>
-                      </div>
-                    }
-                    trigger="click"
-                  >
-                    <span className={styles["bold-text"]}>
-                      {currentUsername || "Tài khoản"}{" "}
-                    </span>
-                  </Popover>
-                </div>
-              </div>
-            ) : (
-              <div className={styles["action-item"]}>
-                <FaUserCircle className={styles["action-icon"]} />
-                <div className={styles["account-text-container"]}>
-                  <span
-                    className={styles.clickable}
-                    onClick={() => onShowSignIn(handleLoginSuccess)}
-                  >
-                    Đăng Nhập/Đăng Ký
-                  </span>
-                </div>
-              </div>
-            )}
-            <Link to="/cart" className={styles["action-item"]}>
-              <FaShoppingCart className={styles["action-icon"]} />
-              <span className={styles["cart-text"]}>Giỏ Hàng</span>
-              <span className={styles["cart-count"]}>{order.orderItems.length}</span>
-            </Link>
-            <Link to="/fitting_room" className={styles["action-item"]}>
-              <FaPersonBooth className={styles["action-icon"]} />
-              <span className={styles["cart-text"]}>Phòng thử đồ</span>
-            </Link>
-          </Col>
-
-          <Col
-            xs={4}
-            sm={0}
-            md={0}
-            lg={0}
-            className={styles["menu-mobile-col"]}
-          >
-            <FaBars
-              className={styles["menu-mobile-icon"]}
+              icon={<MenuOutlined />}
               onClick={() => setDrawerOpen(true)}
+              className={styles.menuButton}
             />
-          </Col>
-        </Row>
-      </div>
+          </Space>
+        </Col>
+      </Row>
 
+      {/* Drawer Menu for Mobile */}
       <Drawer
-        placement="left"
+        title={
+          <Link to="/" onClick={() => setDrawerOpen(false)}>
+            <span className={styles.drawerTitle}>Ecommerce</span>
+          </Link>
+        }
+        placement="right"
+        width={window.innerWidth < 500 ? "80%" : 300}
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
-        width={window.innerWidth < 500 ? "80vw" : 220}
+        headerStyle={{ borderBottom: "1px solid #f0f0f0" }}
+        bodyStyle={{ padding: 0 }}
       >
-        <div className={styles["actions-container-mobile"]}>
-          {currentIsLoggedIn ? (
-            <div className={styles["action-item"]}>
-              <FaUserCircle className={styles["action-icon"]} />
-              <div className={styles["account-text-container"]}>
-                <Link to="/account" onClick={() => setDrawerOpen(false)}>
-                  <span className={styles["bold-text"]}>Tài khoản</span>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div
-              className={styles["action-item"]}
-              onClick={() => {
-                onShowSignIn(handleLoginSuccess);
-                setDrawerOpen(false);
-              }}
+        <div className={styles.drawerContent}>
+          {/* Search box in drawer */}
+          <div className={styles.drawerSearch}>
+            <Search
+              placeholder="Tìm kiếm sản phẩm..."
+              onSearch={handleSearch}
+              enterButton
+            />
+          </div>
+
+          <Menu
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            style={{ borderRight: 0 }}
+          >
+            <Menu.Item
+              key="/"
+              icon={<HomeOutlined />}
+              onClick={() => setDrawerOpen(false)}
             >
-              <FaUserCircle className={styles["action-icon"]} />
-              <div className={styles["account-text-container"]}>
-                <span className={styles.clickable}>Đăng Nhập Đăng Ký</span>
-              </div>
-            </div>
-          )}
-          <Link
-            to="/cart"
-            className={styles["action-item"]}
-            onClick={() => setDrawerOpen(false)}
-          >
-            <FaShoppingCart className={styles["action-icon"]} />
-            <span className={styles["cart-text"]}>Giỏ Hàng</span>
-            <span className={styles["cart-count"]}>3</span>
-          </Link>
-          <Link
-            to="/fitting_room"
-            className={styles["action-item"]}
-            onClick={() => setDrawerOpen(false)}
-          >
-            <FaPersonBooth className={styles["action-icon"]} />
-            <span className={styles["cart-text"]}>Phòng thử đồ</span>
-          </Link>
+              <Link to="/">Trang chủ</Link>
+            </Menu.Item>
+
+            <Menu.Item
+              key="/fitting_room"
+              icon={<ExperimentOutlined />}
+              onClick={() => setDrawerOpen(false)}
+            >
+              <Link to="/fitting_room">Phòng thử đồ</Link>
+            </Menu.Item>
+
+            <Menu.Item
+              key="/cart"
+              icon={<ShoppingCartOutlined />}
+              onClick={() => setDrawerOpen(false)}
+            >
+              <Link to="/cart">Giỏ hàng ({cartItemCount})</Link>
+            </Menu.Item>
+
+            <Divider style={{ margin: "8px 0" }} />
+
+            {isLoggedIn ? (
+              <>
+                <Menu.Item
+                  key="/profile"
+                  icon={<UserOutlined />}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <Link to="/profile">Thông tin tài khoản</Link>
+                </Menu.Item>
+
+                <Menu.Item
+                  key="/profile/my-order"
+                  icon={<ShoppingOutlined />}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <Link to="/profile/my-order">Đơn hàng của tôi</Link>
+                </Menu.Item>
+
+                {user?.isAdmin && (
+                  <Menu.Item
+                    key="/system/admin"
+                    icon={<SettingOutlined />}
+                    onClick={() => setDrawerOpen(false)}
+                  >
+                    <Link to="/system/admin">Quản lý hệ thống</Link>
+                  </Menu.Item>
+                )}
+
+                <Divider style={{ margin: "8px 0" }} />
+
+                <Menu.Item
+                  key="logout"
+                  icon={<LogoutOutlined />}
+                  onClick={handleLogout}
+                >
+                  Đăng xuất
+                </Menu.Item>
+              </>
+            ) : (
+              <Menu.Item
+                key="login"
+                icon={<LoginOutlined />}
+                onClick={() => {
+                  setDrawerOpen(false);
+                  onShowSignIn(handleLoginSuccess);
+                }}
+              >
+                Đăng nhập / Đăng ký
+              </Menu.Item>
+            )}
+          </Menu>
         </div>
       </Drawer>
-    </header>
+    </Header>
   );
 }
 
-export default Header;
+export default AppHeader;
