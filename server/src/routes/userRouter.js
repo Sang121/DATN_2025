@@ -15,7 +15,7 @@ router.delete(
 router.get("/getAllUser", authAdminMiddleware, userController.getAllUser);
 router.get(
   "/getDetailUser/:id",
-  authUserMiddleware,
+
   userController.getDetailUser
 );
 router.get("/refreshToken", userController.refreshToken);
