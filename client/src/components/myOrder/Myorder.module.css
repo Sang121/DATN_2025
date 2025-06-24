@@ -1,81 +1,202 @@
 .orderContainer {
-    padding: 24px;
-    background-color: #ffffff;
-    border-radius: 8px;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.orderLayout {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.orderSidebar {
+  width: 250px;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: fit-content;
+  position: sticky;
+  top: 80px;
+  display: none; /* Mặc định ẩn, chỉ hiện trên desktop */
+}
+
+@media (min-width: 769px) {
+  .orderSidebar {
+    display: block;
   }
   
-  .title {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 24px;
-    color: #1a1a1a;
+  .mobileOrderSidebar {
+    display: none;
   }
-  
-  .orderCard {
-    margin-bottom: 16px;
-    border: 1px solid #f0f0f0;
-    border-radius: 8px;
-    transition: box-shadow 0.3s;
-  }
-  
-  .orderCard:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .cardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-    color: #8c8c8c;
-  }
-  
-  .orderId {
-    font-weight: 600;
-    color: #1890ff;
-  }
-  
-  .productItem {
-    display: flex;
-    margin-bottom: 16px;
-  }
-  
-  .productImage {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-right: 16px;
-  }
-  
-  .productInfo {
-    flex: 1;
-  }
-  
-  .productName {
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  
-  .productPrice {
-    color: #595959;
-  }
-  
-  .orderFooter {
-    text-align: right;
-  }
-  
-  .totalAmount {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 16px;
-  }
-  
-  .totalAmount span {
-    color: #ff4d4f;
-  }
-  
-  .actionButtons button {
-    margin-left: 8px;
-  }
-  
+}
+
+.mobileOrderSidebar {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.orderContent {
+  flex: 1;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #1a1a1a;
+}
+
+.statusHeading {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  color: #1a1a1a;
+}
+
+.statusHeading .icon {
+  margin-right: 10px;
+  color: #1890ff;
+}
+
+.statusFilter {
+  margin-bottom: 20px;
+}
+
+.filterMenu {
+  border-radius: 4px;
+  background-color: #fff;
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.filterMenu::-webkit-scrollbar {
+  height: 4px;
+}
+
+.filterMenu::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.hideOnDesktop {
+  display: none;
+}
+
+.sidebarMenu {
+  background: transparent;
+  border-right: 0;
+}
+
+.sidebarMenu :global(.ant-menu-item) {
+  height: 45px;
+  line-height: 45px;
+  border-radius: 4px;
+  margin: 4px 0;
+}
+
+.sidebarMenu :global(.ant-menu-item-icon) {
+  font-size: 18px;
+}
+
+.sidebarMenu :global(.ant-menu-item-selected) {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.filterMenu :global(.ant-menu-item) {
+  margin: 0 !important;
+  padding: 0 16px !important;
+}
+
+.filterMenu :global(.ant-menu-item-selected) {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.filterMenu :global(.ant-menu-item-icon) {
+  margin-right: 6px;
+}
+
+.statusCount {
+  margin-left: 8px;
+  background-color: #f1f1f1;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 12px;
+  color: #666;
+}
+
+.orderCard {
+  margin-bottom: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  transition: box-shadow 0.3s;
+}
+
+.orderCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.orderId {
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.productItem {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.productImage {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 16px;
+}
+
+.productInfo {
+  flex: 1;
+}
+
+.productName {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.productPrice {
+  color: #595959;
+}
+
+.orderFooter {
+  text-align: right;
+}
+
+.totalAmount {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.totalAmount span {
+  color: #ff4d4f;
+}
+
+.actionButtons button {
+  margin-left: 8px;
+}
