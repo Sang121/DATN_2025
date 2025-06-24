@@ -77,6 +77,7 @@ function ProductDetail() {
     const variant = product.variants.find(
       (v) => v.size === size && v.color === color
     );
+
     return variant?.stock || 0;
   };
 
@@ -235,9 +236,9 @@ function ProductDetail() {
 
             <div className={styles["productImageMain"]}>
               {product.totalStock <= 0 && (
-                <div className={styles["product-card-badge-out-of-stock"]}>
-            
-                </div>
+                <div
+                  className={styles["product-card-badge-out-of-stock"]}
+                ></div>
               )}
               <img src={selectedImage} alt={product.name} />
             </div>
@@ -314,7 +315,6 @@ function ProductDetail() {
                 )}
               </div>
             )}
-
             <div className={styles.productInfo}>
               {/* Thêm đánh giá sản phẩm */}
 
@@ -371,15 +371,21 @@ function ProductDetail() {
                 </div>
               </div>
             </div>
-
             {/* Hiển thị số lượng tồn kho */}
             <div className={styles.stockInfo}>
               <strong>Số lượng tồn kho: </strong>
-              {selectedSize && selectedColor
-                ? getStockForVariant(selectedSize, selectedColor)
-                : "Vui lòng chọn size và màu"}
+              {selectedSize && selectedColor ? (
+                getStockForVariant(selectedSize, selectedColor) ? (
+                  <span>
+                    {getStockForVariant(selectedSize, selectedColor)}{" "}
+                  </span>
+                ) : (
+                  "Hết hàng"
+                )
+              ) : (
+                "Vui lòng chọn size và màu"
+              )}
             </div>
-
             {/* Điều chỉnh số lượng */}
             <div className={styles.quantityBlock}>
               <strong>Số lượng:</strong>
@@ -411,35 +417,24 @@ function ProductDetail() {
                   +
                 </Button>
               </div>
-            </div>
-
+            </div>{" "}
             {/* Nút thêm vào giỏ hàng */}
             <div style={{ marginTop: 24 }}>
-              {product.totalStock > 0 ? (
-                <Button
-                  type="primary"
-                  size="large"
-                  disabled={!selectedSize || !selectedColor}
-                  onClick={() =>
-                    handleAddToCart(selectedSize, selectedColor, quantity)
-                  }
-                >
-                  Thêm vào giỏ hàng
-                </Button>
-              ) : (
-                <Button
-                  type="primary"
-                  size="large"
-                  disabled={
-                    product.totalStock <= 0 || !selectedSize || !selectedColor
-                  }
-                  onClick={() =>
-                    handleAddToCart(selectedSize, selectedColor, quantity)
-                  }
-                >
-                  Thêm vào giỏ hàng
-                </Button>
-              )}
+              <Button
+                type="primary"
+                size="large"
+                disabled={
+                  !selectedSize ||
+                  !selectedColor ||
+                  getStockForVariant(selectedSize, selectedColor) <= 0 ||
+                  getStockForVariant(selectedSize, selectedColor) < quantity
+                }
+                onClick={() =>
+                  handleAddToCart(selectedSize, selectedColor, quantity)
+                }
+              >
+                Thêm vào giỏ hàng
+              </Button>
             </div>
           </div>
         </div>
