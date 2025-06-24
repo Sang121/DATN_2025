@@ -9,7 +9,7 @@ const genneralAccessToken = async (payload) => {
     },
     process.env.ACCESS_TOKEN,
     {
-      expiresIn: "30s", // Thời gian hết hạn của Access Token (ngắn)
+      expiresIn: "1h", // Tăng thời gian hết hạn lên 1 giờ để đảm bảo người dùng có đủ thời gian hoạt động
     }
   );
   return access_token;
@@ -17,7 +17,6 @@ const genneralAccessToken = async (payload) => {
 
 const genneralRefreshToken = async (payload) => {
   console.log(payload);
-  // Nên đổi tên biến `access_token` thành `refreshToken` cho rõ ràng
   const refreshToken = jwt.sign(
     {
       ...payload,

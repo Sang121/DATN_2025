@@ -16,15 +16,24 @@ const authUserMiddleware = (req, res, next) => {
         return res
           .status(403)
           .json({ status: "Error", message: "Token is invalid" });
+      } // Luôn gán thông tin user vào request
+      req.user = user;
+      const userId = req.headers.userid;
+
+      // Cho phép admin đi qua
+      if (user.isAdmin) {
+        return next();
       }
-      // Cho phép admin đi qua, hoặc kiểm tra user id
+      // Kiểm tra quyền truy cập dựa trên params hoặc body
       if (
-        user.isAdmin ||
-        user.id === req.params.id ||
-        user.id === req.params.userId
+        // Kiểm tra params
+        user.id === userId ||
+        // Kiểm tra body - cho các request POST như createOrder
+        (req.body.user && user.id === req.body.user) ||
+        // Cho qua các endpoint tạo đơn hàng
+        req.originalUrl.includes("/check-token")
       ) {
-        req.user = user;
-        next();
+        return next();
       } else {
         return res.status(403).json({
           status: "Error",
