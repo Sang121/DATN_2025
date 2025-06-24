@@ -3,7 +3,11 @@ import { useSelector } from "react-redux";
 import { Card, Radio, Button, Space, Row, Col, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import styles from "./PaymentPage.module.css";
-import { create_payment_url, createOrder } from "../../services/orderService";
+import {
+  cancelOrder,
+  create_payment_url,
+  createOrder,
+} from "../../services/orderService";
 import { useNavigate } from "react-router-dom";
 import vnpayLogo from "../../assets/VnpayLogo.png"; // Ensure you have this logo in your assets
 function PaymentPage() {
@@ -61,33 +65,67 @@ function PaymentPage() {
           message.error(res.message || "Đặt hàng thất bại, vui lòng thử lại.");
         }
         return; // Stop execution here for non-VNPAY
-      }
-
-      // --- VNPAY Payment Flow ---
+      } // --- VNPAY Payment Flow ---
       if (paymentMethod === "VNPAY") {
-        // Step 1: Create order in DB to get a unique ID
-        const res = await createOrder(orderData);
+        // Step 1: Create order in DB with pending status
+        const orderDataWithStatus = {
+          ...orderData,
+          orderStatus: "pending payment", // Đặt trạng thái rõ ràng
+          isPaid: false, // Đảm bảo đơn hàng chưa được đánh dấu là đã thanh toán
+        };
+
+        const res = await createOrder(orderDataWithStatus);
         if (res.status !== "Success" || !res.data?._id) {
           message.error("Không thể tạo đơn hàng. Vui lòng thử lại.");
           return;
         }
 
         const newOrderId = res.data._id;
-        // Step 2: Prepare data and get payment URL from server
-        const paymentData = {
-          amount: `${orderData.totalPrice}`,
-          orderId: newOrderId,
-          bankCode: "", // Explicitly set bankCode
-        };
-        console.log("Payment Data:", paymentData);
 
-        const resPayment = await create_payment_url(paymentData);
+        try {
+          // Step 2: Prepare data and get payment URL from server
+          const paymentData = {
+            amount: `${orderData.totalPrice}`,
+            orderId: newOrderId,
+            bankCode: "", // Explicitly set bankCode
+          };
 
-        if (resPayment && resPayment.vnpUrl) {
-          // Step 3: Redirect user to VNPay Gateway
-          window.location.href = resPayment.vnpUrl;
-        } else {
-          message.error("Không thể lấy được URL thanh toán. Vui lòng thử lại.");
+          const resPayment = await create_payment_url(paymentData);
+
+          if (resPayment && resPayment.vnpUrl) {
+            // Step 3: Redirect user to VNPay Gateway
+            // Lưu orderId vào localStorage để sử dụng trong trường hợp người dùng đóng tab
+            localStorage.setItem("pendingVnpayOrderId", newOrderId);
+
+            // Chuyển hướng đến cổng thanh toán
+            window.location.href = resPayment.vnpUrl;
+          } else {
+            // Nếu không lấy được URL thanh toán, hủy đơn hàng đã tạo
+            message.error(
+              "Không thể lấy được URL thanh toán. Đơn hàng đã được hủy."
+            );
+
+            // Hủy đơn hàng với ID đúng (newOrderId thay vì order._id)
+            const cancelResult = await cancelOrder(newOrderId);
+            if (cancelResult.status === "Success") {
+              message.info("Đơn hàng đã được hủy thành công.");
+            } else {
+              message.error("Không thể hủy đơn hàng. Vui lòng liên hệ hỗ trợ.");
+            }
+          }
+        } catch (error) {
+          // Xử lý lỗi khi gọi API thanh toán
+          console.error("Lỗi khi tạo URL thanh toán:", error);
+          message.error(
+            "Có lỗi xảy ra khi xử lý thanh toán. Đơn hàng đã được hủy."
+          );
+
+          // Hủy đơn hàng đã tạo
+          try {
+            await cancelOrder(newOrderId);
+          } catch (cancelError) {
+            console.error("Không thể hủy đơn hàng:", cancelError);
+          }
         }
       }
     } catch (error) {

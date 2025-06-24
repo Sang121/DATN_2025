@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Result } from "antd";
+import { Button, Result, message } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircleFilled, ShoppingOutlined } from "@ant-design/icons";
 import styles from "./PaymentSuccessPage.module.css";
 import { useDispatch } from "react-redux";
 import { clearImmediateOrder } from "../../redux/slices/orderSlice";
+import { updateOrderAfterPayment } from "../../services/orderService";
 
 function PaymentSuccessPage() {
   const dispatch = useDispatch();
@@ -15,26 +16,100 @@ function PaymentSuccessPage() {
   const [totalAmount, setTotalAmount] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const code = location.state?.code;
+
   useEffect(() => {
+    // Log for debugging
+    console.log("Location search:", location.search);
+    console.log("Location state:", location.state);
+
+    // Xử lý khi có lỗi 404 từ VNPAY Return URL
+    // Nếu URL chứa các tham số VNPAY nhưng bị lỗi 404, vẫn cố gắng xử lý thanh toán
+
     const searchParams = new URLSearchParams(location.search);
     const vnp_ResponseCode = searchParams.get("vnp_ResponseCode") || code;
     const vnp_TxnRef = searchParams.get("vnp_TxnRef");
     const vnp_Amount = searchParams.get("vnp_Amount");
 
-    if (vnp_ResponseCode === "00") {
-      setOrderId(vnp_TxnRef);
-      setTotalAmount(vnp_Amount / 100); // Convert back from cents
+    // Kiểm tra VNPAY Response trực tiếp từ URL (trường hợp redirect bị lỗi 404)
+    if (vnp_ResponseCode === "00" && vnp_TxnRef) {
+      // VNPAY success
+      (async () => {
+        try {
+          // Lấy ID gốc từ định dạng orderId_timestamp
+          const originalOrderId = vnp_TxnRef?.split("_")[0] || vnp_TxnRef;
+          setOrderId(originalOrderId);
+          setTotalAmount(vnp_Amount ? Number(vnp_Amount) / 100 : null); // Convert back from cents
+
+          // Xóa orderId từ localStorage nếu có
+          localStorage.removeItem("pendingVnpayOrderId");
+
+          // Cập nhật trạng thái đơn hàng và trạng thái thanh toán trên server
+          try {
+            // Thu thập tất cả tham số VNPAY để gửi đến server
+            const allVnpParams = {};
+            searchParams.forEach((value, key) => {
+              if (key.startsWith("vnp_")) {
+                allVnpParams[key] = value;
+              }
+            });
+
+            // Gọi API cập nhật trạng thái đơn hàng sau thanh toán
+            const result = await updateOrderAfterPayment(
+              originalOrderId,
+              vnp_ResponseCode,
+              allVnpParams
+            );
+
+            if (result.status === "Success") {
+              message.success("Đơn hàng của bạn đã được cập nhật thành công!");
+            }
+          } catch (updateError) {
+            console.error("Lỗi khi cập nhật trạng thái đơn hàng:", updateError);
+            // Vẫn hiển thị thành công vì thanh toán đã thành công,
+            // chỉ có cập nhật frontend bị lỗi
+          }
+
+          setPaymentSuccess(true);
+          dispatch(clearImmediateOrder());
+          console.log(
+            "VNPAY payment success (from URL), order ID:",
+            originalOrderId
+          );
+        } catch (error) {
+          console.error("Error processing VNPAY success:", error);
+          navigate("/payment-failed?error=processing");
+        }
+      })();
+    } else if (vnp_ResponseCode === "01" || code === "01") {
+      // COD or other payment methods (from state)
+      if (location.state?.orderId) {
+        setOrderId(location.state.orderId);
+        setTotalAmount(location.state.totalAmount);
+        setPaymentSuccess(true);
+        dispatch(clearImmediateOrder());
+        console.log("COD payment success, order ID:", location.state.orderId);
+      } else {
+        console.error("Missing order info in state for COD payment");
+        navigate("/payment-failed?error=missing_order_info");
+      }
+    } else if (location.state?.orderId && location.state?.totalAmount) {
+      // Fallback if we have order info in state but no success code
+      setOrderId(location.state.orderId);
+      setTotalAmount(location.state.totalAmount);
       setPaymentSuccess(true);
       dispatch(clearImmediateOrder());
-    } else if (vnp_ResponseCode === "01") {
-      setOrderId(location.state?.orderId);
-      setTotalAmount(location.state?.totalAmount); // Convert back from cents
-      setPaymentSuccess(true);
-      dispatch(clearImmediateOrder());
+      console.log(
+        "Payment success (fallback), order ID:",
+        location.state.orderId
+      );
     } else {
+      // No valid payment information found
+      console.log(
+        "No valid payment information, redirecting to payment-failed"
+      );
       navigate("/payment-failed");
     }
-  }, [location, navigate]);
+  }, [location, navigate, dispatch, code]);
 
   if (!paymentSuccess) {
     return null; // Or a loading spinner while we check the payment status
