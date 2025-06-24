@@ -98,7 +98,6 @@ function OrderDetailPage() {
       setLoading(false);
     }
   }, [orderId]);
-
   useEffect(() => {
     fetchOrderDetails();
   }, [fetchOrderDetails]);
@@ -138,11 +137,22 @@ function OrderDetailPage() {
       />
     );
   }
-
   if (error && !order) {
     return (
       <div className={styles.container}>
-        <Alert message={error} type="error" showIcon />
+        <Card className={styles.errorCard}>
+          <Alert
+            message="Không thể tải đơn hàng"
+            description={error}
+            type="error"
+            showIcon
+            action={
+              <Button type="primary" onClick={fetchOrderDetails}>
+                Thử lại
+              </Button>
+            }
+          />
+        </Card>
       </div>
     );
   }
@@ -150,7 +160,22 @@ function OrderDetailPage() {
   if (!order) {
     return (
       <div className={styles.container}>
-        <Alert message="Không có dữ liệu đơn hàng." type="info" showIcon />
+        <Card className={styles.errorCard}>
+          <Alert
+            message="Không có dữ liệu đơn hàng"
+            description="Không tìm thấy thông tin đơn hàng hoặc đơn hàng không tồn tại."
+            type="info"
+            showIcon
+          />
+          <div className={styles.errorActions}>
+            <Link to="/">
+              <Button type="primary">Về trang chủ</Button>
+            </Link>
+            <Link to="/profile?tab=orders">
+              <Button>Xem các đơn hàng khác</Button>
+            </Link>
+          </div>
+        </Card>
       </div>
     );
   }
@@ -212,8 +237,6 @@ function OrderDetailPage() {
 
   return (
     <div className={styles.container}>
-      
-
       {renderSteps()}
 
       <Card
@@ -222,22 +245,39 @@ function OrderDetailPage() {
         className={styles.contentCard}
       >
         <Row gutter={[32, 24]}>
-          {/* Cột trái: Danh sách sản phẩm và hành động */}
+          {/* Cột trái: Danh sách sản phẩm và hành động */}{" "}
           <Col xs={24} lg={14}>
-            <Title level={5} style={{ marginBottom: "16px" }}>
-              Danh sách sản phẩm
+            <Title
+              level={5}
+              style={{
+                marginBottom: "16px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <ShoppingCartOutlined style={{ marginRight: 8 }} /> Danh sách sản
+              phẩm
             </Title>
             <List
               itemLayout="horizontal"
               dataSource={order.items}
+              className={styles.productsList}
               renderItem={(item) => (
                 <List.Item className={styles.productItem}>
                   <List.Item.Meta
                     avatar={
                       <Avatar
-                        src={`${API_URL}/uploads/${item.image}`}
+                        src={item.image}
                         size={64}
                         shape="square"
+                        icon={<ShoppingCartOutlined />}
+                        onError={(e) => {
+                          // Khi ảnh không load được, hiển thị icon mặc định
+                          const target = e.target;
+                          target.onerror = null; // Ngăn lặp vô hạn
+                          target.src = ""; // Xóa nguồn ảnh lỗi
+                          target.className = `${target.className} ${styles.imageError}`;
+                        }}
                       />
                     }
                     title={
@@ -248,7 +288,12 @@ function OrderDetailPage() {
                         {item.name}
                       </Link>
                     }
-                    description={`Size: ${item.variant.size} - Màu: ${item.variant.color}`}
+                    description={
+                      <span>
+                        Size: <b>{item.variant.size}</b> - Màu:{" "}
+                        <b>{item.variant.color}</b>
+                      </span>
+                    }
                   />
                   <div className={styles.priceInfo}>
                     <Text>{item.price.toLocaleString()}đ</Text>
@@ -274,13 +319,29 @@ function OrderDetailPage() {
               </div>
             )}
           </Col>
-
-          {/* Cột phải: Thông tin giao hàng và thanh toán */}
+          {/* Cột phải: Thông tin giao hàng và thanh toán */}{" "}
           <Col xs={24} lg={10}>
-            <Title level={5} style={{ marginBottom: "16px" }}>
-              Thông tin chi tiết
+            <Title
+              level={5}
+              style={{
+                marginBottom: "16px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <SolutionOutlined style={{ marginRight: 8 }} /> Thông tin chi tiết
             </Title>
-            <Descriptions column={1} bordered size="small">
+            <Descriptions
+              column={1}
+              bordered
+              size="small"
+              className={styles.detailDescriptions}
+            >
+              <Descriptions.Item label="Mã đơn hàng">
+                <Text code copyable>
+                  {order._id}
+                </Text>
+              </Descriptions.Item>
               <Descriptions.Item label="Người nhận">
                 <Text strong>{order.shippingInfo.fullName}</Text>
               </Descriptions.Item>
@@ -288,12 +349,10 @@ function OrderDetailPage() {
                 {order.shippingInfo.phone}
               </Descriptions.Item>
               <Descriptions.Item label="Địa chỉ">
-                {`${order.shippingInfo.address}, ${order.shippingInfo.ward}, ${order.shippingInfo.district}, ${order.shippingInfo.city}`}
+                {`${order.shippingInfo.address}`}
               </Descriptions.Item>
             </Descriptions>
-
             <Divider />
-
             <Descriptions
               column={1}
               bordered
@@ -305,6 +364,13 @@ function OrderDetailPage() {
               </Descriptions.Item>
               <Descriptions.Item label="Tạm tính">
                 {order.itemsPrice.toLocaleString()}đ
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Giảm giá trực tiếp">
+                {order.totalDiscount.toLocaleString()}đ
+              </Descriptions.Item>
+              <Descriptions.Item label="VAT">
+                {order.taxPrice.toLocaleString()}đ
               </Descriptions.Item>
               <Descriptions.Item label="Phí vận chuyển">0 đ</Descriptions.Item>
               <Descriptions.Item

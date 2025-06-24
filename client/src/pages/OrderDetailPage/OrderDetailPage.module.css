@@ -37,13 +37,46 @@
 }
 
 .contentCard {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  height: 100%;
+}
+
+/* Cải thiện tiêu đề phần */
+.contentCard .ant-card-head {
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.contentCard .ant-card-head-title {
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.productItem {
+  display: flex !important;
+  align-items: center !important;
+  padding: 16px !important;
+  margin-bottom: 8px !important;
+  border: 1px solid #f0f0f0 !important;
+  border-radius: 8px !important;
+  background-color: #fff;
 }
 
 .productItem .ant-list-item-meta {
-    align-items: center;
+  flex: 1;
+  align-items: flex-start !important;
+  margin-bottom: 0 !important;
+}
+
+.productItem .ant-avatar {
+  margin-top: 4px;
+  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+}
+
+.productItem:hover {
+  background-color: #fafafa;
+  transition: all 0.3s ease;
 }
 
 .productName {
@@ -57,8 +90,19 @@
     flex-direction: column;
     align-items: flex-end;
     text-align: right;
+    min-width: 120px; /* Đảm bảo không gian tối thiểu cho phần giá */
 }
 
+.priceInfo .ant-typography {
+  line-height: 1.6;
+}
+
+.priceInfo .ant-typography:last-child {
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+/* Căn chỉnh khoảng cách giữa các mục giá */
 .priceDetails .ant-descriptions-item-label {
     font-weight: 500;
 }
@@ -89,4 +133,88 @@
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+}
+
+/* Styles for error states */
+.errorCard {
+  margin: 24px auto;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.errorActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 12px;
+}
+
+/* Better image handling */
+.productItem .ant-avatar {
+  object-fit: cover;
+  border: 1px solid #f0f0f0;
+  background-color: #f5f5f5;
+}
+
+/* Image error handling */
+.imageError {
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bfbfbf;
+}
+
+/* Improve order steps on mobile */
+@media (max-width: 576px) {
+  .orderSteps {
+    margin-bottom: 16px;
+  }
+  
+  .orderSteps .ant-steps-item-title {
+    font-size: 12px;
+  }
+  
+  .orderSteps .ant-steps-item-description {
+    display: none;
+  }
+  
+  .productItem {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  
+  .priceInfo {
+    margin-top: 16px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+}
+
+/* Làm đẹp Descriptions */
+.detailDescriptions {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.detailDescriptions .ant-descriptions-row:last-child .ant-descriptions-item {
+  border-bottom: none;
+}
+
+/* Làm đẹp phần chi tiết giá */
+.priceDetails {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.priceDetails .ant-descriptions-row:last-child {
+  background-color: #fff1f0;
+}
+
+.priceDetails .ant-descriptions-row:last-child .ant-descriptions-item-label,
+.priceDetails .ant-descriptions-row:last-child .ant-descriptions-item-content {
+  border-bottom: none;
 }
