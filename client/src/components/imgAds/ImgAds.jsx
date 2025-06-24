@@ -1,14 +1,21 @@
-import React from 'react'
+import React from "react";
+import { Card } from "antd";
+import styles from "./ImgAds.module.css";
 
-function ImgAds({ img }) {
+function ImgAds({ img, title, link }) {
   return (
-    <div>
-      <img style={{ width: "100%", height: "auto" }}
-        src={img}
-        alt="Quảng cáo"
-      />
-    </div>
+    <Card
+      className={styles.adCard}
+      bordered={false}
+      bodyStyle={{ padding: 0 }}
+      onClick={link ? () => (window.location.href = link) : undefined}
+    >
+      <div className={styles.adImageContainer}>
+        <img className={styles.adImage} src={img} alt={title || "Quảng cáo"} />
+        {title && <div className={styles.adTitle}>{title}</div>}
+      </div>
+    </Card>
   );
 }
 
-export default ImgAds
+export default ImgAds;

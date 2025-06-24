@@ -1,27 +1,92 @@
-import React from "react";
+import React, { useState } from "react";
+import { Slider, InputNumber, Button, Card, Typography, Divider } from "antd";
+import { FilterOutlined } from "@ant-design/icons";
 import styles from "./FilterPrice.module.css";
 
+const { Title } = Typography;
+
 function FilterPrice() {
+  const [priceRange, setPriceRange] = useState([0, 5000000]);
+
+  const handleSliderChange = (value) => {
+    setPriceRange(value);
+  };
+
+  const handleMinInputChange = (value) => {
+    setPriceRange([value || 0, priceRange[1]]);
+  };
+
+  const handleMaxInputChange = (value) => {
+    setPriceRange([priceRange[0], value || 5000000]);
+  };
+
+  const handleApply = () => {
+    console.log("Áp dụng lọc giá:", priceRange);
+    // Tại đây sẽ kết nối với logic lọc sản phẩm theo giá
+  };
+
+  // Format giá tiền
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+  });
+
   return (
-    <div className={styles.filterPriceContainer}>
-      <h2 className={styles.filterPriceTitle}>Lọc theo giá</h2>
+    <Card className={styles.filterPriceContainer}>
+      <Title level={5} className={styles.filterPriceTitle}>
+        <FilterOutlined /> Lọc theo giá
+      </Title>
+      <Divider className={styles.divider} />
+      <Slider
+        range
+        min={0}
+        max={5000000}
+        value={priceRange}
+        onChange={handleSliderChange}
+        tooltip={{
+          formatter: (value) => formatter.format(value),
+        }}
+        className={styles.priceSlider}
+      />
       <div className={styles.filterPriceRange}>
-        <input
-          type="number"
+        <InputNumber
+          min={0}
+          max={priceRange[1]}
+          value={priceRange[0]}
+          onChange={handleMinInputChange}
+          formatter={(value) =>
+            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+          }
+          parser={(value) => value.replace(/\./g, "")}
           className={styles.filterPriceInput}
           placeholder="Từ"
-          min={0}
+          addonBefore="₫"
         />
         <span className={styles.filterPriceDash}>-</span>
-        <input
-          type="number"
+        <InputNumber
+          min={priceRange[0]}
+          max={10000000}
+          value={priceRange[1]}
+          onChange={handleMaxInputChange}
+          formatter={(value) =>
+            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+          }
+          parser={(value) => value.replace(/\./g, "")}
           className={styles.filterPriceInput}
           placeholder="Đến"
-          min={0}
+          addonBefore="₫"
         />
       </div>
-      <button className={styles.filterPriceBtn}>Áp dụng</button>
-    </div>
+      <Button
+        type="primary"
+        onClick={handleApply}
+        className={styles.filterPriceBtn}
+        icon={<FilterOutlined />}
+      >
+        Áp dụng
+      </Button>
+    </Card>
   );
 }
 

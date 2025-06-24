@@ -1,6 +1,21 @@
 import React from "react";
 import styles from "./SideBar.module.css";
 import { Link } from "react-router-dom";
+import { Menu, Typography, Badge, Avatar } from "antd";
+import {
+  TagsOutlined,
+  ManOutlined,
+  WomanOutlined,
+  SkinOutlined,
+  ShoppingOutlined,
+  ThunderboltOutlined,
+  ClockCircleOutlined,
+  InboxOutlined,
+  StarOutlined,
+} from "@ant-design/icons";
+
+const { Title } = Typography;
+
 function Sidebar() {
   const typeProductsList = [
     {
@@ -70,27 +85,58 @@ function Sidebar() {
         "https://salt.tikicdn.com/cache/100x100/ts/category/31/a7/94/6524d2ecbec216816d91b6066452e3f2.png",
     },
   ];
+  // Tạo các items cho Menu của Ant Design
+  const menuItems = typeProductsList.map((product, index) => {
+    // Chọn icon phù hợp dựa vào category
+    let icon;
+    switch (product.category) {
+      case "Nam":
+        icon = <ManOutlined />;
+        break;
+      case "Nữ":
+        icon = <WomanOutlined />;
+        break;
+      case "Quần":
+      case "Áo":
+      case "Váy":
+        icon = <SkinOutlined />;
+        break;
+      case "Trẻ em":
+        icon = <ThunderboltOutlined />;
+        break;
+      case "Giày":
+        icon = <ShoppingOutlined />;
+        break;
+      case "Đồng Hồ":
+        icon = <ClockCircleOutlined />;
+        break;
+      case "Ba lô":
+      case "Túi Xách":
+        icon = <InboxOutlined />;
+        break;
+      default:
+        icon = <TagsOutlined />;
+    }
+
+    return {
+      key: index.toString(),
+      icon: icon,
+      label: <Link to={`/search/${product.category}`}>{product.name}</Link>,
+    };
+  });
 
   return (
     <div className={styles.sidebar}>
       <div className={styles.typeProductsContainer}>
-        <h2 className={styles.typeProductsTitle}>Danh mục sản phẩm</h2>
-        {typeProductsList.map((product, index) => (
-          <Link
-            to={`/search/${product.category}`}
-            key={index}
-            className={styles.typeProductItem}
-          >
-            {product.image && (
-              <img
-                src={product.image}
-                alt={product.name}
-                className={styles.typeProductImage}
-              />
-            )}
-            {product.name}
-          </Link>
-        ))}
+        <Title level={4} className={styles.categoryTitle}>
+          <TagsOutlined /> Danh mục sản phẩm
+        </Title>
+        <Menu
+          mode="vertical"
+          items={menuItems}
+          className={styles.categoryMenu}
+          theme="light"
+        />
       </div>
     </div>
   );
