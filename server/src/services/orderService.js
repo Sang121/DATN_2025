@@ -180,24 +180,30 @@ const createOrder = (orderData) => {
             data: null,
           });
         }
-      }      // Cập nhật stock và sold của product variants
-      await updateProductStock(orderData.items);
-      
-      // Nếu phương thức thanh toán là VNPAY, đánh dấu đơn hàng đã thanh toán
+      } // Cập nhật stock và sold của product variants
+      await updateProductStock(orderData.items); // Thiết lập trạng thái ban đầu cho đơn hàng dựa vào phương thức thanh toán
       if (orderData.paymentMethod === "VNPAY") {
-        orderData.isPaid = true;
-        orderData.paidAt = new Date();
+        // Đơn hàng VNPAY có trạng thái ban đầu là "chờ thanh toán"
+        orderData.isPaid = false;
+        orderData.orderStatus = "pending payment"; // Đặt trạng thái rõ ràng
+      } else {
+        // Các đơn hàng khác (COD) có trạng thái ban đầu là "chờ xử lý"
+        orderData.isPaid = false;
+        orderData.orderStatus = orderData.orderStatus || "pending";
       }
-      
+
       // Thêm lịch sử trạng thái ban đầu
       if (!orderData.statusHistory) {
         orderData.statusHistory = [];
       }
 
       orderData.statusHistory.push({
-        status: orderData.orderStatus || "pending",
+        status: orderData.orderStatus,
         updatedAt: new Date(),
-        note: "Đơn hàng mới được tạo" + (orderData.paymentMethod === "VNPAY" ? " - Đã thanh toán qua VNPAY" : ""),
+        note:
+          orderData.paymentMethod === "VNPAY"
+            ? "Đơn hàng mới được tạo - Đang chờ thanh toán qua VNPAY"
+            : "Đơn hàng mới được tạo",
       });
 
       // Create order
@@ -268,41 +274,123 @@ const getOrdersByUserId = (userId, limit = 5, page = 0, status) => {
 };
 
 const updateOrderAfterPayment = async (orderId, vnpResponseCode, vnpParams) => {
-  const originalOrderId = orderId.split("_")[0];
-  const order = await Order.findById(originalOrderId);
+  try {
+    console.log("Updating order after payment:", {
+      orderId,
+      vnpResponseCode,
+      params: vnpParams,
+    });
 
-  if (!order) {
-    const err = new Error("Order not found");
-    err.code = "ORDER_NOT_FOUND";
-    throw err;
-  }
+    // Lấy ID gốc nếu có timestamp
+    const originalOrderId = orderId.includes("_")
+      ? orderId.split("_")[0]
+      : orderId;
+    console.log("Looking up order with ID:", originalOrderId);
 
-  if (order.isPaid) {
-    return { status: "Success", message: "Order has already been paid" };
-  }
+    const order = await Order.findById(originalOrderId);
 
-  if (vnpResponseCode === "00") {
-    order.isPaid = true;
-    order.paidAt = new Date();
-    order.paymentInfo = {
-      id: vnpParams.vnp_TransactionNo,
+    if (!order) {
+      console.error(`Order not found: ${originalOrderId}`);
+      const err = new Error("Order not found");
+      err.code = "ORDER_NOT_FOUND";
+      throw err;
+    }
+
+    console.log("Found order:", {
+      id: order._id,
+      status: order.orderStatus,
+      isPaid: order.isPaid,
+      paymentMethod: order.paymentMethod,
+    });
+
+    // Chỉ xử lý cho đơn hàng VNPAY
+    if (order.paymentMethod !== "VNPAY") {
+      console.log(`Order ${originalOrderId} is not a VNPAY payment`);
+      return {
+        status: "Success",
+        message: "Not a VNPAY order, no action needed",
+        data: order,
+      };
+    }
+
+    // Kiểm tra nếu đơn hàng đã được thanh toán
+    if (order.isPaid) {
+      console.log(`Order ${originalOrderId} has already been paid`);
+      return { status: "Success", message: "Order has already been paid" };
+    }
+
+    const now = new Date();
+
+    if (vnpResponseCode === "00") {
+      console.log(`Payment successful for order ${originalOrderId}`);
+
+      // Cập nhật trạng thái thanh toán
+      order.isPaid = true;
+      order.paidAt = now;
+      order.paymentInfo = {
+        id: vnpParams.vnp_TransactionNo || "unknown",
+        status: "Success",
+        update_time: now,
+        email_address: order.shippingInfo.email,
+        amount: vnpParams.vnp_Amount
+          ? Number(vnpParams.vnp_Amount) / 100
+          : order.totalPrice,
+        bankCode: vnpParams.vnp_BankCode || "unknown",
+      };
+
+      // Cập nhật trạng thái đơn hàng
+      order.orderStatus = "pending";
+
+      // Thêm vào lịch sử trạng thái
+      order.statusHistory.push({
+        status: "pending",
+        updatedBy: null, // Không có ID người dùng trong ngữ cảnh này
+        updatedAt: now,
+        note:
+          "Thanh toán VNPAY thành công" +
+          (vnpParams.vnp_BankCode
+            ? ` qua ngân hàng ${vnpParams.vnp_BankCode}`
+            : ""),
+      });
+
+      // Thêm lịch sử trạng thái thanh toán
+      order.statusHistory.push({
+        status: "payment_updated",
+        updatedBy: null,
+        updatedAt: now,
+        note:
+          "Đã thanh toán thành công qua VNPAY" +
+          (vnpParams.vnp_TransactionNo
+            ? ` - Mã giao dịch: ${vnpParams.vnp_TransactionNo}`
+            : ""),
+      });
+    } else {
+      console.log(
+        `Payment failed for order ${originalOrderId} with code: ${vnpResponseCode}`
+      );
+
+      // Cập nhật trạng thái đơn hàng thành thất bại
+      order.orderStatus = "payment_failed";
+
+      // Thêm vào lịch sử trạng thái
+      order.statusHistory.push({
+        status: "payment_failed",
+        updatedBy: null,
+        updatedAt: now,
+        note: `Thanh toán VNPAY thất bại với mã: ${vnpResponseCode}`,
+      });
+    }
+
+    const updatedOrder = await order.save();
+    return {
       status: "Success",
-      update_time: new Date(),
-      email_address: order.shippingInfo.email,
+      message: "Order status updated successfully",
+      data: updatedOrder,
     };
-    order.orderStatus = "processing";
-    // Khi thanh toán thành công mới trừ kho
-    await updateProductStock(order.items);
-  } else {
-    order.orderStatus = "payment_failed";
+  } catch (error) {
+    console.error("Error updating order after payment:", error);
+    throw error;
   }
-
-  const updatedOrder = await order.save();
-  return {
-    status: "Success",
-    message: "Order status updated successfully",
-    data: updatedOrder,
-  };
 };
 
 const getOrderDetails = (orderId) => {
@@ -481,26 +569,26 @@ const updateOrderStatus = (orderId, newStatus, adminUserId, note) => {
           status: "Err",
           message: "Không thể thay đổi trạng thái của đơn hàng đã hủy",
         });
-      }      // Thêm logic xử lý các trường hợp cụ thể
+      } // Thêm logic xử lý các trường hợp cụ thể
       if (newStatus === "delivered") {
         // Nếu trạng thái mới là đã giao, cập nhật thời gian giao hàng
         order.deliveredAt = new Date();
-        
+
         // Nếu phương thức thanh toán là "COD" (thanh toán khi nhận hàng), đánh dấu đã thanh toán
         if (order.paymentMethod === "COD" && !order.isPaid) {
           order.isPaid = true;
           order.paidAt = new Date();
-          
+
           // Thêm ghi chú vào lịch sử về việc cập nhật tự động trạng thái thanh toán
           if (!order.statusHistory) {
             order.statusHistory = [];
           }
-          
+
           order.statusHistory.push({
             status: "payment_updated",
             updatedBy: adminUserId,
             updatedAt: new Date(),
-            note: "Thanh toán COD được xác nhận khi giao hàng thành công"
+            note: "Thanh toán COD được xác nhận khi giao hàng thành công",
           });
         }
       }
