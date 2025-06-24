@@ -1,9 +1,22 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Table, Spin, Alert, Button, Tag } from "antd";
+import {
+  Table,
+  Spin,
+  Alert,
+  Button,
+  Tag,
+  Space,
+  message,
+  Tooltip,
+  Modal,
+  Radio,
+} from "antd";
 import { useNavigate } from "react-router-dom";
 import * as orderService from "../../../../services/orderService";
 import styles from "./OrderManager.module.css";
+import * as XLSX from "xlsx";
+import { FileExcelOutlined, LoadingOutlined } from "@ant-design/icons";
 
 const OrderManager = () => {
   const navigate = useNavigate();
@@ -11,6 +24,10 @@ const OrderManager = () => {
     current: 1,
     pageSize: 10,
   });
+  const [exportModalVisible, setExportModalVisible] = useState(false);
+  const [exportType, setExportType] = useState("current");
+  const [exporting, setExporting] = useState(false);
+
   const {
     data: queryData,
     isLoading,
@@ -23,6 +40,134 @@ const OrderManager = () => {
       orderService.getAllOrders(pagination.pageSize, pagination.current - 1),
     keepPreviousData: true, // Giữ lại dữ liệu cũ khi đang fetch dữ liệu mới
   });
+
+  // Mở modal xuất Excel
+  const showExportModal = () => {
+    setExportModalVisible(true);
+  };
+
+  // Xử lý sự kiện thay đổi loại xuất
+  const handleExportTypeChange = (e) => {
+    setExportType(e.target.value);
+  };
+
+  // Xử lý đóng modal
+  const handleCancelExport = () => {
+    setExportModalVisible(false);
+  };
+
+  // Chuẩn bị dữ liệu để xuất Excel
+  const prepareExportData = (orders) => {
+    return orders.map((order) => {
+      return {
+        "Mã đơn hàng": order._id,
+        "Khách hàng": order.shippingInfo?.fullName || "N/A",
+        Email: order.shippingInfo?.email || "N/A",
+        "Số điện thoại": order.shippingInfo?.phone || "N/A",
+        "Địa chỉ": order.shippingInfo?.address || "N/A",
+        "Phương thức thanh toán": order.paymentMethod || "N/A",
+        "Tổng tiền": order.totalPrice.toLocaleString("vi-VN") + " VND",
+        "Trạng thái đơn hàng": formatOrderStatus(order.orderStatus),
+        "Trạng thái thanh toán": order.isPaid
+          ? "Đã thanh toán"
+          : "Chưa thanh toán",
+        "Ngày tạo": new Date(order.createdAt).toLocaleDateString("vi-VN"),
+        "Cập nhật cuối": new Date(
+          order.updatedAt || order.createdAt
+        ).toLocaleDateString("vi-VN"),
+      };
+    });
+  };
+
+  // Hàm xuất dữ liệu sang Excel
+  const exportToExcel = async () => {
+    try {
+      setExporting(true);
+
+      let exportData = [];
+
+      if (exportType === "current") {
+        // Xuất dữ liệu từ trang hiện tại
+        if (!queryData?.data || queryData.data.length === 0) {
+          message.warning("Không có dữ liệu để xuất");
+          setExporting(false);
+          setExportModalVisible(false);
+          return;
+        }
+        exportData = prepareExportData(queryData.data);
+      } else {
+        // Xuất tất cả dữ liệu
+        const allOrdersResponse = await orderService.getAllOrdersForExport();
+        if (!allOrdersResponse?.data || allOrdersResponse.data.length === 0) {
+          message.warning("Không có dữ liệu để xuất");
+          setExporting(false);
+          setExportModalVisible(false);
+          return;
+        }
+        exportData = prepareExportData(allOrdersResponse.data);
+      }
+
+      // Tạo workbook và worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(exportData);
+
+      // Thiết lập độ rộng các cột
+      const columnWidths = [
+        { wch: 30 }, // Mã đơn hàng
+        { wch: 25 }, // Khách hàng
+        { wch: 30 }, // Email
+        { wch: 15 }, // Số điện thoại
+        { wch: 40 }, // Địa chỉ
+        { wch: 20 }, // Phương thức thanh toán
+        { wch: 15 }, // Tổng tiền
+        { wch: 20 }, // Trạng thái đơn hàng
+        { wch: 20 }, // Trạng thái thanh toán
+        { wch: 15 }, // Ngày tạo
+        { wch: 15 }, // Cập nhật cuối
+      ];
+      ws["!cols"] = columnWidths;
+
+      // Thêm worksheet vào workbook
+      XLSX.utils.book_append_sheet(wb, ws, "Danh sách đơn hàng");
+
+      // Tạo tên file với định dạng "Danh_sach_don_hang-YYYY-MM-DD.xlsx"
+      const currentDate = new Date();
+      const fileName = `Danh_sach_don_hang-${currentDate
+        .toISOString()
+        .slice(0, 10)
+        .replace(/\//g, "-")}.xlsx`;
+
+      // Xuất file
+      XLSX.writeFile(wb, fileName);
+      message.success("Xuất Excel thành công!");
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Có lỗi xảy ra khi xuất Excel. Vui lòng thử lại sau.");
+    } finally {
+      setExporting(false);
+      setExportModalVisible(false);
+    }
+  };
+  // Helper function để format trạng thái đơn hàng
+  const formatOrderStatus = (status) => {
+    switch (status) {
+      case "pending":
+        return "Chờ xử lý";
+      case "pending_payment":
+        return "Chờ thanh toán";
+      case "processing":
+        return "Đang xử lý";
+      case "delivered":
+        return "Đã giao";
+      case "cancelled":
+        return "Đã hủy";
+      case "payment_failed":
+        return "Thanh toán thất bại";
+      default:
+        return status;
+    }
+  };
+
   const handleDetailsClick = (orderId) => {
     navigate(`/admin/order-details/${orderId}`);
   };
@@ -164,7 +309,20 @@ const OrderManager = () => {
   }
   return (
     <div className={styles.orderManagerContainer}>
-      <h2>Quản lý đơn hàng</h2>
+      <div className={styles.headerContainer}>
+        <h2>Quản lý đơn hàng</h2>
+        <Tooltip title="Xuất danh sách đơn hàng ra Excel">
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={showExportModal}
+            className={styles.exportButton}
+            disabled={isLoading || !queryData?.data?.length}
+          >
+            Xuất Excel
+          </Button>
+        </Tooltip>
+      </div>
       <Table
         columns={columns}
         dataSource={queryData?.data || []}
@@ -183,6 +341,31 @@ const OrderManager = () => {
         onChange={handleTableChange}
         scroll={{ x: true }}
       />
+      {/* Modal xác nhận xuất Excel */}
+      <Modal
+        title="Xuất danh sách đơn hàng"
+        open={exportModalVisible}
+        onOk={exportToExcel}
+        onCancel={handleCancelExport}
+        okText="Xuất Excel"
+        cancelText="Hủy"
+        confirmLoading={exporting}
+      >
+        <p>Chọn dữ liệu muốn xuất:</p>
+        <Radio.Group onChange={handleExportTypeChange} value={exportType}>
+          <Radio value="current">
+            Trang hiện tại ({queryData?.data?.length || 0} đơn hàng)
+          </Radio>
+          <Radio value="all">
+            Tất cả đơn hàng ({queryData?.total || 0} đơn hàng)
+          </Radio>
+        </Radio.Group>
+        {exporting && (
+          <div className={styles.exportingIndicator}>
+            <LoadingOutlined /> Đang xuất dữ liệu...
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

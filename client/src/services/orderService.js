@@ -192,3 +192,19 @@ export const updateOrderAfterPayment = async (
     throw new Error(errorMessage);
   }
 };
+export const getAllOrdersForExport = async () => {
+  try {
+    // Gọi API với limit lớn để lấy tất cả đơn hàng (giới hạn 1000 đơn)
+    const response = await axiosInstance.get(
+      `/order/getAllOrders?limit=1000&page=0`
+    );
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Unknown error occurred while fetching all orders for export.";
+    console.error("Error fetching all orders for export:", errorMessage);
+    throw new Error(errorMessage);
+  }
+};
