@@ -116,6 +116,18 @@ axiosInstance.interceptors.request.use(
         } else {
           // Access Token vẫn còn hạn, thêm vào header
           config.headers.token = `Bearer ${accessToken}`;
+
+          // Thêm userId vào headers nếu có
+          const userId = currentUserState?._id;
+          console.log("userState:", currentUserState._id);
+          if (userId) {
+            config.headers.userId = `${userId}`;
+            console.log(
+              `Added userId to request headers: ${userId} for URL: ${config.url}`
+            );
+          } else {
+            console.warn(`No userId available for request to: ${config.url}`);
+          }
         }
       } catch (error) {
         console.error(
