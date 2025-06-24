@@ -1,2 +1,2 @@
-import AdminOrderDetail from './AdminOrderDetail';
+import AdminOrderDetail from "./AdminOrderDetail";
 export default AdminOrderDetail;

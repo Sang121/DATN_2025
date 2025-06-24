@@ -187,11 +187,12 @@ function AdminOrderDetail() {
         description: "Trạng thái đơn hàng không thay đổi.",
       });
     }
-  };  const handleUpdateStatus = async () => {
+  };
+  const handleUpdateStatus = async () => {
     try {
       setUpdatingStatus(true);
       // Lấy note từ form và gửi đến API
-      const adminNote = noteForm.getFieldValue('note') || '';
+      const adminNote = noteForm.getFieldValue("note") || "";
 
       const res = await updateOrderStatus(orderId, selectedStatus, adminNote);
       if (res?.status === "Success") {
@@ -228,16 +229,22 @@ function AdminOrderDetail() {
     try {
       setUpdatingPayment(true);
       // Lấy note từ form và gửi đến API
-      const paymentNote = paymentForm.getFieldValue('note') || '';
+      const paymentNote = paymentForm.getFieldValue("note") || "";
       // Đảo ngược trạng thái thanh toán hiện tại
       const newPaymentStatus = !order.isPaid;
 
-      const res = await updatePaymentStatus(orderId, newPaymentStatus, paymentNote);
+      const res = await updatePaymentStatus(
+        orderId,
+        newPaymentStatus,
+        paymentNote
+      );
       if (res?.status === "Success") {
         await fetchOrderDetails();
         notification.success({
           message: "Thành công",
-          description: `Trạng thái thanh toán đã được cập nhật thành: ${newPaymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}.`,
+          description: `Trạng thái thanh toán đã được cập nhật thành: ${
+            newPaymentStatus ? "Đã thanh toán" : "Chưa thanh toán"
+          }.`,
         });
         setPaymentModalVisible(false);
         paymentForm.resetFields();
@@ -251,7 +258,8 @@ function AdminOrderDetail() {
     } catch (err) {
       notification.error({
         message: "Lỗi",
-        description: err.message || "Đã có lỗi xảy ra khi cập nhật trạng thái thanh toán.",
+        description:
+          err.message || "Đã có lỗi xảy ra khi cập nhật trạng thái thanh toán.",
       });
     } finally {
       setUpdatingPayment(false);
@@ -377,7 +385,9 @@ function AdminOrderDetail() {
       <Row gutter={[24, 24]} className={styles.adminToolbar}>
         <Col span={24}>
           <Card title="Cập nhật đơn hàng" bordered={false}>
-            <Row gutter={[16, 16]}>              <Col xs={24} md={12}>
+            <Row gutter={[16, 16]}>
+              {" "}
+              <Col xs={24} md={12}>
                 <Space direction="vertical" style={{ width: "100%" }}>
                   <div>
                     <Text strong>Trạng thái đơn hàng:</Text>
@@ -405,7 +415,7 @@ function AdminOrderDetail() {
                   </Space>
                 </Space>
               </Col>
-                <Col xs={24} md={12}>
+              <Col xs={24} md={12}>
                 <Space direction="vertical" style={{ width: "100%" }}>
                   <div>
                     <Text strong>Trạng thái thanh toán:</Text>
@@ -413,25 +423,28 @@ function AdminOrderDetail() {
                       {order.isPaid ? "ĐÃ THANH TOÁN" : "CHƯA THANH TOÁN"}
                     </Tag>
                   </div>
-                  
+
                   {/* Chỉ hiện nút cập nhật thanh toán cho các trường hợp đặc biệt, không phải VNPAY và chưa giao hàng */}
-                  {order.paymentMethod !== "VNPAY" && order.orderStatus !== "delivered" && (
-                    <Space>
-                      <Text strong>Cập nhật:</Text>
-                      <Button
-                        type="primary"
-                        onClick={showPaymentModal}
-                        icon={<EditOutlined />}
-                      >
-                        {order.isPaid ? "Đánh dấu chưa thanh toán" : "Đánh dấu đã thanh toán"}
-                      </Button>
-                      {order.paymentMethod === "COD" && (
-                        <Text type="secondary" italic>
-                          (Sẽ tự động được đánh dấu khi giao hàng)
-                        </Text>
-                      )}
-                    </Space>
-                  )}
+                  {order.paymentMethod !== "VNPAY" &&
+                    order.orderStatus !== "delivered" && (
+                      <Space>
+                        <Text strong>Cập nhật:</Text>
+                        <Button
+                          type="primary"
+                          onClick={showPaymentModal}
+                          icon={<EditOutlined />}
+                        >
+                          {order.isPaid
+                            ? "Đánh dấu chưa thanh toán"
+                            : "Đánh dấu đã thanh toán"}
+                        </Button>
+                        {order.paymentMethod === "COD" && (
+                          <Text type="secondary" italic>
+                            (Sẽ tự động được đánh dấu khi giao hàng)
+                          </Text>
+                        )}
+                      </Space>
+                    )}
 
                   {/* Hiển thị thông báo cho VNPAY */}
                   {order.paymentMethod === "VNPAY" && (
@@ -441,14 +454,16 @@ function AdminOrderDetail() {
                   )}
 
                   {/* Hiển thị thông báo cho đơn hàng đã giao */}
-                  {order.orderStatus === "delivered" && order.paymentMethod === "COD" && (
-                    <Text type="secondary">
-                      Đơn hàng COD đã được giao, trạng thái thanh toán đã tự động cập nhật.
-                    </Text>
-                  )}
+                  {order.orderStatus === "delivered" &&
+                    order.paymentMethod === "COD" && (
+                      <Text type="secondary">
+                        Đơn hàng COD đã được giao, trạng thái thanh toán đã tự
+                        động cập nhật.
+                      </Text>
+                    )}
                 </Space>
               </Col>
-             </Row>
+            </Row>
           </Card>
         </Col>
       </Row>
@@ -502,7 +517,8 @@ function AdminOrderDetail() {
                   {order.shippingInfo.address}
                 </Descriptions.Item>
               </Descriptions>
-            </Card>            <Card
+            </Card>{" "}
+            <Card
               title={
                 <span>
                   <HistoryOutlined /> Lịch sử đơn hàng
@@ -522,14 +538,15 @@ function AdminOrderDetail() {
                     {new Date(order.paidAt).toLocaleString()}
                   </Timeline.Item>
                 )}
-                
+
                 {/* Hiển thị lịch sử trạng thái từ statusHistory */}
-                {order.statusHistory && order.statusHistory.length > 0 && 
+                {order.statusHistory &&
+                  order.statusHistory.length > 0 &&
                   order.statusHistory.map((history, index) => {
                     let color = "blue";
                     let statusText = "Đang xử lý";
-                    
-                    switch(history.status) {
+
+                    switch (history.status) {
                       case "pending":
                         color = "orange";
                         statusText = "Chờ xử lý";
@@ -553,20 +570,25 @@ function AdminOrderDetail() {
                       default:
                         color = "blue";
                     }
-                    
+
                     return (
                       <Timeline.Item color={color} key={index}>
                         <div>
-                          <strong>{statusText}</strong> - {new Date(history.updatedAt).toLocaleString()}
+                          <strong>{statusText}</strong> -{" "}
+                          {new Date(history.updatedAt).toLocaleString()}
                         </div>
-                        {history.note && <div style={{marginTop: '5px', fontStyle: 'italic'}}>{history.note}</div>}
+                        {history.note && (
+                          <div
+                            style={{ marginTop: "5px", fontStyle: "italic" }}
+                          >
+                            {history.note}
+                          </div>
+                        )}
                       </Timeline.Item>
                     );
-                  })
-                }
+                  })}
               </Timeline>
             </Card>
-
             <Card
               title={
                 <span>
@@ -575,16 +597,25 @@ function AdminOrderDetail() {
               }
               className={styles.paymentCard}
               size="small"
-            >              <Descriptions column={1} size="small">
+            >
+              {" "}
+              <Descriptions column={1} size="small">
                 <Descriptions.Item label="Phương thức">
-                  <Tag color={order.paymentMethod === "VNPAY" ? "cyan" : "blue"}>
-                    {order.paymentMethod === "VNPAY" ? "VNPAY" : "Thanh toán khi nhận hàng (COD)"}
+                  <Tag
+                    color={order.paymentMethod === "VNPAY" ? "cyan" : "blue"}
+                  >
+                    {order.paymentMethod === "VNPAY"
+                      ? "VNPAY"
+                      : "Thanh toán khi nhận hàng (COD)"}
                   </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Trạng thái">
                   <Tag color={order.isPaid ? "green" : "volcano"}>
                     {order.isPaid ? "ĐÃ THANH TOÁN" : "CHƯA THANH TOÁN"}
-                    {order.paymentMethod === "COD" && order.orderStatus === "delivered" && !order.isPaid && " (Sẽ tự động cập nhật)"}
+                    {order.paymentMethod === "COD" &&
+                      order.orderStatus === "delivered" &&
+                      !order.isPaid &&
+                      " (Sẽ tự động cập nhật)"}
                   </Tag>
                 </Descriptions.Item>
                 {order.isPaid && (
@@ -601,12 +632,18 @@ function AdminOrderDetail() {
                 )}
                 {order.paymentMethod === "VNPAY" && (
                   <Descriptions.Item label="Ghi chú">
-                    <Text type="secondary">Đơn hàng VNPAY được thanh toán tự động khi đặt hàng thành công.</Text>
+                    <Text type="secondary">
+                      Đơn hàng VNPAY được thanh toán tự động khi đặt hàng thành
+                      công.
+                    </Text>
                   </Descriptions.Item>
                 )}
                 {order.paymentMethod === "COD" && (
                   <Descriptions.Item label="Ghi chú">
-                    <Text type="secondary">Đơn hàng COD sẽ được tự động cập nhật thành đã thanh toán khi trạng thái là "Đã giao hàng".</Text>
+                    <Text type="secondary">
+                      Đơn hàng COD sẽ được tự động cập nhật thành đã thanh toán
+                      khi trạng thái là "Đã giao hàng".
+                    </Text>
                   </Descriptions.Item>
                 )}
               </Descriptions>
@@ -689,7 +726,8 @@ function AdminOrderDetail() {
             </Card>
           </Col>
         </Row>
-      </Card>{" "}      {/* Modal cập nhật trạng thái đơn hàng */}
+      </Card>{" "}
+      {/* Modal cập nhật trạng thái đơn hàng */}
       <Modal
         title="Cập nhật trạng thái đơn hàng"
         visible={modalVisible}
@@ -721,7 +759,7 @@ function AdminOrderDetail() {
           </Form.Item>
         </Form>
       </Modal>
-        {/* Modal cập nhật trạng thái thanh toán */}
+      {/* Modal cập nhật trạng thái thanh toán */}
       <Modal
         title="Cập nhật trạng thái thanh toán"
         visible={paymentModalVisible}
@@ -737,7 +775,8 @@ function AdminOrderDetail() {
           sang{" "}
           <Tag color={!order.isPaid ? "green" : "volcano"}>
             {!order.isPaid ? "ĐÃ THANH TOÁN" : "CHƯA THANH TOÁN"}
-          </Tag>?
+          </Tag>
+          ?
         </p>
 
         {order.paymentMethod === "COD" && !order.isPaid && (
