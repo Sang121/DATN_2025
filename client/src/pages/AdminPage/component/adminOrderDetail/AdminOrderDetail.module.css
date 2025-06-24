@@ -1,0 +1,89 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.errorCard {
+  max-width: 600px;
+  margin: 100px auto;
+}
+
+.errorActions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.orderSteps {
+  margin-bottom: 24px;
+}
+
+.adminToolbar {
+  margin-bottom: 24px;
+}
+
+.contentCard {
+  margin-bottom: 24px;
+}
+
+.customerCard, .timelineCard, .paymentCard, .productsCard, .pricingSummaryCard {
+  margin-bottom: 16px;
+}
+
+.productsList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.productItem {
+  padding: 12px 0;
+}
+
+.priceInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.totalPrice {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ff4d4f;
+}
+
+.imageError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+/* Print-specific styles */
+@media print {
+  .adminToolbar, .header button {
+    display: none;
+  }
+
+  .container {
+    padding: 0;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
