@@ -29,10 +29,44 @@ router.get(
   orderController.getAllOrders
 );
 
+router.get(
+  "/getOrdersCount/:userId",
+  authUserMiddleware,
+  orderController.getOrdersCount
+);
+
 router.put(
   "/cancelOrder/:orderId",
   authUserMiddleware,
   orderController.cancelOrder
+);
+
+router.put(
+  "/updateOrderStatus/:orderId",
+  authMiddleware,
+  (req, res, next) => {
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ status: "Err", message: "Forbidden: Admins only" });
+    }
+    next();
+  },
+  orderController.updateOrderStatus
+);
+
+router.put(
+  "/updatePaymentStatus/:orderId",
+  authMiddleware,
+  (req, res, next) => {
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ status: "Err", message: "Forbidden: Admins only" });
+    }
+    next();
+  },
+  orderController.updatePaymentStatus
 );
 
 // VNPAY routes

@@ -32,13 +32,18 @@ const createOrder = async (req, res) => {
 const getOrdersByUserId = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const { limit, page } = req.query;
+    const { limit, page, status } = req.query;
     if (!userId) {
       return res
         .status(400)
         .json({ status: "Err", message: "User ID is required" });
     }
-    const response = await orderService.getOrdersByUserId(userId, limit, page);
+    const response = await orderService.getOrdersByUserId(
+      userId,
+      limit,
+      page,
+      status
+    );
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ status: "Err", message: error.message });
@@ -204,6 +209,86 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const updateOrderStatus = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const { status, note } = req.body;
+
+    // Kiểm tra status có hợp lệ không
+    const validStatuses = [
+      "pending",
+      "processing",
+      "delivered",
+      "cancelled",
+      "payment_failed",
+    ];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        status: "Err",
+        message: "Trạng thái không hợp lệ",
+      });
+    }
+
+    // Kiểm tra user có quyền admin không (thông qua middleware)
+    if (!req.user.isAdmin) {
+      return res.status(403).json({
+        status: "Err",
+        message: "Không có quyền thực hiện thao tác này",
+      });
+    }
+
+    const response = await orderService.updateOrderStatus(
+      orderId,
+      status,
+      req.user.id,
+      note
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ status: "Err", message: error.message });
+  }
+};
+
+const getOrdersCount = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ status: "Err", message: "User ID is required" });
+    }
+    const response = await orderService.getOrdersCount(userId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ status: "Err", message: error.message });
+  }
+};
+
+const updatePaymentStatus = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const { isPaid, note } = req.body;
+
+    // Kiểm tra user có quyền admin không (thông qua middleware)
+    if (!req.user.isAdmin) {
+      return res.status(403).json({
+        status: "Err",
+        message: "Không có quyền thực hiện thao tác này",
+      });
+    }
+
+    const response = await orderService.updatePaymentStatus(
+      orderId,
+      isPaid,
+      req.user.id,
+      note
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ status: "Err", message: error.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getOrdersByUserId,
@@ -213,4 +298,7 @@ module.exports = {
   vnpayIpn,
   getOrderDetails,
   getAllOrders,
+  updateOrderStatus,
+  getOrdersCount,
+  updatePaymentStatus,
 };

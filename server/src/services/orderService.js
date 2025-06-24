@@ -180,10 +180,25 @@ const createOrder = (orderData) => {
             data: null,
           });
         }
+      }      // Cập nhật stock và sold của product variants
+      await updateProductStock(orderData.items);
+      
+      // Nếu phương thức thanh toán là VNPAY, đánh dấu đơn hàng đã thanh toán
+      if (orderData.paymentMethod === "VNPAY") {
+        orderData.isPaid = true;
+        orderData.paidAt = new Date();
+      }
+      
+      // Thêm lịch sử trạng thái ban đầu
+      if (!orderData.statusHistory) {
+        orderData.statusHistory = [];
       }
 
-      // Cập nhật stock và sold của product variants
-      await updateProductStock(orderData.items);
+      orderData.statusHistory.push({
+        status: orderData.orderStatus || "pending",
+        updatedAt: new Date(),
+        note: "Đơn hàng mới được tạo" + (orderData.paymentMethod === "VNPAY" ? " - Đã thanh toán qua VNPAY" : ""),
+      });
 
       // Create order
       const createdOrder = await Order.create(orderData);
@@ -206,15 +221,24 @@ const createOrder = (orderData) => {
   });
 };
 
-const getOrdersByUserId = (userId, limit = 5, page = 0) => {
+const getOrdersByUserId = (userId, limit = 5, page = 0, status) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!userId) {
         return reject({ status: "Err", message: "User ID is required" });
       }
 
-      const totalOrders = await Order.countDocuments({ user: userId });
-      const orders = await Order.find({ user: userId })
+      // Xây dựng query dựa trên tham số status
+      const query = { user: userId };
+      if (status && status !== "all") {
+        query.orderStatus = status;
+      }
+
+      // Đếm tổng số đơn hàng theo query
+      const totalOrders = await Order.countDocuments(query);
+
+      // Lấy đơn hàng với query và phân trang
+      const orders = await Order.find(query)
         .sort({
           createdAt: -1,
         })
@@ -380,6 +404,191 @@ const cancelOrder = (orderId, userId) => {
   });
 };
 
+const getOrdersCount = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!userId) {
+        return reject({ status: "Err", message: "User ID is required" });
+      }
+
+      // Get total orders count
+      const totalOrders = await Order.countDocuments({ user: userId });
+
+      // Get counts by status
+      const pendingOrders = await Order.countDocuments({
+        user: userId,
+        orderStatus: "pending",
+      });
+
+      const processingOrders = await Order.countDocuments({
+        user: userId,
+        orderStatus: "processing",
+      });
+
+      const deliveredOrders = await Order.countDocuments({
+        user: userId,
+        orderStatus: "delivered",
+      });
+
+      const cancelledOrders = await Order.countDocuments({
+        user: userId,
+        orderStatus: "cancelled",
+      });
+
+      resolve({
+        status: "Success",
+        message: "Order counts retrieved successfully",
+        total: totalOrders,
+        pending: pendingOrders,
+        processing: processingOrders,
+        delivered: deliveredOrders,
+        cancelled: cancelledOrders,
+      });
+    } catch (error) {
+      reject({
+        status: "Err",
+        message: "Error retrieving order counts",
+        error: error.message,
+      });
+    }
+  });
+};
+
+const updateOrderStatus = (orderId, newStatus, adminUserId, note) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const order = await Order.findById(orderId);
+
+      if (!order) {
+        return reject({
+          status: "Err",
+          message: "Order not found",
+        });
+      }
+
+      const previousStatus = order.orderStatus;
+
+      // Kiểm tra logic trước khi cập nhật trạng thái
+      if (previousStatus === "delivered" && newStatus !== "delivered") {
+        return reject({
+          status: "Err",
+          message: "Không thể thay đổi trạng thái của đơn hàng đã giao",
+        });
+      }
+
+      if (previousStatus === "cancelled" && newStatus !== "cancelled") {
+        return reject({
+          status: "Err",
+          message: "Không thể thay đổi trạng thái của đơn hàng đã hủy",
+        });
+      }      // Thêm logic xử lý các trường hợp cụ thể
+      if (newStatus === "delivered") {
+        // Nếu trạng thái mới là đã giao, cập nhật thời gian giao hàng
+        order.deliveredAt = new Date();
+        
+        // Nếu phương thức thanh toán là "COD" (thanh toán khi nhận hàng), đánh dấu đã thanh toán
+        if (order.paymentMethod === "COD" && !order.isPaid) {
+          order.isPaid = true;
+          order.paidAt = new Date();
+          
+          // Thêm ghi chú vào lịch sử về việc cập nhật tự động trạng thái thanh toán
+          if (!order.statusHistory) {
+            order.statusHistory = [];
+          }
+          
+          order.statusHistory.push({
+            status: "payment_updated",
+            updatedBy: adminUserId,
+            updatedAt: new Date(),
+            note: "Thanh toán COD được xác nhận khi giao hàng thành công"
+          });
+        }
+      }
+
+      if (newStatus === "cancelled" && previousStatus !== "cancelled") {
+        // Nếu hủy đơn hàng, hoàn trả số lượng sản phẩm vào kho
+        await revertProductStock(order.items);
+      }
+
+      // Cập nhật trạng thái mới
+      order.orderStatus = newStatus;
+
+      // Thêm log lịch sử cập nhật nếu cần
+      if (!order.statusHistory) {
+        order.statusHistory = [];
+      }
+
+      order.statusHistory.push({
+        status: newStatus,
+        updatedBy: adminUserId,
+        updatedAt: new Date(),
+        note: note || "",
+      });
+
+      const updatedOrder = await order.save();
+
+      resolve({
+        status: "Success",
+        message: "Order status updated successfully",
+        data: processOrderImages(updatedOrder),
+      });
+    } catch (error) {
+      reject({
+        status: "Err",
+        message: error.message || "Error updating order status",
+      });
+    }
+  });
+};
+
+const updatePaymentStatus = (orderId, isPaid, adminUserId, note) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const order = await Order.findById(orderId);
+
+      if (!order) {
+        return reject({
+          status: "Err",
+          message: "Order not found",
+        });
+      }
+
+      // Cập nhật trạng thái thanh toán
+      order.isPaid = isPaid;
+      if (isPaid) {
+        order.paidAt = new Date();
+      }
+
+      // Thêm log lịch sử cập nhật
+      if (!order.statusHistory) {
+        order.statusHistory = [];
+      }
+
+      order.statusHistory.push({
+        status: order.orderStatus,
+        updatedBy: adminUserId,
+        updatedAt: new Date(),
+        note: `Trạng thái thanh toán được cập nhật thành: ${
+          isPaid ? "Đã thanh toán" : "Chưa thanh toán"
+        }${note ? " - " + note : ""}`,
+      });
+
+      const updatedOrder = await order.save();
+
+      resolve({
+        status: "Success",
+        message: "Payment status updated successfully",
+        data: processOrderImages(updatedOrder),
+      });
+    } catch (error) {
+      reject({
+        status: "Err",
+        message: error.message || "Error updating payment status",
+      });
+    }
+  });
+};
+
 module.exports = {
   createOrder,
   getOrdersByUserId,
@@ -388,4 +597,7 @@ module.exports = {
   getOrderDetails,
   getAllOrders,
   cancelOrder,
+  getOrdersCount,
+  updateOrderStatus,
+  updatePaymentStatus,
 };

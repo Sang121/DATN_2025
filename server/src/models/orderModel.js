@@ -64,6 +64,14 @@ const orderSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
+    statusHistory: [
+      {
+        status: { type: String },
+        updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+        updatedAt: { type: Date, default: Date.now },
+        note: { type: String },
+      },
+    ],
   },
   {
     timestamps: true,
