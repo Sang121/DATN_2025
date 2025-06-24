@@ -142,7 +142,7 @@ export const routes = [
     path: "/profile/my-order",
     page: MyOrdersPage,
     isShowHeader: true,
-    isPrivate: true,
+    isPrivate: false,
   },
   {
     path: "*",

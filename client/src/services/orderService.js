@@ -1,4 +1,3 @@
-import axios from "axios";
 import axiosInstance from "../utils/axios";
 import { Navigate } from "react-router-dom";
 
@@ -17,17 +16,19 @@ export const createOrder = async (orderData) => {
 };
 export const create_payment_url = async (paymentData) => {
   try {
-    const response = await axios.post(
-      `http://localhost:3001/order/create_payment_url`,
+    // Sử dụng axiosInstance để tự động xử lý token và URL cơ sở
+    const response = await axiosInstance.post(
+      `/order/create_payment_url`,
       paymentData
     );
+    console.log("Payment URL response:", response.data);
     return response.data;
   } catch (error) {
     const errorMessage =
       error.response?.data?.message ||
       error.message ||
-      "Unknown error occurred while fetching order.";
-    console.error("Error fetching order:", errorMessage);
+      "Unknown error occurred while creating payment URL.";
+    console.error("Error creating payment URL:", errorMessage);
     throw new Error(errorMessage);
   }
 };
@@ -64,9 +65,12 @@ export const getOrdersByUserId = async (
 
 export const getOrderDetails = async (orderId) => {
   try {
+    // UserId đã được tự động thêm vào headers bởi axios interceptor
+    // nên không cần truyền thủ công nữa
     const response = await axiosInstance.get(
       `/order/getOrderDetails/${orderId}`
     );
+
     return response.data;
   } catch (error) {
     const errorMessage =
@@ -160,6 +164,31 @@ export const updatePaymentStatus = async (orderId, isPaid, note) => {
       error.message ||
       "Unknown error occurred while updating payment status.";
     console.error("Error updating payment status:", errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+export const updateOrderAfterPayment = async (
+  orderId,
+  vnpResponseCode,
+  vnpParams
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/order/updateOrderAfterPayment`,
+      {
+        orderId,
+        vnpResponseCode,
+        vnpParams,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Unknown error occurred while updating order after payment.";
+    console.error("Error updating order after payment:", errorMessage);
     throw new Error(errorMessage);
   }
 };
