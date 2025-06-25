@@ -1,5 +1,6 @@
 const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
+const emailService = require("./emailService");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -185,7 +186,7 @@ const createOrder = (orderData) => {
       if (orderData.paymentMethod === "VNPAY") {
         // Đơn hàng VNPAY có trạng thái ban đầu là "chờ thanh toán"
         orderData.isPaid = false;
-        orderData.orderStatus = "pending payment"; // Đặt trạng thái rõ ràng
+        orderData.orderStatus = "pending payment";
       } else {
         // Các đơn hàng khác (COD) có trạng thái ban đầu là "chờ xử lý"
         orderData.isPaid = false;
@@ -208,6 +209,11 @@ const createOrder = (orderData) => {
 
       // Create order
       const createdOrder = await Order.create(orderData);
+
+      // Chỉ gửi email cho phương thức thanh toán không phải VNPAY
+      if (orderData.paymentMethod !== "VNPAY") {
+        await emailService.sendMail(orderData);
+      }
 
       if (createdOrder) {
         resolve({
@@ -364,6 +370,26 @@ const updateOrderAfterPayment = async (orderId, vnpResponseCode, vnpParams) => {
             ? ` - Mã giao dịch: ${vnpParams.vnp_TransactionNo}`
             : ""),
       });
+
+      // Lưu đơn hàng trước
+      const updatedOrder = await order.save();
+
+      // Gửi email xác nhận đơn hàng CHỈ KHI thanh toán VNPAY thành công
+      try {
+        // Chuyển đổi Mongoose document thành plain object để gửi email
+        const orderForEmail = updatedOrder.toObject();
+        await emailService.sendMail(orderForEmail);
+        console.log(`Email confirmation sent for order ${originalOrderId}`);
+      } catch (emailError) {
+        console.error("Error sending confirmation email:", emailError);
+        // Không ném lỗi ở đây vì đơn hàng vẫn đã được cập nhật thành công
+      }
+
+      return {
+        status: "Success",
+        message: "Order status updated and confirmation email sent",
+        data: updatedOrder,
+      };
     } else {
       console.log(
         `Payment failed for order ${originalOrderId} with code: ${vnpResponseCode}`
@@ -379,14 +405,14 @@ const updateOrderAfterPayment = async (orderId, vnpResponseCode, vnpParams) => {
         updatedAt: now,
         note: `Thanh toán VNPAY thất bại với mã: ${vnpResponseCode}`,
       });
-    }
 
-    const updatedOrder = await order.save();
-    return {
-      status: "Success",
-      message: "Order status updated successfully",
-      data: updatedOrder,
-    };
+      const updatedOrder = await order.save();
+      return {
+        status: "Success",
+        message: "Order status updated to payment_failed",
+        data: updatedOrder,
+      };
+    }
   } catch (error) {
     console.error("Error updating order after payment:", error);
     throw error;
@@ -456,16 +482,20 @@ const cancelOrder = (orderId, userId) => {
         return reject({ status: "Err", message: "Order not found" });
       }
 
-      // Chỉ chủ đơn hàng mới có quyền hủy
-      if (order.user.toString() !== userId) {
+      // Nếu là gọi từ VNPAY callback (userId không được cung cấp)
+      // hoặc nếu người dùng là chủ đơn hàng
+      const isSystemCancel = !userId; 
+      const isOwnerCancel = userId && order.user.toString() === userId;
+      
+      if (!isSystemCancel && !isOwnerCancel) {
         return reject({
           status: "Err",
           message: "You are not authorized to cancel this order",
         });
       }
 
-      // Chỉ cho phép hủy khi đơn hàng đang ở trạng thái "pending"
-      if (order.orderStatus !== "pending") {
+      // Chỉ cho phép hủy khi đơn hàng đang ở trạng thái "pending" hoặc "pending payment"
+      if (order.orderStatus !== "pending" && order.orderStatus !== "pending payment") {
         return reject({
           status: "Err",
           message: `Order cannot be cancelled. Status: ${order.orderStatus}`,
@@ -476,6 +506,21 @@ const cancelOrder = (orderId, userId) => {
       await revertProductStock(order.items);
 
       order.orderStatus = "cancelled";
+      
+      // Thêm vào lịch sử trạng thái
+      if (!order.statusHistory) {
+        order.statusHistory = [];
+      }
+      
+      order.statusHistory.push({
+        status: "cancelled",
+        updatedBy: userId || null,
+        updatedAt: new Date(),
+        note: isSystemCancel 
+          ? "Đơn hàng bị hủy do không hoàn tất thanh toán"
+          : "Đơn hàng bị hủy bởi người dùng",
+      });
+      
       const updatedOrder = await order.save();
 
       resolve({
