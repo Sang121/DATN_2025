@@ -148,9 +148,9 @@
 }
 .productName {
   display: -webkit-box;
-  font-weight: bolder;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    font-weight: bolder;
     align-self: stretch;
     overflow: hidden;
     color: var(--Alias-Primary---On-Theme, #27272a);

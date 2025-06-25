@@ -184,10 +184,9 @@ function AppHeader({ onShowSignIn }) {
         {/* Logo - Hiển thị trên mọi thiết bị */}
         <Col xs={14} sm={8} md={5} lg={4} xl={4}>
           <Link to="/" className={styles.logoLink}>
-            <div className={styles.logo}>Ecommerce</div>
+            <div className={styles.logo}>S-Fashion</div>
           </Link>
         </Col>
-
         {/* Thanh tìm kiếm - Ẩn trên mobile */}
         <Col xs={0} sm={8} md={8} lg={10} xl={10} className={styles.searchCol}>
           <Search
@@ -203,7 +202,6 @@ function AppHeader({ onShowSignIn }) {
             allowClear
           />
         </Col>
-
         {/* Navigation Menu - Hiển thị trên desktop */}
         <Col xs={0} sm={0} md={9} lg={8} xl={8} className={styles.navLinks}>
           {isLoggedIn ? (
@@ -277,7 +275,8 @@ function AppHeader({ onShowSignIn }) {
               </Button>
             </Space>
           )}
-        </Col>        {/* Menu icon cho mobile */}
+        </Col>{" "}
+        {/* Menu icon cho mobile */}
         <Col
           xs={10}
           sm={8}
@@ -311,7 +310,7 @@ function AppHeader({ onShowSignIn }) {
       <Drawer
         title={
           <Link to="/" onClick={() => setDrawerOpen(false)}>
-            <span className={styles.drawerTitle}>Ecommerce</span>
+            <span className={styles.drawerTitle}>S-Fashion</span>
           </Link>
         }
         placement="right"

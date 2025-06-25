@@ -213,7 +213,7 @@ function SignUpPage({ open, onClose, onSwitchToSignIn, onLoginSuccess }) {
               />
               <div className={styles.rightText}>
                 <div className={styles.rightTitle}>
-                  Chào mừng bạn đến với Ecommerce
+                  Chào mừng bạn đến với S-Fashion
                 </div>
                 <div className={styles.rightDesc}>
                   Đăng ký để nhận ưu đãi hấp dẫn!

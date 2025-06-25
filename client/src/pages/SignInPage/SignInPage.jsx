@@ -68,14 +68,11 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
       );
       if (onLoginSuccess) {
         onLoginSuccess(userDataToDispatch);
-
       }
       form.resetFields();
       onClose();
       queryClient.invalidateQueries({ queryKey: ["userData"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-   
- 
     },
 
     onError: (error) => {
@@ -93,7 +90,6 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
 
   const onFinish = (values) => {
     signInMutation.mutate(values);
-    
   };
 
   return (
@@ -214,7 +210,7 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
                   Bằng việc tiếp tục, bạn đã đọc và đồng ý với{" "}
                   <a href="#">điều khoản sử dụng</a> và{" "}
                   <a href="#">Chính sách bảo mật thông tin cá nhân</a> của
-                  Ecommerce
+                  S-Fashion
                 </div>
               </div>
             </div>
@@ -227,7 +223,7 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
                 />
               </Link>
               <div className={styles.rightText}>
-                <div className={styles.rightTitle}>Mua sắm tại Ecommerce</div>
+                <div className={styles.rightTitle}>Mua sắm tại S-Fashion</div>
                 <div className={styles.rightDesc}>Siêu ưu đãi mỗi ngày</div>
               </div>
             </div>
