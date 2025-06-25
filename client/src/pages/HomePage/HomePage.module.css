@@ -1,4 +1,4 @@
-  html{ background-color: #efefef;
+html{ background-color: #efefef;
 font-family: Inter, Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.15;
@@ -58,4 +58,23 @@ div
     border-radius: 4px;
     padding: 10px;
     margin-top: 10px;
+}
+.backTopButton {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  background-color: #1677ff;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
+
+.backTopButton:hover {
+  background-color: #4096ff;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }

@@ -6,6 +6,8 @@ import Carousel from "../../components/Carousel/Carousel";
 import ImgAds from "../../components/imgAds/ImgAds";
 import ListProduct from "../../components/ListProducts/ListProduct";
 import FilterPrice from "../../components/FilterPrice/FilterPrice";
+import { BackTop } from "antd";
+import { ArrowUpOutlined } from "@ant-design/icons";
 function HomePage() {
   return (
     <div>
@@ -38,6 +40,13 @@ function HomePage() {
           </div>
         </div>
       </main>
+
+      {/* Nút cuộn lên đầu trang */}
+      <BackTop>
+        <div className={styles.backTopButton}>
+          <ArrowUpOutlined />
+        </div>
+      </BackTop>
     </div>
   );
 }
