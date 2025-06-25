@@ -61,7 +61,7 @@ function PaymentSuccessPage() {
             );
 
             if (result.status === "Success") {
-              message.success("Đơn hàng của bạn đã được cập nhật thành công!");
+              message.success("Đơn hàng đã được thanh toán thành công!");
             }
           } catch (updateError) {
             console.error("Lỗi khi cập nhật trạng thái đơn hàng:", updateError);
