@@ -104,6 +104,17 @@ const isValidStatusTransition = (currentStatus, newStatus) => {
       message: "Không thể thay đổi trạng thái của đơn hàng đã hủy.",
     };
   }
+  if (
+    currentStatus === "payment_failed" &&
+    (newStatus === "pending" ||
+      newStatus === "processing" ||
+      newStatus === "delivered")
+  ) {
+    return {
+      valid: false,
+      message: "Không thể thay đổi trạng thái của đơn hàng đã thất bại.",
+    };
+  }
 
   // Không thể chuyển từ đang xử lý hoặc chờ xử lý về trạng thái thanh toán thất bại
   if (
@@ -400,6 +411,9 @@ function AdminOrderDetail() {
                       onChange={handleStatusChange}
                       style={{ width: 180 }}
                     >
+                      <Option value="payment_failed">
+                        Thanh toán thất bại
+                      </Option>
                       <Option value="pending">Chờ xử lý</Option>
                       <Option value="processing">Đang xử lý</Option>
                       <Option value="delivered">Đã giao hàng</Option>
