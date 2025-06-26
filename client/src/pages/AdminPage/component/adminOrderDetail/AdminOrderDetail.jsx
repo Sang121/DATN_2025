@@ -42,6 +42,7 @@ import {
   HistoryOutlined,
   EditOutlined,
   CheckCircleOutlined,
+  ArrowLeftOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text, Paragraph } = Typography;
@@ -381,6 +382,15 @@ function AdminOrderDetail() {
 
   return (
     <div className={styles.container}>
+      <Button 
+        type="default" 
+        icon={<ArrowLeftOutlined />} 
+        onClick={handleBackToList}
+        style={{ marginBottom: 16 }}
+        className={styles.backButton}
+      >
+        Quay lại
+      </Button>
       <div className={styles.header}>
         <Title level={3}>Chi tiết đơn hàng #{order._id.slice(-8)}</Title>
         <Space>
