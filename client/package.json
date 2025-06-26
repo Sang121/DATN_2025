@@ -39,6 +39,7 @@
     "dotenv-webpack": "^8.1.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
+    "lodash": "^4.17.21",
     "lodash.throttle": "^4.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
