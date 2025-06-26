@@ -4,6 +4,8 @@ import BelowHeader from "../../components/BelowHeader/BelowHeader";
 import Header from "../../components/Header/Header";
 import SignInPage from "../SignInPage/SignInPage";
 import SignUpPage from "../SignUpPage/SignUpPage";
+import ChatbotUser from "../../components/AI/UserChatbot";
+import "./DefauPage.css";
 
 const DefauPage = ({ children }) => {
   const [showSignIn, setShowSignIn] = useState(false);
@@ -36,6 +38,9 @@ const DefauPage = ({ children }) => {
       <BelowHeader />
       {children}
       <Footer />
+      <div className="global-chatbot-container">
+        <ChatbotUser />
+      </div>
     </div>
   );
 };
