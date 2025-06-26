@@ -44,18 +44,21 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
     tempImageUrls: [],
     variants: [],
   });
-  
+
   // Định nghĩa thứ tự kích thước từ nhỏ đến lớn
-  const sizeOrder = useMemo(() => ({ "S": 1, "M": 2, "L": 3, "XL": 4, "XXL": 5 }), []);
-  
+  const sizeOrder = useMemo(() => ({ S: 1, M: 2, L: 3, XL: 4, XXL: 5 }), []);
+
   // Hàm sắp xếp variants theo kích thước
-  const sortVariantsBySize = useCallback((variants) => {
-    return [...variants].sort((a, b) => {
-      const orderA = sizeOrder[a.size] || 999; // Nếu không tìm thấy trong bảng sắp xếp, đặt ở cuối
-      const orderB = sizeOrder[b.size] || 999;
-      return orderA - orderB;
-    });
-  }, [sizeOrder]);
+  const sortVariantsBySize = useCallback(
+    (variants) => {
+      return [...variants].sort((a, b) => {
+        const orderA = sizeOrder[a.size] || 999; // Nếu không tìm thấy trong bảng sắp xếp, đặt ở cuối
+        const orderB = sizeOrder[b.size] || 999;
+        return orderA - orderB;
+      });
+    },
+    [sizeOrder]
+  );
 
   const [variant, setVariant] = useState({
     size: "",
@@ -115,18 +118,20 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
   useEffect(() => {
     if (mode === "edit" && productData) {
       // Sắp xếp variants theo kích thước trước khi cập nhật state
-      const sortedVariants = productData.variants ? sortVariantsBySize(productData.variants) : [];
-      
+      const sortedVariants = productData.variants
+        ? sortVariantsBySize(productData.variants)
+        : [];
+
       setProduct({
         ...productData,
         variants: sortedVariants,
         tempImageUrls: [],
       });
-      
+
       // Cập nhật form với dữ liệu đã được sắp xếp
       form.setFieldsValue({
         ...productData,
-        variants: sortedVariants
+        variants: sortedVariants,
       });
     }
   }, [mode, productData, form, sortVariantsBySize]);
@@ -319,7 +324,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
       } // Prepare product data
       // Sắp xếp variants theo size từ nhỏ đến lớn
       const sortedVariants = sortVariantsBySize(product.variants);
-      
+
       const productData = {
         name: product.name,
         category: product.category,
@@ -587,8 +592,10 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
                       setVariant((prev) => ({ ...prev, size: value }))
                     }
                   >
-                    {Object.keys(sizeOrder).map(size => (
-                      <Option key={size} value={size}>{size}</Option>
+                    {Object.keys(sizeOrder).map((size) => (
+                      <Option key={size} value={size}>
+                        {size}
+                      </Option>
                     ))}
                   </Select>
                 </Form.Item>
@@ -641,9 +648,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
             {/* Tạo hàm so sánh sizes để hiển thị trong bảng */}
             <Table
               dataSource={
-                product?.variants 
-                ? sortVariantsBySize(product.variants)
-                : []
+                product?.variants ? sortVariantsBySize(product.variants) : []
               }
               pagination={false}
               size="small"
@@ -707,10 +712,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
           </Title>
           <Divider />
 
-          <Form.Item
-            name="description"
-            rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
-          >
+          <Form.Item name="description">
             {" "}
             <Editor
               apiKey="hfm046cu8943idr5fja0r5l2vzk9l8vkj5cp3hx2ka26l84x"
