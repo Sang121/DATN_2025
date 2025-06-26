@@ -24,7 +24,7 @@ import {
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import * as orderService from "../../services/orderService";
-import styles from "./MyOrder.module.css";
+import styles from "./Myorder.module.css";
 import { Link } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 
