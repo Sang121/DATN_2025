@@ -440,7 +440,7 @@ function ProductDetail() {
         </div>
         <div className={styles["productDetail"]}>
           <h2>Thông tin chi tiết</h2>
-          {product.description}
+          <div dangerouslySetInnerHTML={{ __html: product.description }} />
           <h3>Thông số kỹ thuật</h3>
         </div>
       </div>
