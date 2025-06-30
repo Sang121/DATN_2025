@@ -299,7 +299,6 @@ const sendMail = async (orderData) => {
       `,
     });
 
-    console.log("Message sent:", info.messageId);
   })();
 };
 module.exports = {

@@ -94,9 +94,7 @@ productSchema.pre("findOneAndUpdate", function (next) {
       update.$set.totalStock = newTotalStock;
       update.$set.sold = newTotalSold;
 
-      console.log(
-        `Updating totalStock from ${this.totalStock} to ${newTotalStock}`
-      );
+  
     }
   }
 
@@ -120,9 +118,7 @@ productSchema.post("findOneAndUpdate", async function (doc) {
       doc.totalStock !== calculatedTotalStock ||
       doc.sold !== calculatedTotalSold
     ) {
-      console.log(
-        `Correcting totalStock: ${doc.totalStock} -> ${calculatedTotalStock}`
-      );
+     
       await this.model.updateOne(
         { _id: doc._id },
         {

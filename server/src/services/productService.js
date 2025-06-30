@@ -6,7 +6,6 @@ dotenv.config();
 const createProduct = (productData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("Creating product with data:", productData);
       // Validate required fields
       if (
         !productData.name ||

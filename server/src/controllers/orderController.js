@@ -308,16 +308,12 @@ const vnpayIpn = async (req, res) => {
           message = "Unknown error";
         }
 
-        console.log("VNPAY IPN Failed - Response:", {
-          RspCode: responseCode,
-          Message: message,
-        });
+         
         return res
           .status(200)
           .json({ RspCode: responseCode, Message: message });
       }
     } else {
-      console.log("VNPAY IPN Failed - Invalid checksum");
       return res.status(200).json({ RspCode: "97", Message: "Fail checksum" });
     }
   } catch (error) {
@@ -464,11 +460,7 @@ const updateOrderAfterPaymentClient = async (req, res) => {
       });
     }
 
-    console.log("Client requested order update after payment:", {
-      orderId,
-      vnpResponseCode,
-      params: vnpParams,
-    });
+   
 
     const response = await orderService.updateOrderAfterPayment(
       orderId,
