@@ -25,7 +25,7 @@ import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import * as orderService from "../../services/orderService";
 import styles from "./Myorder.module.css";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useMediaQuery } from "react-responsive";
 
 const { Title, Text, Paragraph } = Typography;

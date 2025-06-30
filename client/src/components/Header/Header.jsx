@@ -317,8 +317,8 @@ function AppHeader({ onShowSignIn }) {
         width={window.innerWidth < 500 ? "80%" : 300}
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
-        headerStyle={{ borderBottom: "1px solid #f0f0f0" }}
-        bodyStyle={{ padding: 0 }}
+        styles={{ padding: 0, borderBottom: "1px solid #f0f0f0" }}
+      
       >
         <div className={styles.drawerContent}>
           {/* Search box in drawer */}
