@@ -1,12 +1,12 @@
-import { Form, Select, Divider, Row, Col } from "antd";
-import React, { useState, useMemo } from "react";
+import { Form, Select, Row, Col, Card, Space } from "antd";
+import React, { useEffect, useMemo } from "react";
 import {
   Button,
   Input,
   Avatar,
   Typography,
-  Upload,
   message as antdMessage,
+  Badge,
 } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { updateUser } from "../../services/userService";
@@ -16,11 +16,11 @@ import {
   UserOutlined,
   MailOutlined,
   PhoneOutlined,
-  HomeOutlined,
   ManOutlined,
   WomanOutlined,
   SaveOutlined,
-  UploadOutlined,
+  EditOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import styles from "./userUpdate.module.css";
 
@@ -28,7 +28,6 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 function UserUpdate() {
-  // Sử dụng useMemo để đảm bảo user không thay đổi tham chiếu sau mỗi lần render
   const user = useMemo(
     () => JSON.parse(sessionStorage.getItem("userState"))?.user || {},
     []
@@ -36,9 +35,14 @@ function UserUpdate() {
 
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const [avatarUrl, setAvatarUrl] = useState(user.avatar || "");
-
-  React.useEffect(() => {
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, []);
+  useEffect(() => {
     form.setFieldsValue({
       fullName: user.fullName,
       gender: user.gender,
@@ -46,7 +50,6 @@ function UserUpdate() {
       phone: user.phone,
       address: user.address,
     });
-    setAvatarUrl(user.avatar || "");
   }, [user, form]);
 
   const updateUserMutation = useMutation({
@@ -94,169 +97,210 @@ function UserUpdate() {
     });
   };
 
-  // Tạm thời chỉ hiển thị phần tải lên avatar, chưa có xử lý tải lên thực tế
-  const handleAvatarChange = (info) => {
-    if (info.file.status === "done") {
-      antdMessage.success(`${info.file.name} tải lên thành công`);
-      // Trong thực tế, bạn sẽ lấy URL từ phản hồi tải lên
-      // setAvatarUrl(info.file.response.url);
-    } else if (info.file.status === "error") {
-      antdMessage.error(`${info.file.name} tải lên thất bại.`);
-    }
-  };
-
   return (
-    <div className={styles.userUpdateContainer}>
-      <Title level={2} className={styles.formTitle}>
-        <UserOutlined className={styles.titleIcon} /> Thông tin tài khoản
-      </Title>
-
-      {/* <div className={styles.userAvatar}>
-        <Avatar
-          size={100}
-          icon={<UserOutlined />}
-          src={avatarUrl}
-          className={styles.avatarImage}
-        />
-        <Upload
-          name="avatar"
-          showUploadList={false}
-          action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-          onChange={handleAvatarChange}
-          className={styles.avatarUploader}
-        >
-          <Button icon={<UploadOutlined />} className={styles.uploadButton}>
-            Cập nhật ảnh đại diện
-          </Button>
-        </Upload>
-      </div> */}
-
-      <Form
-        form={form}
-        name="user_update"
-        onFinish={onFinish}
-        layout="vertical"
-        className={styles.updateForm}
-        initialValues={{
-          fullName: user.fullName,
-          gender: user.gender,
-          email: user.email,
-          phone: user.phone,
-          address: user.address,
-        }}
-      >
-        <Divider orientation="left" className={styles.sectionDivider}>
-          Thông tin cá nhân
-        </Divider>
-
-        <Row gutter={24}>
-          <Col xs={24} sm={12}>
-            <Form.Item
-              label="Họ và tên"
-              name="fullName"
-              rules={[{ required: true, message: "Họ và tên là bắt buộc!" }]}
+    <div className={styles.container}>
+      {/* Simple Header */}
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.avatarSection}>
+            <Badge
+              count={<EditOutlined className={styles.editIcon} />}
+              offset={[-8, 8]}
             >
-              <Input
-                prefix={<UserOutlined className={styles.inputIcon} />}
-                placeholder="Nhập họ và tên của bạn"
-                size="large"
+              <Avatar
+                size={64}
+                icon={<UserOutlined />}
+                src={user.avatar}
+                className={styles.avatar}
               />
-            </Form.Item>
-          </Col>
-
-          <Col xs={24} sm={12}>
-            <Form.Item
-              name="gender"
-              label="Giới tính"
-              rules={[{ required: true, message: "Vui lòng chọn giới tính!" }]}
-            >
-              <Select
-                placeholder="Chọn giới tính"
-                size="large"
-                className={styles.selectField}
-              >
-                <Option value="male">
-                  <ManOutlined /> Nam
-                </Option>
-                <Option value="female">
-                  <WomanOutlined /> Nữ
-                </Option>
-                <Option value="other">Khác</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Divider orientation="left" className={styles.sectionDivider}>
-          Thông tin liên hệ
-        </Divider>
-
-        <Row gutter={24}>
-          <Col xs={24} sm={12}>
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                { required: true, message: "Email là bắt buộc!" },
-                { type: "email", message: "Email không hợp lệ!" },
-              ]}
-            >
-              <Input
-                prefix={<MailOutlined className={styles.inputIcon} />}
-                placeholder="Email của bạn"
-                size="large"
+            </Badge>
+          </div>
+          <div className={styles.userInfo}>
+            <Title level={3} className={styles.userName}>
+              {user.fullName || user.username || "Người dùng"}
+            </Title>
+            <Text className={styles.userEmail}>
+              {user.email || "email@example.com"}
+            </Text>
+            <div className={styles.userStats}>
+              <Badge
+                status="success"
+                text="Đã xác thực"
+                style={{ fontSize: "12px", color: "#6b7280" }}
               />
-            </Form.Item>
-          </Col>
-
-          <Col xs={24} sm={12}>
-            <Form.Item
-              label="Số điện thoại"
-              name="phone"
-              rules={[
-                { required: true, message: "Số điện thoại là bắt buộc" },
-                {
-                  pattern: /^[0-9]{10,11}$/,
-                  message: "Số điện thoại không hợp lệ!",
-                },
-              ]}
-            >
-              <Input
-                prefix={<PhoneOutlined className={styles.inputIcon} />}
-                placeholder="Số điện thoại của bạn"
-                size="large"
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item
-          label="Địa chỉ"
-          name="address"
-          rules={[{ required: true, message: "Địa chỉ là bắt buộc" }]}
-        >
-          <Input.TextArea
-            placeholder="Địa chỉ của bạn"
-            size="large"
-            autoSize={{ minRows: 2, maxRows: 6 }}
-            className={styles.textareaField}
-            prefix={<HomeOutlined className={styles.inputIcon} />}
-          />
-        </Form.Item>
-
-        <div className={styles.formActions}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            icon={<SaveOutlined />}
-            className={styles.submitButton}
-            loading={updateUserMutation.isPending}
-            size="large"
-          >
-            Cập nhật thông tin
-          </Button>
+            </div>
+          </div>
         </div>
-      </Form>
+      </div>
+
+      {/* Simple Form */}
+      <div className={styles.formSection}>
+        <Card className={styles.formCard}>
+          <div className={styles.cardHeader}>
+            <Title level={4} className={styles.cardTitle}>
+              Thông tin cá nhân
+            </Title>
+            <Text className={styles.cardDescription}>
+              Cập nhật thông tin để có trải nghiệm tốt hơn
+            </Text>
+          </div>
+
+          <Form
+            form={form}
+            name="user_update"
+            onFinish={onFinish}
+            layout="vertical"
+            className={styles.form}
+            initialValues={{
+              fullName: user.fullName,
+              gender: user.gender,
+              email: user.email,
+              phone: user.phone,
+              address: user.address,
+            }}
+          >
+            {/* Basic Information */}
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <UserOutlined className={styles.sectionIcon} />
+                <Text className={styles.sectionTitle}>Thông tin cơ bản</Text>
+              </div>
+
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label="Họ và tên"
+                    name="fullName"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập họ và tên" },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Nhập họ và tên"
+                      size="large"
+                      className={styles.input}
+                    />
+                  </Form.Item>
+                </Col>
+
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    name="gender"
+                    label="Giới tính"
+                    rules={[
+                      { required: true, message: "Vui lòng chọn giới tính" },
+                    ]}
+                  >
+                    <Select
+                      placeholder="Chọn giới tính"
+                      size="large"
+                      className={styles.select}
+                    >
+                      <Option value="male">
+                        <Space>
+                          <ManOutlined />
+                          Nam
+                        </Space>
+                      </Option>
+                      <Option value="female">
+                        <Space>
+                          <WomanOutlined />
+                          Nữ
+                        </Space>
+                      </Option>
+                      <Option value="other">Khác</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
+
+            {/* Contact Information */}
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <MailOutlined className={styles.sectionIcon} />
+                <Text className={styles.sectionTitle}>Thông tin liên hệ</Text>
+              </div>
+
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label="Email"
+                    name="email"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập email" },
+                      { type: "email", message: "Email không hợp lệ" },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Email của bạn"
+                      size="large"
+                      className={styles.input}
+                    />
+                  </Form.Item>
+                </Col>
+
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label="Số điện thoại"
+                    name="phone"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng nhập số điện thoại",
+                      },
+                      {
+                        pattern: /^[0-9]{10,11}$/,
+                        message: "Số điện thoại không hợp lệ",
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Số điện thoại"
+                      size="large"
+                      className={styles.input}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              <Form.Item
+                label="Địa chỉ"
+                name="address"
+                rules={[{ required: true, message: "Vui lòng nhập địa chỉ" }]}
+              >
+                <Input.TextArea
+                  placeholder="Địa chỉ của bạn"
+                  autoSize={{ minRows: 3, maxRows: 5 }}
+                  className={styles.textarea}
+                />
+              </Form.Item>
+            </div>
+
+            {/* Action Buttons */}
+            <div className={styles.actionSection}>
+              <Button
+                type="default"
+                size="large"
+                className={styles.cancelButton}
+                onClick={() => form.resetFields()}
+              >
+                Hủy bỏ
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<SaveOutlined />}
+                className={styles.submitButton}
+                loading={updateUserMutation.isPending}
+                size="large"
+              >
+                Cập nhật
+              </Button>
+            </div>
+          </Form>
+        </Card>
+      </div>
     </div>
   );
 }

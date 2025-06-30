@@ -27,6 +27,15 @@ function CartPage() {
 
   const dispatch = useDispatch();
 
+  // Auto scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, []);
+
   const [shippingInfo, setShippingInfo] = useState(() => {
     const orderShipping = order.shippingInfo || {};
     const userInfo = user || {};
@@ -42,7 +51,10 @@ function CartPage() {
   useEffect(() => {
     if (
       user &&
-      (!shippingInfo.fullName || !shippingInfo.phone || !shippingInfo.address || !shippingInfo.email)
+      (!shippingInfo.fullName ||
+        !shippingInfo.phone ||
+        !shippingInfo.address ||
+        !shippingInfo.email)
     ) {
       const updatedInfo = {
         fullName: order.shippingInfo?.fullName || user.fullName || "",
@@ -52,8 +64,14 @@ function CartPage() {
       };
       setShippingInfo(updatedInfo);
     }
-
-  }, [user, order.shippingInfo]);
+  }, [
+    user,
+    order.shippingInfo,
+    shippingInfo.fullName,
+    shippingInfo.phone,
+    shippingInfo.address,
+    shippingInfo.email,
+  ]);
 
   const summaryItem = selectedItems.reduce((acc, item) => {
     const itemData = cartItems.find((cartItem) => cartItem.id === item);
@@ -85,6 +103,12 @@ function CartPage() {
       setSelectedItems([]);
       console.log("Selected items:", []);
     }
+
+    // Scroll to top smoothly when selecting all items
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const handleSelectItem = (itemId) => {
@@ -120,6 +144,11 @@ function CartPage() {
   };
   const handleChangeInfo = () => {
     setIsChangeInfoOpen(true);
+    // Scroll to top when opening change info modal
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const handleCloseChangeInfo = () => {
@@ -166,6 +195,11 @@ function CartPage() {
 
   const handleShowSignIn = () => {
     setShowSignIn(true);
+    // Scroll to top when opening sign in modal
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const handleLoginSuccess = (userData) => {
@@ -181,6 +215,12 @@ function CartPage() {
       setShowSignUp(false);
 
       message.success("Đăng nhập thành công!");
+
+      // Scroll to top after successful login
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -231,6 +271,12 @@ function CartPage() {
   };
 
   const handleCheckout = () => {
+    // Scroll to top first
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
     if (!isUserLoggedIn) {
       message.error("Vui lòng đăng nhập để thanh toán.");
       handleShowSignIn();

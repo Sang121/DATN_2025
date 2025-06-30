@@ -129,7 +129,7 @@ function MyOrder() {
     };
 
     fetchOrderCounts();
-  }, [userId, activeStatus]); // Thêm activeStatus để cập nhật khi chuyển tab
+  }, [userId, activeStatus]); 
 useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -156,7 +156,6 @@ useEffect(() => {
         return Promise.reject(new Error("Vui lòng đăng nhập để xem đơn hàng."));
       }
 
-      // Gọi API với tham số status nếu không phải "all"
       const status = activeStatus !== "all" ? activeStatus : undefined;
       console.log(`Fetching orders with status: ${status || "all"}`);
 
@@ -170,16 +169,13 @@ useEffect(() => {
     enabled: !!userId,
     keepPreviousData: true,
     onSuccess: (data) => {
-      // Chỉ cập nhật thông tin tổng số đơn hàng cho view hiện tại
-      // không cần cập nhật các counts khác vì đã có API getOrdersCount làm việc đó
+
       if (activeStatus !== "all") {
-        // Khi đang lọc theo trạng thái, chỉ cập nhật số lượng hiện tại
         setOrderCounts((prev) => ({
           ...prev,
           [activeStatus]: data.total || 0,
         }));
       } else {
-        // Khi xem tất cả, cập nhật tổng số đơn hàng
         setOrderCounts((prev) => ({ ...prev, all: data.total || 0 }));
       }
     },
@@ -192,10 +188,9 @@ useEffect(() => {
   const handlePageChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
 
-    // Cuộn trang lên đầu sau khi chuyển trang
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // Tạo hiệu ứng cuộn mượt
+      behavior: "smooth", 
     });
   };
 

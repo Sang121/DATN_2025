@@ -1,231 +1,344 @@
-/* UserUpdate.module.css */
-
-.userUpdateContainer {
-    /* Đổi tên class */
-    background-color: #ffffff;
-   
+/* Minimal Design Variables */
+:root {
+  --primary-color: #0ea5e9;
+  --primary-hover: #0284c7;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --background: #ffffff;
+  --background-light: #f9fafb;
+  --border-light: #e5e7eb;
+  --border-color: #d1d5db;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --transition: all 0.2s ease;
 }
 
-.formTitle {
-    /* Đổi tên class */
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 28px !important;
-    color: #1890ff;
+/* Minimal Container */
+.container {
+  margin: 0 auto;
+  padding: var(--spacing-md);
+  background: var(--background-light);
+  min-height: 100vh;
 }
 
-.titleIcon {
-    /* Đổi tên class */
-    font-size: 32px;
-    color: #1890ff;
+/* Simple Header */
+.header {
+  background: var(--background);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Tùy chỉnh các Form.Item */
-.updateForm .ant-form-item-label>label {
-    /* Đổi tên class cha */
-    font-weight: 600;
-    color: #555;
-    font-size: 15px;
-    margin-bottom: 5px;
-}
-
-/* Tùy chỉnh Input, Select */
-.updateForm .ant-input-affix-wrapper,
-/* Đổi tên class cha */
-.updateForm .ant-select-selector {
-    border-radius: 8px;
-    height: 48px !important;
-    font-size: 16px;
-    border: 1px solid #d9d9d9;
-    transition: all 0.3s ease;
-    box-shadow: none !important;
-}
-
-.updateForm .ant-input-affix-wrapper:hover,
-.updateForm .ant-select-selector:hover {
-    border-color: #40a9ff !important;
-}
-
-.updateForm .ant-input-affix-wrapper-focused,
-.updateForm .ant-select-focused .ant-select-selector {
-    border-color: #1890ff !important;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
-}
-
-.formItemIcon {
-    /* Đổi tên class */
-    color: #a0a0a0;
-    font-size: 18px;
-    margin-right: 8px;
-}
-
-/* Tùy chỉnh nút Cập nhật */
-.buttonContainer {
-    /* Đổi tên class */
-    text-align: center;
-    margin-top: 30px;
-    margin-bottom: 0 !important;
-}
-
-.updateButton {
-    /* Đổi tên class */
-    background: linear-gradient(45deg, #1890ff, #40a9ff);
-    border: none;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: 600;
-    height: 50px;
-    padding: 0 30px;
-    box-shadow: 0 4px 15px rgba(24, 144, 255, 0.2);
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: auto;
-    min-width: 220px;
-}
-
-.updateButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(24, 144, 255, 0.3);
-    opacity: 0.9;
-}
-
-/* New styles for additional elements */
-.userAvatar {
+.headerContent {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  margin-bottom: 30px;
+  gap: var(--spacing-md);
 }
 
-.avatarImage {
-  border: 3px solid #1890ff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.avatarSection {
+  position: relative;
 }
 
-.avatarUploader {
-  margin-top: 16px;
+.avatar {
+  border: 2px solid var(--border-light);
+  background: var(--background-light);
 }
 
-.uploadButton {
-  margin-top: 12px;
-  border-radius: 20px;
-  font-weight: 500;
+.editIcon {
+  color: var(--primary-color);
+  background: var(--background);
+  border: 2px solid var(--background);
+  border-radius: 50%;
+  padding: 2px;
+  font-size: 12px;
 }
 
-.sectionDivider {
-  margin-bottom: 24px;
-  color: #1890ff !important;
+.userInfo {
+  flex: 1;
+}
+
+.userName {
+  color: var(--text-primary) !important;
+  margin: 0 0 var(--spacing-xs) 0 !important;
+  font-weight: 600 !important;
+  font-size: 24px !important;
+}
+
+.userEmail {
+  color: var(--text-secondary) !important;
+  font-size: 16px;
+  margin: 0;
+}
+
+.userStats {
+  margin-top: var(--spacing-xs);
+}
+
+.verifiedIcon {
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+/* Simple Form Section */
+.formSection {
+  margin-top: var(--spacing-md);
+}
+
+.formCard {
+  background: var(--background);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+}
+
+.cardHeader {
+  text-align: left;
+  margin-bottom: var(--spacing-lg);
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.cardIcon {
+  display: none; /* Hide decorative icons for minimal design */
+}
+
+.cardTitle {
+  margin: 0 0 var(--spacing-xs) 0 !important;
+  color: var(--text-primary);
+  font-weight: 600 !important;
+  font-size: 20px !important;
+}
+
+.cardDescription {
+  margin: 0 !important;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Clean Form Styles */
+.form {
+  padding: 0;
+}
+
+.section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+.sectionIcon {
+  font-size: 18px;
+  color: var(--primary-color);
+}
+
+.sectionTitle {
+  font-size: 16px;
+  color: var(--text-primary);
   font-weight: 600;
+  margin: 0;
+}
+
+/* Clean Form Items */
+.form :global(.ant-form-item) {
+  margin-bottom: var(--spacing-sm);
+}
+
+.form :global(.ant-form-item-label) {
+  padding-bottom: var(--spacing-xs);
+}
+
+.form :global(.ant-form-item-label > label) {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 14px;
+  height: auto;
+}
+
+.form :global(.ant-form-item-label > label::after) {
+  display: none;
+}
+
+.form :global(.ant-form-item-required::before) {
+  content: '*';
+  color: #ef4444;
+  margin-right: 4px;
+}
+
+/* Clean Input Styles */
+.input,
+.select,
+.textarea {
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--spacing-xs) !important;
+  transition: var(--transition) !important;
+  font-size: 14px !important;
+  background: var(--background) !important;
+}
+
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: var(--primary-hover) !important;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
 }
 
 .inputIcon {
-  color: #1890ff;
-  margin-right: 8px;
+  color: var(--text-muted);
 }
 
-.selectField .ant-select-selector {
-  height: 48px !important;
-  padding-top: 8px !important;
-  border-radius: 8px !important;
+/* Clean Select Styles */
+.form :global(.ant-select-selector) {
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--spacing-xs) !important;
 }
 
-.textareaField {
-  border-radius: 8px;
+.form :global(.ant-select:hover .ant-select-selector) {
+  border-color: var(--primary-hover) !important;
 }
 
-.formActions {
+.form :global(.ant-select-focused .ant-select-selector) {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
+}
+
+/* Simple Action Section */
+.actionSection {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-light);
   display: flex;
-  justify-content: center;
-  margin-top: 32px;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+}
+
+/* Clean Button Styles */
+.cancelButton {
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  background: var(--background) !important;
+  border-radius: var(--spacing-xs) !important;
+  padding: 8px var(--spacing-sm) !important;
+  height: auto !important;
+  font-weight: 500 !important;
+  transition: var(--transition) !important;
+}
+
+.cancelButton:hover {
+  border-color: var(--text-secondary) !important;
+  color: var(--text-primary) !important;
 }
 
 .submitButton {
-  border-radius: 8px;
-  font-size: 16px;
-  min-width: 180px;
-  height: 48px;
-  text-transform: uppercase;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.35);
+  background: var(--primary-color) !important;
+  border: 1px solid var(--primary-color) !important;
+  border-radius: var(--spacing-xs) !important;
+  padding: 8px var(--spacing-md) !important;
+  height: auto !important;
+  font-weight: 500 !important;
+  transition: var(--transition) !important;
 }
 
-/* Responsive adjustments */
+.submitButton:hover {
+  background: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+
+.submitButton:disabled {
+  background: var(--text-muted) !important;
+  border-color: var(--text-muted) !important;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .userUpdateContainer {
-        padding: 25px 20px;
-        margin: 20px auto;
-    }
-
-    .formTitle {
-        font-size: 24px !important;
-        margin-bottom: 25px;
-    }
-
-    .titleIcon {
-        font-size: 28px;
-    }
-
-    .updateForm .ant-form-item-label>label {
-        font-size: 14px;
-    }
-
-    .updateForm .ant-input-affix-wrapper,
-    .updateForm .ant-select-selector {
-        height: 45px !important;
-        font-size: 15px;
-    }
-
-    .updateButton {
-        height: 48px;
-        font-size: 16px;
-        min-width: 180px;
-    }
+  .container {
+    padding: var(--spacing-sm);
+  }
+  
+  .header {
+    padding: var(--spacing-md);
+  }
+  
+  .headerContent {
+    gap: var(--spacing-sm);
+  }
+  
+  .userName {
+    font-size: 20px !important;
+  }
+  
+  .formCard {
+    padding: var(--spacing-md);
+  }
+  
+  .actionSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
-    .userUpdateContainer {
-        padding: 20px 15px;
-        margin: 15px auto;
-    }
-
-    .formTitle {
-        font-size: 22px !important;
-        margin-bottom: 20px;
-    }
-
-    .titleIcon {
-        font-size: 26px;
-    }
-
-    .updateForm .ant-input-affix-wrapper,
-    .updateForm .ant-select-selector {
-        height: 42px !important;
-        font-size: 14px;
-    }
-
-    .updateButton {
-        height: 45px;
-        font-size: 15px;
-        min-width: 160px;
-    }
-
-    /* Responsive styling */
-    @media (max-width: 576px) {
-  .userUpdateContainer {
-    padding: 20px;
+  .container {
+    padding: var(--spacing-xs);
   }
   
-  .formTitle {
-    font-size: 22px !important;
+  .headerContent {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .section {
+    margin-bottom: var(--spacing-md);
   }
 }
+
+/* Remove unused styles */
+.form :global(.ant-form-item-explain-error) {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.form :global(.ant-input-affix-wrapper) {
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--spacing-xs) !important;
+}
+
+.form :global(.ant-input-affix-wrapper:hover) {
+  border-color: var(--primary-hover) !important;
+}
+
+.form :global(.ant-input-affix-wrapper-focused) {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
 }

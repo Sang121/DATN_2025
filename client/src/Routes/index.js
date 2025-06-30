@@ -139,7 +139,7 @@ export const routes = [
     isPrivate: true, // Chỉ admin mới có thể truy cập
   },
   {
-    path: "/profile/my-order",
+    path: "/profile/my-orders",
     page: MyOrdersPage,
     isShowHeader: true,
     isPrivate: false,
