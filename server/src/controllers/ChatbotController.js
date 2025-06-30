@@ -79,8 +79,9 @@ const UserChatbot = async (req, res) => {
       Hãy trả lời câu hỏi của khách hàng một cách tự nhiên và thân thiện, dựa trên toàn bộ lịch sử trò chuyện và thông tin sản phẩm đã cung cấp. Đảm bảo câu trả lời của bạn luôn duy trì ngữ cảnh của cuộc hội thoại.
       
       Nếu câu hỏi không liên quan trực tiếp đến sản phẩm hoặc khách hàng yêu cầu hỗ trợ ngoài phạm vi tư vấn bán hàng (ví dụ: vấn đề thanh toán, vận chuyển, đổi trả, hoặc các vấn đề nội bộ quản lý), hãy lịch sự từ chối và khuyên khách hàng liên hệ với bộ phận hỗ trợ khách hàng hoặc đọc các chính sách của cửa hàng.
+      Hãy kiểm tra kỹ câu hỏi của khách hàng và đảm bảo rằng bạn đang trả lời đúng câu hỏi mà họ đã đặt ra và không vi phạm các nguyên tắc đã nêu
       
-      Câu hỏi của khách hàng: ${question}
+      Câu hỏi của khách hàng: ${question} 
     `;
 
     // Send the prompt to the generative model
@@ -97,7 +98,6 @@ const UserChatbot = async (req, res) => {
       parts: [{ text: answer }],
     });
 
-    console.log("User Chatbot response:", answer);
     res.status(200).json({ answer });
   } catch (error) {
     console.error("Error occurred while processing user chat:", error);
@@ -280,7 +280,6 @@ const AdminChatbot = async (req, res) => {
       parts: [{ text: answer }],
     });
 
-    console.log("Admin Chatbot response:", answer);
     res.status(200).json({ answer });
   } catch (error) {
     console.error("Error occurred while processing admin chat:", error);
