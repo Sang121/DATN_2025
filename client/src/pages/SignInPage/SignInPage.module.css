@@ -55,7 +55,7 @@
 }
 
 .submitBtn {
-  background: #ff424e !important;
+  background: #0d84e8 !important;
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -65,7 +65,7 @@
   height: 44px;
 }
 .submitBtn:hover {
-  background: #e11b1e !important;
+  background: #0a86ec !important;
 }
 
 .emailLogin {

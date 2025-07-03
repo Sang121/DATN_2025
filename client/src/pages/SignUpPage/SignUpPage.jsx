@@ -143,15 +143,7 @@ function SignUpPage({ open, onClose, onSwitchToSignIn, onLoginSuccess }) {
                   >
                     <Input size="large" placeholder="Email" />
                   </Form.Item>
-                  <Form.Item
-                    name="address"
-                    rules={[
-                      { required: true, message: "Vui lòng nhập địa chỉ!" },
-                      { min: 5, message: "Địa chỉ phải có ít nhất 5 ký tự!" },
-                    ]}
-                  >
-                    <Input size="large" placeholder="Địa chỉ" />
-                  </Form.Item>
+
                   <Form.Item
                     name="password"
                     rules={[
