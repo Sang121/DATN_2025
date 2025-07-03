@@ -171,7 +171,7 @@ function AppHeader({ onShowSignIn }) {
         <Link to="/profile">Thông tin tài khoản</Link>
       </Menu.Item>
       <Menu.Item key="orders" icon={<ShoppingOutlined />}>
-        <Link to="/profile/my-order">Đơn hàng của tôi</Link>
+        <Link to="/profile/my-orders">Đơn hàng của tôi</Link>
       </Menu.Item>
       {user?.isAdmin && (
         <Menu.Item key="admin" icon={<DashboardOutlined />}>
@@ -282,7 +282,6 @@ function AppHeader({ onShowSignIn }) {
             <div className={styles.navItems}>
               <Link to="/favoriteProducts" className={styles.navItem}>
                 <HeartOutlined className={styles.navIcon} />
-                <span className={styles.navLabel}>Yêu thích</span>
               </Link>
 
               <Link to="/cart" className={styles.navItem}>
@@ -297,7 +296,6 @@ function AppHeader({ onShowSignIn }) {
                 >
                   <ShoppingCartOutlined className={styles.navIcon} />
                 </Badge>
-                <span className={styles.navLabel}>Giỏ hàng</span>
               </Link>
 
               <Button
@@ -476,7 +474,7 @@ function AppHeader({ onShowSignIn }) {
                   onClick={() => setDrawerOpen(false)}
                 >
                   <Link
-                    to="/profile/my-order"
+                    to="/profile/my-orders"
                     className={styles.drawerMenuLink}
                   >
                     <ShoppingOutlined className={styles.drawerMenuIcon} />
