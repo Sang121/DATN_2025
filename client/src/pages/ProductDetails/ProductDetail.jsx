@@ -438,16 +438,16 @@ function ProductDetail() {
             </div>
           </div>
         </div>
-        <div className={styles["productDetail"]}>
+        <div
+          className={styles["productDetail"]}
+          style={{
+            padding: "12px 16px",
+            border: "1px solid #eee",
+            borderRadius: "4px",
+          }}
+        >
           <h2>Thông tin chi tiết</h2>
-          <div
-            style={{
-              padding: "12px 16px",
-              border: "1px solid #eee",
-              borderRadius: "4px",
-            }}
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
+          <div dangerouslySetInnerHTML={{ __html: product.description }} />
         </div>
       </div>
       <div className={styles["product-detail-related"]}>
