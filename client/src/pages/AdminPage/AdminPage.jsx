@@ -13,7 +13,8 @@ import styles from "./AdminPage.module.css";
 import { Col, Divider, Menu, Switch } from "antd";
 import UserManager from "./component/userManager/UserManager";
 import ProductManager from "./component/productManager/ProductManager";
-import OrderManager from "./component/orderManager/OrderManager"; // Import component mới
+import OrderManager from "./component/orderManager/OrderManager";
+import Statistics from "./component/StatisticsPage/Statistics";
 
 const items = [
   {
@@ -30,6 +31,11 @@ const items = [
     key: "order", // Thêm key cho đơn hàng
     icon: <ShoppingCartOutlined />,
     label: "Đơn hàng",
+  },
+  {
+    key: "Statistics", // Thêm key cho thống kê
+    icon: <ShoppingCartOutlined />,
+    label: "Thống kê doanh số",
   },
 ];
 
@@ -48,6 +54,8 @@ const AdminPage = () => {
         return <ProductManager />;
       case "order":
         return <OrderManager />;
+      case "Statistics":
+        return <Statistics />;
       default:
         return <UserManager />;
     }
