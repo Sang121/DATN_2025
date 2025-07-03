@@ -142,7 +142,7 @@ function PaymentSuccessPage() {
             <Button
               type="primary"
               key="orders"
-              onClick={() => navigate("/profile/my-order")}
+              onClick={() => navigate("/profile/my-orders")}
               className={styles.orderButton}
             >
               Xem đơn hàng
