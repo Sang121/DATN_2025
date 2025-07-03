@@ -19,10 +19,15 @@
 
 .cartHeader {
   display: grid;
-  grid-template-columns: 3fr 1fr 1fr 1fr 40px;
+  grid-template-columns: 40px 100px 2fr 1fr 1fr 1fr 40px;
   padding: 12px;
   border-bottom: 1px solid #f0f0f0;
   align-items: center;
+  gap: 16px; /* Add gap for spacing */
+}
+
+.cartHeader > span:first-of-type {
+  grid-column: 3; /* Align 'Tất cả' with item name */
 }
 
 .cartItem {
@@ -226,6 +231,7 @@
   font-size: 16px;
 }
 
+/* Responsive Styles */
 @media (max-width: 992px) {
   .cartContent {
     grid-template-columns: 1fr;
@@ -233,22 +239,89 @@
 }
 
 @media (max-width: 768px) {
-  .cartItem {
-    grid-template-columns: 40px 80px 1fr;
-    gap: 12px;
-  }
-
   .cartHeader {
-    display: none;
+    display: none; /* Hide header on mobile */
   }
 
-  .itemPrice, .quantityControl, .totalPrice {
-    grid-column: 2 / -1;
+  .cartItem {
+    display: grid;
+    grid-template-columns: 80px 1fr; /* Image and the rest */
+    grid-template-rows: auto auto auto;
+    gap: 4px 12px;
+    position: relative;
+    padding: 16px;
+    padding-left: 45px; /* Space for checkbox */
+  }
+
+  .cartItem > .ant-checkbox-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+  }
+
+  .deleteIcon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 14px;
+  }
+
+  .cartItem > .itemImage {
+    grid-row: 1 / span 3;
+    grid-column: 1;
+    width: 80px;
+    height: 80px;
+    align-self: center;
+  }
+
+  .itemInfo {
+    grid-row: 1;
+    grid-column: 2;
+    padding: 0;
+    align-self: start;
+  }
+
+  .itemPrice,
+  .currentPrice {
+    grid-row: 2;
+    grid-column: 2;
+    align-self: center;
+  }
+
+  .quantityControl {
+    grid-row: 3;
+    grid-column: 2;
+    align-self: center;
+  }
+
+  .totalPrice {
+    /* grid-row: 2;
+    grid-column: 3;
+    justify-self: end; */
+    position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 14px;
+    align-self: center;
+    font-weight: bold;
+    color: #ff4d4f;
   }
 }
 
 @media (max-width: 480px) {
   .cartContainer {
     padding: 10px;
+  }
+
+  .cartItem {
+    padding-left: 40px;
+    gap: 4px 8px;
+  }
+  .cartItem > .ant-checkbox-wrapper {
+    left: 8px;
+  }
+  .deleteIcon {
+    right: 8px;
   }
 }

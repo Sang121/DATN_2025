@@ -86,7 +86,7 @@ function CartPage() {
     }
     return acc;
   }, 0);
-  const summaryVAT = Math.round((summaryItem - summaryDiscount) * 0.1);
+  const summaryVAT = Math.round((summaryItem - summaryDiscount) * 0.01);
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -369,9 +369,11 @@ function CartPage() {
                   disabled={item.amount >= item.variant.stock}
                 />
               </div>
+
               <div className={styles.totalPrice}>
                 {formatPrice(item.price * (quantities[item.id] || item.amount))}
               </div>
+
               <DeleteOutlined
                 onClick={() => handleRemoveItem(item.id)}
                 className={styles.deleteIcon}
