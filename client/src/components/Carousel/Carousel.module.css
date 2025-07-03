@@ -1,72 +1,82 @@
-/* Variables */
-:root {
-  --carousel-border-radius: 8px;
-  --carousel-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --carousel-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --overlay-bg: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-  --transition: all 0.3s ease;
-  --transition-slow: all 0.5s ease;
-}
-
+/* === Modern Carousel Component === */
 .carouselContainer {
   margin: 0 0 20px;
-  border-radius: var(--carousel-border-radius);
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: var(--carousel-shadow);
-  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
   width: 100%;
-  max-width: 100%;
+  position: relative;
 }
 
 .carouselContainer:hover {
-  box-shadow: var(--carousel-shadow-hover);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
+/* === Navigation Buttons === */
+.prevButton,
+.nextButton {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(102, 126, 234, 0.2) !important;
+  color: #667eea !important;
+  width: 48px !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+  opacity: 0 !important;
+  backdrop-filter: blur(10px);
+}
+
+.carouselContainer:hover .prevButton,
+.carouselContainer:hover .nextButton {
+  opacity: 1 !important;
+}
+
+.prevButton {
+  left: 16px !important;
+}
+
+.nextButton {
+  right: 16px !important;
+}
+
+.prevButton:hover,
+.nextButton:hover {
+  background: #667eea !important;
+  border-color: #667eea !important;
+  color: white !important;
+  transform: translateY(-50%) scale(1.1) !important;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3) !important;
+}
+
+.prevButton:focus,
+.nextButton:focus {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: #667eea !important;
+  color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+}
+
+.prevButton:active,
+.nextButton:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+/* === Carousel and Slide Styling === */
 .carousel {
   height: 100%;
   width: 100%;
 }
 
-/* Override Ant Design carousel styles */
-.carousel :global(.slick-slider),
-.carousel :global(.slick-list),
-.carousel :global(.slick-track) {
-  overflow: hidden !important;
-}
-
-.carousel :global(.ant-carousel .slick-dots) {
-  margin-bottom: 12px;
-  z-index: 10;
-}
-
-.carousel :global(.ant-carousel .slick-dots li) {
-  margin: 0 3px;
-}
-
-.carousel :global(.ant-carousel .slick-dots li button) {
-  background-color: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-  opacity: 0.8;
-  width: 12px;
-  height: 12px;
-  transition: var(--transition);
-}
-
-.carousel :global(.ant-carousel .slick-dots li button:hover) {
-  background-color: rgba(255, 255, 255, 0.9);
-  transform: scale(1.2);
-}
-
-.carousel :global(.ant-carousel .slick-dots li.slick-active button) {
-  background-color: #fff;
-  opacity: 1;
-  transform: scale(1.3);
-}
-
 .slider {
   display: flex !important;
   gap: 12px;
-  height: 200px;
   width: 100%;
 }
 
@@ -74,8 +84,8 @@
   flex: 1;
   position: relative;
   overflow: hidden;
-  border-radius: var(--carousel-border-radius);
-  transition: var(--transition);
+  border-radius: 8px;
+  transition: all 0.3s ease;
   height: 100%;
   display: block;
 }
@@ -89,8 +99,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--carousel-border-radius);
-  transition: var(--transition-slow);
+  border-radius: 8px;
+  transition: all 0.5s ease;
   display: block;
 }
 
@@ -105,9 +115,9 @@
   left: 0;
   right: 0;
   padding: 16px;
-  background: var(--overlay-bg);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
   opacity: 0;
-  transition: var(--transition);
+  transition: all 0.3s ease;
   display: flex;
   align-items: end;
 }
@@ -124,7 +134,37 @@
   margin: 0;
 }
 
-/* Responsive design */
+/* === Ant Design Carousel Overrides === */
+.carousel :global(.ant-carousel .slick-dots) {
+  margin-bottom: 12px;
+  z-index: 10;
+}
+
+.carousel :global(.ant-carousel .slick-dots li) {
+  margin: 0 3px;
+}
+
+.carousel :global(.ant-carousel .slick-dots li button) {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  opacity: 0.8;
+  width: 12px;
+  height: 12px;
+  transition: all 0.3s ease;
+}
+
+.carousel :global(.ant-carousel .slick-dots li button:hover) {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.2);
+}
+
+.carousel :global(.ant-carousel .slick-dots li.slick-active button) {
+  background-color: #fff;
+  opacity: 1;
+  transform: scale(1.3);
+}
+
+/* === Responsive Design === */
 @media screen and (max-width: 1024px) {
   .slider {
     height: 180px;
@@ -137,6 +177,20 @@
 
   .imageOverlay {
     padding: 12px;
+  }
+
+  .prevButton,
+  .nextButton {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .prevButton {
+    left: 12px !important;
+  }
+
+  .nextButton {
+    right: 12px !important;
   }
 }
 
@@ -153,7 +207,6 @@
 
   .imageLink {
     flex: none;
-    height: 50%;
   }
 
   .imageLink:hover {
@@ -175,6 +228,21 @@
   .carousel :global(.ant-carousel .slick-dots li button) {
     width: 10px;
     height: 10px;
+  }
+
+  .prevButton,
+  .nextButton {
+    width: 40px !important;
+    height: 40px !important;
+    opacity: 1 !important;
+  }
+
+  .prevButton {
+    left: 8px !important;
+  }
+
+  .nextButton {
+    right: 8px !important;
   }
 }
 
@@ -218,44 +286,18 @@
   .carousel :global(.ant-carousel .slick-dots li) {
     margin: 0 2px;
   }
-}
 
-@media screen and (max-width: 360px) {
-  .slider {
-    height: 100px;
+  .prevButton,
+  .nextButton {
+    width: 36px !important;
+    height: 36px !important;
   }
 
-  .imageText {
-    font-size: 11px;
+  .prevButton {
+    left: 6px !important;
   }
 
-  .imageOverlay {
-    padding: 6px;
+  .nextButton {
+    right: 6px !important;
   }
-}
-
-/* Loading state */
-.carouselContainer.loading {
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-}
-
-/* Animation for smooth transitions */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.imageLink {
-  animation: slideIn 0.4s ease-out;
 }
