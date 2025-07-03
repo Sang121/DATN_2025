@@ -12,6 +12,10 @@ import {
   LoginOutlined,
   DashboardOutlined,
   ExperimentOutlined,
+  HeartOutlined,
+  BellOutlined,
+  DownOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import styles from "./Header.module.css";
 import {
@@ -30,8 +34,9 @@ import {
   message,
   Tooltip,
   Typography,
+  AutoComplete,
 } from "antd";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser, logout } from "../../redux/slices/userSlice";
 import { clearOrder } from "../../redux/slices/orderSlice";
@@ -44,8 +49,8 @@ const { Search } = Input;
 function AppHeader({ onShowSignIn }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user);
@@ -99,20 +104,30 @@ function AppHeader({ onShowSignIn }) {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, [dispatch]);
-
   // Xử lý sự kiện scroll để thay đổi giao diện khi cuộn trang
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      const scrollTop = window.scrollY;
+      if (scrollTop > 20) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
     };
-    window.addEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+  }, []);
+
+  // Cập nhật thời gian hiện tại
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   // Xử lý tìm kiếm
@@ -172,242 +187,345 @@ function AppHeader({ onShowSignIn }) {
 
   return (
     <Header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
-      <Row
-        className={styles.headerRow}
-        align="middle"
-        justify="space-between"
-        wrap={false}
-      >
-        {/* Logo - Hiển thị trên mọi thiết bị */}
-        <Col xs={14} sm={8} md={5} lg={4} xl={4}>
+      <div className={styles.headerContainer}>
+        {/* Logo Section */}
+        <div className={styles.logoSection}>
           <Link to="/" className={styles.logoLink}>
-            <div className={styles.logo}>S-Fashion</div>
+            <div className={styles.logo}>
+              <span className={styles.logoIcon}>S</span>
+              <span className={styles.logoText}>Fashion</span>
+            </div>
           </Link>
-        </Col>
-        {/* Thanh tìm kiếm - Ẩn trên mobile */}
-        <Col xs={0} sm={8} md={8} lg={10} xl={10} className={styles.searchCol}>
-          <Search
-            placeholder="Tìm sản phẩm, danh mục hay thương hiệu..."
-            enterButton={
-              <Button type="primary" icon={<SearchOutlined />}>
-                Tìm kiếm
-              </Button>
-            }
-            size="large"
-            onSearch={handleSearch}
-            className={styles.searchInput}
-            allowClear
-          />
-        </Col>
-        {/* Navigation Menu - Hiển thị trên desktop */}
-        <Col xs={0} sm={0} md={9} lg={8} xl={8} className={styles.navLinks}>
+        </div>
+
+        {/* Search Section - Desktop */}
+        <div className={styles.searchSection}>
+          <div className={styles.searchWrapper}>
+            <Input.Search
+              placeholder="Tìm kiếm sản phẩm, thương hiệu..."
+              enterButton={
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  className={styles.searchButton}
+                />
+              }
+              size="large"
+              onSearch={handleSearch}
+              className={styles.searchInput}
+              allowClear
+            />
+          </div>
+        </div>
+
+        {/* Navigation Section - Desktop */}
+        <div className={styles.navSection}>
           {isLoggedIn ? (
-            <Space size="large">
-              <Tooltip title="Phòng thử đồ">
-                <Link to="/fitting_room" className={styles.navLink}>
-                  <div className={styles.navItem}>
-                    <ExperimentOutlined className={styles.navIcon} />
-                    <Text className={styles.navText}>Phòng thử đồ</Text>
-                  </div>
+            <div className={styles.navItems}>
+              <Tooltip title="Yêu thích" placement="bottom">
+                <Link to="/favoriteProducts" className={styles.navItem}>
+                  <HeartOutlined className={styles.navIcon} />
                 </Link>
               </Tooltip>
 
-              <Tooltip title="Giỏ hàng">
-                <Link to="/cart" className={styles.navLink}>
+              <Tooltip title="Giỏ hàng" placement="bottom">
+                <Link to="/cart" className={styles.navItem}>
                   <Badge
                     count={cartItemCount}
-                    overflowCount={99}
-                    className={styles.navItem}
+                    size="small"
+                    className={
+                      cartItemCount > 0
+                        ? `${styles.badge} ${styles.hasNotifications}`
+                        : styles.badge
+                    }
                   >
                     <ShoppingCartOutlined className={styles.navIcon} />
-                    <Text className={styles.navText}>Giỏ hàng</Text>
                   </Badge>
                 </Link>
               </Tooltip>
 
+              <Tooltip title="Thông báo" placement="bottom">
+                <div className={styles.navItem}>
+                  <Badge
+                    count={3}
+                    size="small"
+                    className={`${styles.badge} ${styles.hasNotifications}`}
+                  >
+                    <BellOutlined
+                      className={`${styles.navIcon} ${styles.notificationBell}`}
+                    />
+                  </Badge>
+                </div>
+              </Tooltip>
               <Dropdown
                 overlay={userMenu}
                 trigger={["click"]}
                 placement="bottomRight"
+                className={styles.userDropdown}
               >
-                <div className={styles.userDropdown}>
+                <div className={styles.userProfile}>
                   <Avatar
-                    size="small"
-                    className={styles.avatar}
+                    size={32}
+                    className={styles.userAvatar}
                     icon={<UserOutlined />}
                   />
-                  <Text className={styles.userName}>
-                    {user.username || "Tài khoản"}
-                  </Text>
+                  <div className={styles.userInfo}>
+                    <span className={styles.userName}>
+                      {user.username || "Tài khoản"}
+                    </span>
+                    <DownOutlined className={styles.dropdownIcon} />
+                  </div>
                 </div>
               </Dropdown>
-            </Space>
+            </div>
           ) : (
-            <Space size="large">
-              <Link to="/fitting_room" className={styles.navLink}>
-                <div className={styles.navItem}>
-                  <ExperimentOutlined className={styles.navIcon} />
-                  <Text className={styles.navText}>Phòng thử đồ</Text>
-                </div>
+            <div className={styles.navItems}>
+              <Link to="/favoriteProducts" className={styles.navItem}>
+                <HeartOutlined className={styles.navIcon} />
+                <span className={styles.navLabel}>Yêu thích</span>
               </Link>
 
-              <Link to="/cart" className={styles.navLink}>
+              <Link to="/cart" className={styles.navItem}>
                 <Badge
                   count={cartItemCount}
-                  overflowCount={99}
-                  className={styles.navItem}
+                  size="small"
+                  className={
+                    cartItemCount > 0
+                      ? `${styles.badge} ${styles.hasNotifications}`
+                      : styles.badge
+                  }
                 >
                   <ShoppingCartOutlined className={styles.navIcon} />
-                  <Text className={styles.navText}>Giỏ hàng</Text>
                 </Badge>
+                <span className={styles.navLabel}>Giỏ hàng</span>
               </Link>
 
               <Button
-                type="text"
+                type="primary"
                 icon={<LoginOutlined />}
                 className={styles.loginButton}
                 onClick={() => onShowSignIn(handleLoginSuccess)}
               >
                 Đăng nhập
               </Button>
-            </Space>
+            </div>
           )}
-        </Col>{" "}
-        {/* Menu icon cho mobile */}
-        <Col
-          xs={10}
-          sm={8}
-          md={0}
-          lg={0}
-          xl={0}
-          className={styles.mobileMenuCol}
-        >
-          <Space>
-            <Link to="/cart">
-              <Badge count={cartItemCount} size="small">
-                <Button
-                  type="text"
-                  icon={<ShoppingCartOutlined />}
-                  className={styles.iconButton}
-                />
-              </Badge>
-            </Link>
+        </div>
+
+        {/* Mobile Menu */}
+        <div className={styles.mobileSection}>
+          <div className={styles.mobileActions}>
+            <Tooltip title="Giỏ hàng" placement="bottom">
+              <Link to="/cart" className={styles.navItem}>
+                <Badge
+                  count={cartItemCount}
+                  size="small"
+                  className={
+                    cartItemCount > 0
+                      ? `${styles.badge} ${styles.hasNotifications}`
+                      : styles.badge
+                  }
+                >
+                  <ShoppingCartOutlined className={styles.navIcon} />
+                </Badge>
+              </Link>
+            </Tooltip>
 
             <Button
               type="text"
-              icon={<MenuOutlined />}
-              onClick={() => setDrawerOpen(true)}
-              className={styles.menuButton}
+              icon={drawerOpen ? <CloseOutlined /> : <MenuOutlined />}
+              onClick={() => setDrawerOpen(!drawerOpen)}
+              className={styles.menuToggle}
             />
-          </Space>
-        </Col>
-      </Row>
+          </div>
+        </div>
+      </div>
 
-      {/* Drawer Menu for Mobile */}
+      {/* Modern Mobile Drawer */}
       <Drawer
-        title={
-          <Link to="/" onClick={() => setDrawerOpen(false)}>
-            <span className={styles.drawerTitle}>S-Fashion</span>
-          </Link>
-        }
+        title={null}
         placement="right"
-        width={window.innerWidth < 500 ? "80%" : 300}
+        width="300px"
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
-        styles={{ padding: 0, borderBottom: "1px solid #f0f0f0" }}
+        className={styles.mobileDrawer}
+        closeIcon={null}
+        styles={{
+          body: { padding: 0 },
+          header: { display: "none" },
+        }}
+        transitionName="slide"
+        maskTransitionName="fade"
       >
         <div className={styles.drawerContent}>
-          {/* Search box in drawer */}
-          <div className={styles.drawerSearch}>
-            <Search
-              placeholder="Tìm kiếm sản phẩm..."
-              onSearch={handleSearch}
-              enterButton
+          {/* Drawer Header */}
+          <div className={styles.drawerHeader}>
+            <Link to="/" onClick={() => setDrawerOpen(false)}>
+              <div className={styles.drawerLogo}>
+                <span className={styles.logoIcon}>S</span>
+                <span className={styles.logoText}>Fashion</span>
+              </div>
+            </Link>
+            <Button
+              type="text"
+              icon={<CloseOutlined />}
+              onClick={() => setDrawerOpen(false)}
+              className={styles.drawerClose}
             />
           </div>
 
-          <Menu
-            mode="inline"
-            selectedKeys={[location.pathname]}
-            style={{ borderRight: 0 }}
-          >
-            <Menu.Item
-              key="/"
-              icon={<HomeOutlined />}
+          {/* Mobile Search */}
+          <div className={styles.drawerSearch}>
+            <Input.Search
+              placeholder="Tìm kiếm sản phẩm..."
+              onSearch={(value) => {
+                handleSearch(value);
+                setDrawerOpen(false);
+              }}
+              enterButton
+              size="large"
+              className={styles.mobileSearchInput}
+            />
+          </div>
+
+          {/* User Section */}
+          {isLoggedIn && (
+            <div className={styles.drawerUserSection}>
+              <div className={styles.drawerUserInfo}>
+                <Avatar
+                  size={48}
+                  className={styles.drawerUserAvatar}
+                  icon={<UserOutlined />}
+                />
+                <div className={styles.drawerUserDetails}>
+                  <span className={styles.drawerUserName}>
+                    {user.username || "Tài khoản"}
+                  </span>
+                  <span className={styles.drawerUserRole}>
+                    {user.isAdmin ? "Quản trị viên" : "Khách hàng"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Menu */}
+          <div className={styles.drawerMenu}>
+            <div
+              className={styles.drawerMenuItem}
               onClick={() => setDrawerOpen(false)}
             >
-              <Link to="/">Trang chủ</Link>
-            </Menu.Item>
+              <Link to="/" className={styles.drawerMenuLink}>
+                <HomeOutlined className={styles.drawerMenuIcon} />
+                <span>Trang chủ</span>
+              </Link>
+            </div>
 
-            <Menu.Item
-              key="/fitting_room"
-              icon={<ExperimentOutlined />}
+            <div
+              className={styles.drawerMenuItem}
               onClick={() => setDrawerOpen(false)}
             >
-              <Link to="/fitting_room">Phòng thử đồ</Link>
-            </Menu.Item>
+              <Link to="/favoriteProducts" className={styles.drawerMenuLink}>
+                <HeartOutlined className={styles.drawerMenuIcon} />
+                <span>Yêu thích</span>
+              </Link>
+            </div>
 
-            <Menu.Item
-              key="/cart"
-              icon={<ShoppingCartOutlined />}
+            {isLoggedIn && (
+              <div
+                className={styles.drawerMenuItem}
+                onClick={() => setDrawerOpen(false)}
+              >
+                <Link to="/notifications" className={styles.drawerMenuLink}>
+                  <BellOutlined className={styles.drawerMenuIcon} />
+                  <span>Thông báo</span>
+                  <Badge count={3} className={styles.drawerBadge} />
+                </Link>
+              </div>
+            )}
+
+            <div
+              className={styles.drawerMenuItem}
               onClick={() => setDrawerOpen(false)}
             >
-              <Link to="/cart">Giỏ hàng ({cartItemCount})</Link>
-            </Menu.Item>
-
-            <Divider style={{ margin: "8px 0" }} />
+              <Link to="/cart" className={styles.drawerMenuLink}>
+                <ShoppingCartOutlined className={styles.drawerMenuIcon} />
+                <span>Giỏ hàng</span>
+                {cartItemCount > 0 && (
+                  <Badge count={cartItemCount} className={styles.drawerBadge} />
+                )}
+              </Link>
+            </div>
 
             {isLoggedIn ? (
               <>
-                <Menu.Item
-                  key="/profile"
-                  icon={<UserOutlined />}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <Link to="/profile">Thông tin tài khoản</Link>
-                </Menu.Item>
+                <div className={styles.drawerDivider} />
 
-                <Menu.Item
-                  key="/profile/my-order"
-                  icon={<ShoppingOutlined />}
+                <div
+                  className={styles.drawerMenuItem}
                   onClick={() => setDrawerOpen(false)}
                 >
-                  <Link to="/profile/my-order">Đơn hàng của tôi</Link>
-                </Menu.Item>
+                  <Link to="/profile" className={styles.drawerMenuLink}>
+                    <UserOutlined className={styles.drawerMenuIcon} />
+                    <span>Thông tin tài khoản</span>
+                  </Link>
+                </div>
+
+                <div
+                  className={styles.drawerMenuItem}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <Link
+                    to="/profile/my-order"
+                    className={styles.drawerMenuLink}
+                  >
+                    <ShoppingOutlined className={styles.drawerMenuIcon} />
+                    <span>Đơn hàng của tôi</span>
+                  </Link>
+                </div>
 
                 {user?.isAdmin && (
-                  <Menu.Item
-                    key="/system/admin"
-                    icon={<SettingOutlined />}
+                  <div
+                    className={styles.drawerMenuItem}
                     onClick={() => setDrawerOpen(false)}
                   >
-                    <Link to="/system/admin">Quản lý hệ thống</Link>
-                  </Menu.Item>
+                    <Link to="/system/admin" className={styles.drawerMenuLink}>
+                      <DashboardOutlined className={styles.drawerMenuIcon} />
+                      <span>Quản lý hệ thống</span>
+                    </Link>
+                  </div>
                 )}
 
-                <Divider style={{ margin: "8px 0" }} />
+                <div className={styles.drawerDivider} />
 
-                <Menu.Item
-                  key="logout"
-                  icon={<LogoutOutlined />}
-                  onClick={handleLogout}
-                >
-                  Đăng xuất
-                </Menu.Item>
+                <div className={styles.drawerMenuItem} onClick={handleLogout}>
+                  <div className={styles.drawerMenuLink}>
+                    <LogoutOutlined className={styles.drawerMenuIcon} />
+                    <span>Đăng xuất</span>
+                  </div>
+                </div>
               </>
             ) : (
-              <Menu.Item
-                key="login"
-                icon={<LoginOutlined />}
-                onClick={() => {
-                  setDrawerOpen(false);
-                  onShowSignIn(handleLoginSuccess);
-                }}
-              >
-                Đăng nhập / Đăng ký
-              </Menu.Item>
+              <>
+                <div className={styles.drawerDivider} />
+                <div className={styles.drawerMenuItem}>
+                  <Button
+                    type="primary"
+                    block
+                    size="large"
+                    icon={<LoginOutlined />}
+                    onClick={() => {
+                      setDrawerOpen(false);
+                      onShowSignIn(handleLoginSuccess);
+                    }}
+                    className={styles.drawerLoginButton}
+                  >
+                    Đăng nhập / Đăng ký
+                  </Button>
+                </div>
+              </>
             )}
-          </Menu>
+          </div>
         </div>
       </Drawer>
     </Header>
