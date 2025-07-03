@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ListProduct.module.css";
-import { Flex, Spin, Alert } from "antd";
+import { Spin, Alert } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { searchProduct } from "../../services/productService";
 
@@ -23,14 +23,14 @@ function ListProduct({ query }) {
 
   if (isLoading) {
     return (
-      <div className={styles.statusContainer}>
+      <div className={styles.container}>
         <Spin size="large" tip="Đang tải sản phẩm..." />
       </div>
     );
   }
   if (isError) {
     return (
-      <div className={styles.statusContainer}>
+      <div className={styles.container}>
         <Alert
           message="Lỗi"
           description={
@@ -46,7 +46,7 @@ function ListProduct({ query }) {
 
   if (!products?.data || products.data.length === 0) {
     return (
-      <div className={styles.statusContainer}>
+      <div className={styles.container}>
         <Alert
           message="Không có sản phẩm nào trong danh mục này"
           description="Vui lòng chọn danh mục khác"
@@ -59,8 +59,7 @@ function ListProduct({ query }) {
 
   return (
     <div className={styles.container}>
-      <Flex wrap gap="small" className={styles["list-product-container"]}>
-        {/* Chỉ hiển thị số lượng sản phẩm giới hạn */}
+      <div className={styles["list-product-container"]}>
         {products.data.slice(0, visibleProducts).map((product) => (
           <ProductCard
             key={product._id}
@@ -76,9 +75,8 @@ function ListProduct({ query }) {
             extra={product.description}
           />
         ))}
-      </Flex>
+      </div>
 
-      {/* Hiển thị nút Load More nếu còn sản phẩm */}
       {products.data.length > visibleProducts && (
         <div className={styles["load-more-wrapper"]}>
           <button

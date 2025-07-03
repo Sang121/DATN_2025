@@ -6,10 +6,8 @@ import {
   SearchOutlined,
   LogoutOutlined,
   MenuOutlined,
-  AppstoreOutlined,
   ShoppingOutlined,
   HomeOutlined,
-  UserSwitchOutlined,
   SettingOutlined,
   LoginOutlined,
   DashboardOutlined,
@@ -45,7 +43,6 @@ const { Search } = Input;
 
 function AppHeader({ onShowSignIn }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // Đã xóa biến searchTerm không sử dụng
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -208,10 +205,10 @@ function AppHeader({ onShowSignIn }) {
             <Space size="large">
               <Tooltip title="Phòng thử đồ">
                 <Link to="/fitting_room" className={styles.navLink}>
-                  <Badge className={styles.navItem}>
+                  <div className={styles.navItem}>
                     <ExperimentOutlined className={styles.navIcon} />
                     <Text className={styles.navText}>Phòng thử đồ</Text>
-                  </Badge>
+                  </div>
                 </Link>
               </Tooltip>
 
@@ -248,10 +245,10 @@ function AppHeader({ onShowSignIn }) {
           ) : (
             <Space size="large">
               <Link to="/fitting_room" className={styles.navLink}>
-                <Badge className={styles.navItem}>
+                <div className={styles.navItem}>
                   <ExperimentOutlined className={styles.navIcon} />
                   <Text className={styles.navText}>Phòng thử đồ</Text>
-                </Badge>
+                </div>
               </Link>
 
               <Link to="/cart" className={styles.navLink}>
@@ -318,7 +315,6 @@ function AppHeader({ onShowSignIn }) {
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
         styles={{ padding: 0, borderBottom: "1px solid #f0f0f0" }}
-      
       >
         <div className={styles.drawerContent}>
           {/* Search box in drawer */}

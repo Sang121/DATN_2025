@@ -4,6 +4,13 @@
   padding: 16px;
 }
 
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
+
 .backButton {
   margin-bottom: 16px;
   font-weight: 500;
@@ -48,7 +55,14 @@
   margin-bottom: 24px;
 }
 
-.customerCard, .timelineCard, .paymentCard, .productsCard, .pricingSummaryCard {
+.customerCard {
+  margin-bottom: 24px;
+}
+
+.timelineCard,
+.paymentCard,
+.productsCard,
+.pricingSummaryCard {
   margin-bottom: 16px;
 }
 
@@ -74,11 +88,73 @@
   color: #ff4d4f;
 }
 
+.totalAmount {
+  font-size: 1.2rem !important;
+  color: #ff4d4f !important;
+}
+
 .imageError {
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #f5f5f5;
+}
+
+.statusSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.statusDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.statusSelect {
+  width: 180px;
+}
+
+.paymentSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.paymentDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.paymentControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.paymentNote {
+  font-style: italic;
+}
+
+.historyNote {
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.modalAlert {
+  margin-bottom: 16px;
 }
 
 /* Print-specific styles */

@@ -10,7 +10,6 @@
   --border-light: #e5e7eb;
   --border-color: #d1d5db;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --border-radius: 12px;
   --spacing-xs: 8px;
   --spacing-sm: 16px;
@@ -19,7 +18,7 @@
   --transition: all 0.2s ease;
 }
 
-/* Minimal Container */
+/* Container */
 .container {
   margin: 0 auto;
   padding: var(--spacing-md);
@@ -27,7 +26,7 @@
   min-height: 100vh;
 }
 
-/* Simple Header */
+/* Header */
 .header {
   background: var(--background);
   border: 1px solid var(--border-light);
@@ -82,12 +81,13 @@
   margin-top: var(--spacing-xs);
 }
 
-.verifiedIcon {
+.verifiedText {
   color: var(--primary-color);
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
-/* Simple Form Section */
+/* Form Section */
 .formSection {
   margin-top: var(--spacing-md);
 }
@@ -108,10 +108,6 @@
   border: none;
 }
 
-.cardIcon {
-  display: none; /* Hide decorative icons for minimal design */
-}
-
 .cardTitle {
   margin: 0 0 var(--spacing-xs) 0 !important;
   color: var(--text-primary);
@@ -125,7 +121,7 @@
   font-size: 14px;
 }
 
-/* Clean Form Styles */
+/* Form Styles */
 .form {
   padding: 0;
 }
@@ -157,7 +153,7 @@
   margin: 0;
 }
 
-/* Clean Form Items */
+/* Form Items */
 .form :global(.ant-form-item) {
   margin-bottom: var(--spacing-sm);
 }
@@ -183,7 +179,7 @@
   margin-right: 4px;
 }
 
-/* Clean Input Styles */
+/* Input Styles */
 .input,
 .select,
 .textarea {
@@ -207,11 +203,7 @@
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
 }
 
-.inputIcon {
-  color: var(--text-muted);
-}
-
-/* Clean Select Styles */
+/* Select Styles */
 .form :global(.ant-select-selector) {
   border: 1px solid var(--border-color) !important;
   border-radius: var(--spacing-xs) !important;
@@ -226,7 +218,7 @@
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
 }
 
-/* Simple Action Section */
+/* Action Section */
 .actionSection {
   margin-top: var(--spacing-lg);
   padding-top: var(--spacing-md);
@@ -236,7 +228,7 @@
   gap: var(--spacing-sm);
 }
 
-/* Clean Button Styles */
+/* Button Styles */
 .cancelButton {
   border: 1px solid var(--border-color) !important;
   color: var(--text-secondary) !important;
@@ -321,24 +313,4 @@
   .section {
     margin-bottom: var(--spacing-md);
   }
-}
-
-/* Remove unused styles */
-.form :global(.ant-form-item-explain-error) {
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.form :global(.ant-input-affix-wrapper) {
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--spacing-xs) !important;
-}
-
-.form :global(.ant-input-affix-wrapper:hover) {
-  border-color: var(--primary-hover) !important;
-}
-
-.form :global(.ant-input-affix-wrapper-focused) {
-  border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
 }

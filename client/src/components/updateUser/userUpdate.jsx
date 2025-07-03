@@ -1,12 +1,16 @@
-import { Form, Select, Row, Col, Card, Space } from "antd";
 import React, { useEffect, useMemo } from "react";
 import {
+  Form,
+  Select,
+  Row,
+  Col,
   Button,
   Input,
   Avatar,
   Typography,
   message as antdMessage,
   Badge,
+  Space,
 } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { updateUser } from "../../services/userService";
@@ -15,12 +19,8 @@ import { updateUser as updateReduxUser } from "../../redux/slices/userSlice";
 import {
   UserOutlined,
   MailOutlined,
-  PhoneOutlined,
-  ManOutlined,
-  WomanOutlined,
   SaveOutlined,
   EditOutlined,
-  CheckCircleOutlined,
 } from "@ant-design/icons";
 import styles from "./userUpdate.module.css";
 
@@ -123,11 +123,7 @@ function UserUpdate() {
               {user.email || "email@example.com"}
             </Text>
             <div className={styles.userStats}>
-              <Badge
-                status="success"
-                text="Đã xác thực"
-                style={{ fontSize: "12px", color: "#6b7280" }}
-              />
+              <span className={styles.verifiedText}>✓ Đã xác thực</span>
             </div>
           </div>
         </div>
@@ -135,7 +131,7 @@ function UserUpdate() {
 
       {/* Simple Form */}
       <div className={styles.formSection}>
-        <Card className={styles.formCard}>
+        <div className={styles.formCard}>
           <div className={styles.cardHeader}>
             <Title level={4} className={styles.cardTitle}>
               Thông tin cá nhân
@@ -196,18 +192,8 @@ function UserUpdate() {
                       size="large"
                       className={styles.select}
                     >
-                      <Option value="male">
-                        <Space>
-                          <ManOutlined />
-                          Nam
-                        </Space>
-                      </Option>
-                      <Option value="female">
-                        <Space>
-                          <WomanOutlined />
-                          Nữ
-                        </Space>
-                      </Option>
+                      <Option value="male">Nam</Option>
+                      <Option value="female">Nữ</Option>
                       <Option value="other">Khác</Option>
                     </Select>
                   </Form.Item>
@@ -299,7 +285,7 @@ function UserUpdate() {
               </Button>
             </div>
           </Form>
-        </Card>
+        </div>
       </div>
     </div>
   );

@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
-  List,
   Card,
   Tag,
   Button,
   Typography,
   Spin,
   Alert,
-  Avatar,
   Menu,
   Divider,
   Empty,
@@ -16,7 +14,6 @@ import {
   Space,
   Pagination,
   Image,
-  Badge,
   Tooltip,
 } from "antd";
 import {
@@ -25,7 +22,6 @@ import {
   CarOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  AppstoreOutlined,
   UnorderedListOutlined,
   ShoppingOutlined,
   EyeOutlined,
@@ -40,7 +36,7 @@ import styles from "./Myorder.module.css";
 import { Link } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const getStatusTag = (status) => {
   const statusMap = {
@@ -101,18 +97,15 @@ function MyOrder() {
     processing: 0,
     delivered: 0,
     cancelled: 0,
-  }); // Lấy tổng số đơn hàng và số lượng đơn hàng theo từng trạng thái
+  });
   useEffect(() => {
     const fetchOrderCounts = async () => {
       if (!userId) return;
 
       try {
-        // Lấy tổng số đơn hàng và phân loại theo trạng thái
         const allOrdersCount = await orderService.getOrdersCount(userId);
 
-        // Kiểm tra dữ liệu trả về từ API
         if (allOrdersCount && typeof allOrdersCount === "object") {
-          // Cập nhật state với dữ liệu từ API
           setOrderCounts({
             all: allOrdersCount.total || 0,
             pending: allOrdersCount.pending || 0,
@@ -129,12 +122,12 @@ function MyOrder() {
     };
 
     fetchOrderCounts();
-  }, [userId, activeStatus]); 
-useEffect(() => {
+  }, [userId, activeStatus]);
+  useEffect(() => {
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   }, []);
   const {
@@ -169,7 +162,6 @@ useEffect(() => {
     enabled: !!userId,
     keepPreviousData: true,
     onSuccess: (data) => {
-
       if (activeStatus !== "all") {
         setOrderCounts((prev) => ({
           ...prev,
@@ -183,14 +175,13 @@ useEffect(() => {
   const handleStatusChange = (status) => {
     console.log(`Changing status filter to: ${status}`);
     setActiveStatus(status);
-    setPagination((prev) => ({ ...prev, current: 1 })); // Reset về trang đầu khi thay đổi bộ lọc
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
   const handlePageChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
-
     window.scrollTo({
       top: 0,
-      behavior: "smooth", 
+      behavior: "smooth",
     });
   };
 
@@ -202,7 +193,7 @@ useEffect(() => {
 
   if (isError) {
     return <Alert message={error.message} type="error" showIcon />;
-  } // Render status menu function để tái sử dụng
+  }
   const renderStatusMenu = () => {
     const menuItems = [
       {
@@ -290,7 +281,6 @@ useEffect(() => {
       </div>
 
       <Row gutter={[24, 24]}>
-        {/* Sidebar - Desktop Only */}
         <Col xs={0} sm={0} md={6} lg={5} xl={5}>
           <Card className={styles.sidebarCard}>
             <div className={styles.sidebarHeader}>
@@ -301,16 +291,13 @@ useEffect(() => {
           </Card>
         </Col>
 
-        {/* Main Content */}
         <Col xs={24} sm={24} md={18} lg={19} xl={19}>
-          {/* Mobile Filter */}
           <div className={styles.mobileFilter}>
             <Card className={styles.mobileFilterCard}>
               {renderStatusMenu()}
             </Card>
           </div>
 
-          {/* Orders List */}
           <div className={styles.ordersWrapper}>
             <Spin spinning={isFetching}>
               {queryData?.data?.length === 0 ? (
@@ -336,7 +323,6 @@ useEffect(() => {
                 >
                   {queryData?.data?.map((order) => (
                     <Card key={order._id} className={styles.orderCard}>
-                      {/* Order Header */}
                       <div className={styles.orderHeader}>
                         <div className={styles.orderInfo}>
                           <Space>
@@ -369,7 +355,6 @@ useEffect(() => {
 
                       <Divider className={styles.orderDivider} />
 
-                      {/* Order Items */}
                       <div className={styles.orderItems}>
                         {order.items?.slice(0, 2).map((item, index) => (
                           <div key={index} className={styles.orderItem}>
@@ -411,7 +396,6 @@ useEffect(() => {
 
                       <Divider className={styles.orderDivider} />
 
-                      {/* Order Footer */}
                       <div className={styles.orderFooter}>
                         <div className={styles.totalSection}>
                           <Text>Tổng tiền: </Text>
@@ -436,7 +420,6 @@ useEffect(() => {
               )}
             </Spin>
 
-            {/* Pagination */}
             {queryData?.total > 0 && (
               <div className={styles.paginationWrapper}>
                 <Pagination

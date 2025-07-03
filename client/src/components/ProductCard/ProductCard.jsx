@@ -1,15 +1,22 @@
 import React from "react";
 import styles from "./ProductCard.module.css";
 import { Link } from "react-router-dom";
-import { StarFilled, ShoppingCartOutlined } from "@ant-design/icons";
 
-function ProductCard({ productId, image, name,totalStock, price, sold, discount }) {
+function ProductCard({
+  productId,
+  image,
+  name,
+  totalStock,
+  price,
+  sold,
+  discount,
+}) {
   const newPrice = price - (price * discount) / 100;
   const formattedPrice = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
   }).format(newPrice);
-const productPrice = {
+  const productPrice = {
     newPrice: formattedPrice,
     oldPrice: price?.toLocaleString("vi-VN"),
   };
@@ -19,7 +26,7 @@ const productPrice = {
         <div className={styles["product-card-discount"]}>-{discount}%</div>
       )}
 
-{(totalStock > 0) ? (
+      {totalStock > 0 ? (
         sold > 20 ? (
           <div className={styles["product-card-badge"]}>Bán chạy</div>
         ) : null
@@ -30,16 +37,6 @@ const productPrice = {
         <img src={image} alt={name} className={styles["product-image"]} />
       </Link>
       <div className={styles["product-card-body"]}>
-        {/* <div className={styles["product-card-labels"]}>
-          {labels.map((label, idx) => (
-            <span
-              key={idx}
-              className={`${styles["product-card-label"]} ${label.type}`}
-            >
-              {label.text}ddd
-            </span>
-          ))}
-        </div> */}
         <div className="card">
           <Link to={`/products/${productId}`}>
             <div className={styles["productName"]}>{name}</div>
@@ -67,12 +64,11 @@ const productPrice = {
             <div>
               {/* Giá hiện tại */}
               <div className={styles["productPrice"]}>
-                <span className={styles["red"]}>
+                <span style={{ color: "#ff424e" }}>
                   {productPrice.newPrice?.toLocaleString("vi-VN")}
                 </span>
 
                 <div className={styles["productOldPriceContainer"]}>
-                
                   {/* Giá gốc */}
                   <div className={styles["productOldPrice"]}>
                     <del>{productPrice.oldPrice?.toLocaleString("vi-VN")}đ</del>
@@ -87,17 +83,12 @@ const productPrice = {
                   {price?.toLocaleString("vi-VN")}đ
                 </span>
               )}
-              {discount > 0 && (
-                <Tag color="red" className={styles.discountTag}>
-                  -{discount}%
-                </Tag>
-              )}
             </div>
           )}
           <div className={styles["product-sold"]}>
             <span className={styles["sold-count"]}>
               {" "}
-              Đã bán {sold ? sold : 0 } sản phẩm
+              Đã bán {sold ? sold : 0} sản phẩm
             </span>
           </div>
         </div>

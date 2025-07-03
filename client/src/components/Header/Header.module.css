@@ -1,34 +1,14 @@
-/* Variables for easier theme management */
-:root {
-  --primary-blue: #1A94FF;
-  --dark-blue: #0D5CB6;
-  --text-color-light: #fff;
-  --text-color-dark: #333;
-  --border-color: #f0f0f0;
-  --background-light-grey: #f5f5f5;
-  --yellow-accent: #faad14;
-  --dark-grey-text: rgba(0, 0, 0, 0.65);
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --max-width: 1200px;
-  --header-height: 64px;
-  --transition-speed: 0.3s;
-  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Header Container Styles */
+/* === Modern Header Component === */
 .header {
-  background: var(--primary-blue);
+  background: #1A94FF;
   padding: 0;
-  height: var(--header-height);
-  line-height: var(--header-height);
+  height: 64px;
+  line-height: 64px;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: var(--box-shadow);
-  transition: all var(--transition-speed) ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .header.scrolled {
@@ -36,35 +16,35 @@
 }
 
 .headerRow {
-  max-width: var(--max-width);
+  max-width: 1200px;
   margin: 0 auto !important;
-  padding: 0 var(--spacing-md);
+  padding: 0 16px;
   height: 100%;
 }
 
-/* Logo Styles */
+/* === Logo === */
 .logo {
   font-size: 24px;
   font-weight: bold;
-  color: var(--text-color-light);
+  color: #fff;
   margin: 0;
 }
 
 .logoLink {
   display: block;
-  color: var(--text-color-light);
+  color: #fff;
   text-decoration: none;
-  transition: color var(--transition-speed);
+  transition: color 0.3s;
 }
 
 .logoLink:hover {
   color: rgba(255, 255, 255, 0.85);
 }
 
-/* Search Bar Styles */
+/* === Search Bar === */
 .searchCol {
   text-align: center;
-  padding: 0 var(--spacing-md);
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,7 +82,7 @@
 .searchInput :global(.ant-input-search-button) {
   border: none !important;
   box-shadow: none !important;
-  background-color: var(--dark-blue) !important;
+  background-color: #0D5CB6 !important;
   height: 40px !important;
   border-top-right-radius: 6px !important;
   border-bottom-right-radius: 6px !important;
@@ -115,7 +95,7 @@
   display: flex;
 }
 
-/* Navigation Links Styles */
+/* === Navigation === */
 .navLinks {
   display: flex;
   justify-content: flex-end;
@@ -123,8 +103,8 @@
 }
 
 .navLink {
-  color: var(--text-color-light);
-  margin: 0 var(--spacing-md);
+  color: #fff;
+  margin: 0 16px;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -147,21 +127,21 @@
 .navText {
   font-size: 12px;
   line-height: 1;
-  color: var(--text-color-light);
+  color: #fff;
 }
 
 .navLink:hover .navIcon {
   transform: scale(1.1);
 }
 
-/* User Dropdown Styles */
+/* === User Menu === */
 .userDropdown {
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 0 var(--spacing-sm);
-  color: var(--text-color-light);
-  transition: background-color var(--transition-speed);
+  padding: 0 8px;
+  color: #fff;
+  transition: background-color 0.3s;
 }
 
 .userDropdown:hover {
@@ -170,13 +150,13 @@
 }
 
 .avatar {
-  background-color: var(--dark-blue);
-  margin-right: var(--spacing-xs);
+  background-color: #0D5CB6;
+  margin-right: 4px;
 }
 
 .userName {
-  color: var(--text-color-light);
-  margin-left: var(--spacing-xs);
+  color: #fff;
+  margin-left: 4px;
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -184,9 +164,8 @@
   font-weight: 500;
 }
 
-/* Login Button Style */
 .loginButton {
-  color: var(--text-color-light) !important;
+  color: #fff !important;
   border: 1px solid rgba(255, 255, 255, 0.5) !important;
   background: transparent !important;
   transition: all 0.3s ease;
@@ -197,27 +176,23 @@
   border-color: white !important;
 }
 
-/* Mobile Menu Styles */
+/* === Mobile Menu === */
 .mobileMenuCol {
   display: none;
   justify-content: flex-end;
 }
 
-.iconButton {
-  color: var(--text-color-light) !important;
-  font-size: 18px;
-}
-
+.iconButton,
 .menuButton {
-  color: var(--text-color-light) !important;
+  color: #fff !important;
   font-size: 18px;
 }
 
-/* Drawer Styles */
+/* === Drawer === */
 .drawerTitle {
   font-size: 20px;
   font-weight: bold;
-  color: var(--primary-blue);
+  color: #1A94FF;
 }
 
 .drawerContent {
@@ -226,8 +201,8 @@
 }
 
 .drawerSearch {
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--border-color);
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .drawerSearch :global(.ant-input-search) {
@@ -238,18 +213,19 @@
   display: flex !important;
 }
 
+/* === Responsive === */
 @media (max-width: 768px) {
   .header {
     line-height: normal;
     height: auto;
     min-height: 56px;
-    padding: var(--spacing-xs) 0;
+    padding: 4px 0;
   }
 
   .logo {
     font-size: 20px;
-    padding: var(--spacing-sm) 0;
-    color: var(--text-color-light);
+    padding: 8px 0;
+    color: #fff;
   }
   
   .mobileMenuCol {
@@ -257,7 +233,7 @@
   }
   
   .headerRow {
-    padding: 0 var(--spacing-sm);
+    padding: 0 8px;
   }
 
   .searchInput {
@@ -265,7 +241,7 @@
   }
 
   .drawerSearch {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 16px;
   }
 
   .drawerSearch :global(.ant-input-search) {
@@ -273,39 +249,6 @@
   }
 }
 
-/* Override Ant Design Badge Styles */
-:global(.ant-badge-count) {
-  background-color: var(--yellow-accent) !important;
-  color: var(--text-color-dark) !important;
-  box-shadow: 0 0 0 1px #fff;
-}
-
-/* Đảm bảo các chữ trong header đều là màu trắng */
-.header :global(.ant-typography) {
-  color: var(--text-color-light);
-}
-
-.header :global(.ant-btn-text) {
-  color: var(--text-color-light);
-}
-
-.header :global(.anticon) {
-  color: var(--text-color-light);
-}
-
-/* Override Ant Design Button styles trong header */
-.header :global(.ant-btn-text:hover) {
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Đảm bảo menu icon chỉ hiển thị trên mobile */
-@media (min-width: 768px) {
-  .mobileMenuCol {
-    display: none !important;
-  }
-}
-
-/* Tăng kích thước button mobile để dễ nhấn */
 @media (max-width: 576px) {
   .iconButton, .menuButton {
     padding: 4px 8px;
@@ -317,7 +260,35 @@
   }
 }
 
-/* Sửa lỗi thanh search cho các trình duyệt khác nhau */
+@media (min-width: 768px) {
+  .mobileMenuCol {
+    display: none !important;
+  }
+}
+
+/* === Ant Design Overrides === */
+:global(.ant-badge-count) {
+  background-color: #faad14 !important;
+  color: #333 !important;
+  box-shadow: 0 0 0 1px #fff;
+}
+
+.header :global(.ant-typography) {
+  color: #fff;
+}
+
+.header :global(.ant-btn-text) {
+  color: #fff;
+}
+
+.header :global(.anticon) {
+  color: #fff;
+}
+
+.header :global(.ant-btn-text:hover) {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
 :global(.ant-input-search .ant-input-wrapper) {
   display: flex !important;
 }

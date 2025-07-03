@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Checkbox, Input, Button, Space, Card, message, Col } from "antd";
+import { Checkbox, Input, Button, Card, message } from "antd";
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import styles from "./CartPage.module.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,11 +29,7 @@ function CartPage() {
 
   // Auto scroll to top when component mounts
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);
 
   const [shippingInfo, setShippingInfo] = useState(() => {
@@ -95,20 +91,10 @@ function CartPage() {
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       setSelectedItems(cartItems.map((item) => item.id));
-      console.log(
-        "Selected items:",
-        selectedItems.map((item) => item.id)
-      );
     } else {
       setSelectedItems([]);
-      console.log("Selected items:", []);
     }
-
-    // Scroll to top smoothly when selecting all items
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSelectItem = (itemId) => {
@@ -116,7 +102,6 @@ function CartPage() {
       setSelectedItems(selectedItems.filter((id) => id !== itemId));
     } else {
       setSelectedItems([...selectedItems, itemId]);
-      console.log("Selected items:", [...selectedItems, itemId]);
     }
   };
 
@@ -139,16 +124,14 @@ function CartPage() {
     const roundedPrice = Math.round(price);
     return new Intl.NumberFormat("vi-VN").format(roundedPrice) + "đ";
   };
+
   const handleRemoveItem = (itemId) => {
     dispatch(removeOrderItem(itemId));
   };
+
   const handleChangeInfo = () => {
     setIsChangeInfoOpen(true);
-    // Scroll to top when opening change info modal
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCloseChangeInfo = () => {
@@ -164,14 +147,11 @@ function CartPage() {
   const processItemsImages = (items) => {
     return items.map((item) => {
       const processedItem = { ...item };
-
       if (processedItem.image) {
         processedItem.image = processedItem.image.replace(
           "http://localhost:3001/uploads/",
           ""
         );
-      } else {
-        console.log("Item image is missing:", processedItem);
       }
       return processedItem;
     });
@@ -195,11 +175,7 @@ function CartPage() {
 
   const handleShowSignIn = () => {
     setShowSignIn(true);
-    // Scroll to top when opening sign in modal
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleLoginSuccess = (userData) => {
@@ -210,17 +186,10 @@ function CartPage() {
         address: userData.address || "",
         email: userData.email || "",
       });
-
       setShowSignIn(false);
       setShowSignUp(false);
-
       message.success("Đăng nhập thành công!");
-
-      // Scroll to top after successful login
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -271,11 +240,7 @@ function CartPage() {
   };
 
   const handleCheckout = () => {
-    // Scroll to top first
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     if (!isUserLoggedIn) {
       message.error("Vui lòng đăng nhập để thanh toán.");
@@ -295,14 +260,12 @@ function CartPage() {
       handleChangeInfo();
       return;
     }
+
     try {
       const selectedCartItems = selectedItems.map((id) => {
         const cartItem = cartItems.find((item) => item.id === id);
-        console.log("Cart item structure:", cartItem); // Debug log
-
         return {
           ...cartItem,
-          // Đảm bảo structure đúng theo orderModel yêu cầu
           variant: {
             size: cartItem.variant?.size || cartItem.size,
             color: cartItem.variant?.color || cartItem.color,
@@ -367,20 +330,16 @@ function CartPage() {
               </div>
               {item.isDiscount ? (
                 <div className={styles.itemPrice}>
-                  <div className={styles.currentPrice}>
-                    <div className={styles.discountedPrice}>
-                      {formatPrice(Math.floor(item.price))}
-                    </div>
+                  <div className={styles.discountedPrice}>
+                    {formatPrice(Math.floor(item.price))}
                   </div>
                   <div className={styles.originalPrice}>
                     {formatPrice(Math.floor(item.originalPrice))}
                   </div>
                 </div>
               ) : (
-                <div className={styles.itemPrice}>
-                  <div className={styles.currentPrice}>
-                    {formatPrice(Math.floor(item.price))}
-                  </div>
+                <div className={styles.currentPrice}>
+                  {formatPrice(Math.floor(item.price))}
                 </div>
               )}
               <div className={styles.quantityControl}>
@@ -407,9 +366,9 @@ function CartPage() {
                       (quantities[item.id] || item.amount) + 1
                     )
                   }
-                  disabled={item.amount >= item.variant.stock ? true : false}
+                  disabled={item.amount >= item.variant.stock}
                 />
-              </div>{" "}
+              </div>
               <div className={styles.totalPrice}>
                 {formatPrice(item.price * (quantities[item.id] || item.amount))}
               </div>

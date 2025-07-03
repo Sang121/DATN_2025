@@ -9,7 +9,7 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    min-height: 300px; /* Ensure it has some height */
+    min-height: 300px;
 }
 
 .headerContainer {
@@ -17,6 +17,13 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #262626;
+    margin: 0;
 }
 
 .exportButton {
@@ -29,20 +36,18 @@
     border-color: #73d13d;
 }
 
-/* New styles for exporting indicator */
-.exportingIndicator {
-    text-align: center;
-    margin-top: 16px;
-    color: #1890ff;
-}
-
 .exportButton:disabled {
     background-color: #f5f5f5;
     border-color: #d9d9d9;
     color: rgba(0, 0, 0, 0.25);
 }
 
-/* For mobile devices */
+.exportingIndicator {
+    text-align: center;
+    margin-top: 16px;
+    color: #1890ff;
+}
+
 @media (max-width: 576px) {
     .headerContainer {
         flex-direction: column;
@@ -52,5 +57,9 @@
     
     .exportButton {
         width: 100%;
+    }
+    
+    .title {
+        font-size: 18px;
     }
 }

@@ -2,7 +2,6 @@ import { lazy } from "react";
 
 const HomePage = lazy(() => import("../pages/HomePage/HomePage"));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage/NotFoundPage"));
-const ProductPage = lazy(() => import("../pages/productPage/ProductPage"));
 const ProductDetail = lazy(() =>
   import("../pages/ProductDetails/ProductDetail")
 );
@@ -43,12 +42,7 @@ export const routes = [
   //   isShowHeader: true,
   //   isPrivate: false,
   // },
-  {
-    path: "/products",
-    page: ProductPage,
-    isShowHeader: true,
-    isPrivate: false,
-  },
+
   {
     path: "/products/:id",
     page: ProductDetail,

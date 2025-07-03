@@ -13,7 +13,6 @@ import {
   Avatar,
   Button,
   Steps,
-  Divider,
   notification,
   Select,
   Modal,
@@ -41,13 +40,12 @@ import {
   MailOutlined,
   HistoryOutlined,
   EditOutlined,
-  CheckCircleOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 
-const { Title, Text, Paragraph } = Typography;
-const { Step } = Steps;
+const { Title, Text } = Typography;
 const { Option } = Select;
+const { Step } = Steps;
 
 const getStatusInfo = (status) => {
   switch (status) {
@@ -288,7 +286,9 @@ function AdminOrderDetail() {
 
   if (loading) {
     return (
-      <Spin size="large" style={{ display: "block", marginTop: "50px" }} />
+      <div className={styles.loadingContainer}>
+        <Spin size="large" />
+      </div>
     );
   }
 
@@ -382,11 +382,10 @@ function AdminOrderDetail() {
 
   return (
     <div className={styles.container}>
-      <Button 
-        type="default" 
-        icon={<ArrowLeftOutlined />} 
+      <Button
+        type="default"
+        icon={<ArrowLeftOutlined />}
         onClick={handleBackToList}
-        style={{ marginBottom: 16 }}
         className={styles.backButton}
       >
         Quay lại
@@ -409,17 +408,17 @@ function AdminOrderDetail() {
             <Row gutter={[16, 16]}>
               {" "}
               <Col xs={24} md={12}>
-                <Space direction="vertical" style={{ width: "100%" }}>
-                  <div>
+                <div className={styles.statusSection}>
+                  <div className={styles.statusDisplay}>
                     <Text strong>Trạng thái đơn hàng:</Text>
                     {getStatusInfo(order.orderStatus).tag}
                   </div>
-                  <Space>
+                  <div className={styles.statusControls}>
                     <Text strong>Thay đổi thành:</Text>
                     <Select
                       value={selectedStatus}
                       onChange={handleStatusChange}
-                      style={{ width: 180 }}
+                      className={styles.statusSelect}
                     >
                       <Option value="payment_failed">
                         Thanh toán thất bại
@@ -436,12 +435,12 @@ function AdminOrderDetail() {
                     >
                       Cập nhật
                     </Button>
-                  </Space>
-                </Space>
+                  </div>
+                </div>
               </Col>
               <Col xs={24} md={12}>
-                <Space direction="vertical" style={{ width: "100%" }}>
-                  <div>
+                <div className={styles.paymentSection}>
+                  <div className={styles.paymentDisplay}>
                     <Text strong>Trạng thái thanh toán:</Text>
                     <Tag color={order.isPaid ? "green" : "volcano"}>
                       {order.isPaid ? "ĐÃ THANH TOÁN" : "CHƯA THANH TOÁN"}
@@ -451,7 +450,7 @@ function AdminOrderDetail() {
                   {/* Chỉ hiện nút cập nhật thanh toán cho các trường hợp đặc biệt, không phải VNPAY và chưa giao hàng */}
                   {order.paymentMethod !== "VNPAY" &&
                     order.orderStatus !== "delivered" && (
-                      <Space>
+                      <div className={styles.paymentControls}>
                         <Text strong>Cập nhật:</Text>
                         <Button
                           type="primary"
@@ -463,11 +462,11 @@ function AdminOrderDetail() {
                             : "Đánh dấu đã thanh toán"}
                         </Button>
                         {order.paymentMethod === "COD" && (
-                          <Text type="secondary" italic>
+                          <Text type="secondary" className={styles.paymentNote}>
                             (Sẽ tự động được đánh dấu khi giao hàng)
                           </Text>
                         )}
-                      </Space>
+                      </div>
                     )}
 
                   {/* Hiển thị thông báo cho VNPAY */}
@@ -485,7 +484,7 @@ function AdminOrderDetail() {
                         động cập nhật.
                       </Text>
                     )}
-                </Space>
+                </div>
               </Col>
             </Row>
           </Card>
@@ -505,7 +504,6 @@ function AdminOrderDetail() {
                   <UserOutlined /> Thông tin khách hàng
                 </span>
               }
-              style={{ marginBottom: 24 }}
               className={styles.customerCard}
               size="small"
             >
@@ -602,9 +600,7 @@ function AdminOrderDetail() {
                           {new Date(history.updatedAt).toLocaleString()}
                         </div>
                         {history.note && (
-                          <div
-                            style={{ marginTop: "5px", fontStyle: "italic" }}
-                          >
+                          <div className={styles.historyNote}>
                             {history.note}
                           </div>
                         )}
@@ -742,7 +738,7 @@ function AdminOrderDetail() {
                   label={<Text strong>Tổng thanh toán</Text>}
                   className={styles.totalPrice}
                 >
-                  <Text strong style={{ fontSize: "1.2rem", color: "#ff4d4f" }}>
+                  <Text strong className={styles.totalAmount}>
                     {order.totalPrice.toLocaleString()}đ
                   </Text>
                 </Descriptions.Item>
@@ -770,7 +766,7 @@ function AdminOrderDetail() {
             description="Hành động này sẽ hủy đơn hàng và không thể hoàn tác. Nếu đơn hàng đã thanh toán, hệ thống sẽ đánh dấu để hoàn tiền cho khách hàng."
             type="warning"
             showIcon
-            style={{ marginBottom: 16 }}
+            className={styles.modalAlert}
           />
         )}
 
@@ -809,7 +805,7 @@ function AdminOrderDetail() {
             description="Đơn hàng COD sẽ tự động được đánh dấu là đã thanh toán khi trạng thái đơn hàng chuyển thành 'Đã giao hàng'."
             type="info"
             showIcon
-            style={{ marginBottom: 16 }}
+            className={styles.modalAlert}
           />
         )}
 
@@ -819,7 +815,7 @@ function AdminOrderDetail() {
             description="Đánh dấu đơn hàng này là chưa thanh toán có thể ảnh hưởng đến báo cáo tài chính."
             type="warning"
             showIcon
-            style={{ marginBottom: 16 }}
+            className={styles.modalAlert}
           />
         )}
 

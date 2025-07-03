@@ -1,86 +1,192 @@
-.SideBar {
-    width: 230px;
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 24px;
-    height: fit-content;
-    z-index: 2;
+/* === Search Page Styles === */
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.statusContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.mainContent {
+  display: flex;
+  padding-top: 16px;
+  gap: 24px;
+  min-height: calc(100vh - 200px);
+}
+
+/* === Sidebar === */
+.sidebar {
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+  z-index: 2;
+  gap: 16px;
+}
+
+/* === Content === */
+.content {
+  flex: 1;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.contentList {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+
+.contentList:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* === Breadcrumb === */
+.breadcrumb {
+  margin-bottom: 20px;
+}
+
+.breadcrumb h1 {
+  color: #1a1a1a;
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.breadcrumb a {
+  color: #667eea;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.breadcrumb a:hover {
+  color: #5a6fdb;
+  text-decoration: underline;
+}
+
+.resultCount {
+  color: #666;
+  font-size: 14px;
+  margin: 8px 0 0 0;
+}
+
+/* === Product Grid === */
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+/* === Responsive Design === */
+
+/* Large Desktop */
+@media screen and (min-width: 1400px) {
+  .container {
+    padding: 0 24px;
+  }
+  
+  .productGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Desktop */
+@media screen and (max-width: 1200px) {
+  .productGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Tablet Large */
+@media screen and (max-width: 1100px) {
+  .mainContent {
     gap: 16px;
-}
-.type-product-page-container {
-    padding-left: 0;
-    margin-right: auto;
-    margin-left: auto;
-}
-
-div {
-    display: block;
-    unicode-bidi: isolate;
+  }
+  
+  .productGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-*,
-::before,
-::after {
-    box-sizing: border-box;
+/* Tablet */
+@media screen and (max-width: 992px) {
+  .container {
+    padding: 0 12px;
+  }
+  
+  .productGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .contentList {
+    padding: 16px;
+  }
 }
 
-.type-product-page {
-    display: flex;
-    padding-top: 16px;
-    justify-content: space-between;
+/* Mobile Large - 2 products per row */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 0 8px;
+  }
+  
+  .mainContent {
+    padding-top: 12px;
+  }
+  
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .contentList {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  .breadcrumb h1 {
+    font-size: 16px;
+  }
 }
 
-.type-product-page-content {
-    width: calc(100% - 254px);
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-width: 0;
-}
-
-@media (max-width: 1100px) {
-    .type-product-page-content {
-        max-width: 100%;
-        padding: 0 4px;
-    }
-    .SideBar {
-        display: none;
-    }
-}
-
-.type-product-page-list {
-    background-color: #fff;
-    border-radius: 4px;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-.product-detail-breadcrumb h1 {
-    color: #1a1a1a;
-    font-family: Inter, sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 22px;
-    margin-bottom: 18px;
-    margin-top: 0;
-    letter-spacing: 0.01em;
-}
-
-.product-detail-breadcrumb a {
-    color: #1a94ff;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-.product-detail-breadcrumb a:hover {
-    color: #1769ff;
-    text-decoration: underline;
-}
-
-/* Responsive giống HomePage */
-@media only screen and (min-width: 1440px) {
-    .type-product-page-container {
-        width: 1440px;
-    }
+/* Mobile - 2 products per row */
+@media screen and (max-width: 480px) {
+  .container {
+    padding: 0 4px;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+  
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .contentList {
+    padding: 8px;
+    border-radius: 6px;
+    margin-top: 4px;
+  }
+  
+  .breadcrumb h1 {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
 }

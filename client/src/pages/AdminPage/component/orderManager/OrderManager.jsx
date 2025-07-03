@@ -6,7 +6,6 @@ import {
   Alert,
   Button,
   Tag,
-  Space,
   message,
   Tooltip,
   Modal,
@@ -38,7 +37,7 @@ const OrderManager = () => {
     queryKey: ["orders", pagination.current, pagination.pageSize],
     queryFn: () =>
       orderService.getAllOrders(pagination.pageSize, pagination.current - 1),
-    keepPreviousData: true, // Giữ lại dữ liệu cũ khi đang fetch dữ liệu mới
+    keepPreviousData: true,
   });
 
   // Mở modal xuất Excel
@@ -187,7 +186,7 @@ const OrderManager = () => {
     // Cuộn trang lên đầu sau khi chuyển trang
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // Tạo hiệu ứng cuộn mượt
+      behavior: "smooth",
     });
   };
   const columns = [
@@ -280,7 +279,7 @@ const OrderManager = () => {
       key: "createdAt",
       render: (date) => new Date(date).toLocaleDateString("vi-VN"),
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
-      defaultSortOrder: "descend", // Mặc định sắp xếp theo thời gian mới nhất
+      defaultSortOrder: "descend",
     },
     {
       title: "Hành động",
@@ -294,7 +293,6 @@ const OrderManager = () => {
   ];
 
   if (isLoading && !queryData) {
-    // Chỉ hiển thị loading toàn trang khi chưa có dữ liệu
     return (
       <div className={styles.loadingContainer}>
         <Spin size="large" />
@@ -310,7 +308,7 @@ const OrderManager = () => {
   return (
     <div className={styles.orderManagerContainer}>
       <div className={styles.headerContainer}>
-        <h2>Quản lý đơn hàng</h2>
+        <div className={styles.title}>Quản lý đơn hàng</div>
         <Tooltip title="Xuất danh sách đơn hàng ra Excel">
           <Button
             type="primary"
@@ -327,7 +325,7 @@ const OrderManager = () => {
         columns={columns}
         dataSource={queryData?.data || []}
         rowKey="_id"
-        loading={isLoading || isFetching} // Hiển thị loading trên bảng khi fetch lại hoặc đang chờ dữ liệu mới
+        loading={isLoading || isFetching}
         pagination={{
           ...pagination,
           total: queryData?.total || 0,
@@ -341,7 +339,6 @@ const OrderManager = () => {
         onChange={handleTableChange}
         scroll={{ x: true }}
       />
-      {/* Modal xác nhận xuất Excel */}
       <Modal
         title="Xuất danh sách đơn hàng"
         open={exportModalVisible}
