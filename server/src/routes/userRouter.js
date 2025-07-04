@@ -30,5 +30,13 @@ router.post(
   authUserMiddleware,
   userController.removeFavorite
 );
+router.get("/getCart/:userId", authUserMiddleware, userController.getCart);
+router.post("/addToCart", authUserMiddleware, userController.addToCart);
+router.put("/updateCartItem", authUserMiddleware, userController.updateCart);
+router.delete(
+  "/removeFromCart",
+  authUserMiddleware,
+  userController.removeFromCart
+);
 
 module.exports = router;

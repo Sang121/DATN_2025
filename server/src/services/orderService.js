@@ -161,7 +161,7 @@ const createOrder = (orderData) => {
         if (
           !item.id ||
           !item.name ||
-          !item.price ||
+          !item.newPrice ||
           !item.amount ||
           !item.product
         ) {

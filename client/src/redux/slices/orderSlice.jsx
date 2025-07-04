@@ -32,6 +32,9 @@ const orderSlice = createSlice({
         state.orderItems.push(newItem);
       }
     },
+    setOrderItems: (state, action) => {
+      state.orderItems = action.payload;
+    },
     updateOrderItem: (state, action) => {
       const newItem = action.payload;
       const existingItem = state.orderItems.find(
@@ -52,7 +55,6 @@ const orderSlice = createSlice({
       state.totalPrice = action.payload.totalPrice;
       state.totalDiscount = action.payload.totalDiscount;
       state.shippingInfo = action.payload.shippingInfo;
-
     },
     removeOrderItem: (state, action) => {
       const id = action.payload;
@@ -73,13 +75,12 @@ const orderSlice = createSlice({
         user: state.user,
       };
     },
-    clearOrder: (state) => {
-      const orderItemsToKeep = state.orderItems.filter(
-        (item) => !state.items.some((orderedItem) => orderedItem.id === item.id)
-      );
+    clearOrder: () => {
       return {
         ...initialState,
-        orderItems: orderItemsToKeep,
+        orderItems: [],
+        shippingInfo: {},
+        user: "",
       };
     },
   },
@@ -87,6 +88,7 @@ const orderSlice = createSlice({
 
 export const {
   addOrderItem,
+  setOrderItems,
   updateOrderItem,
   updateShippingInfo,
   removeOrderItem,

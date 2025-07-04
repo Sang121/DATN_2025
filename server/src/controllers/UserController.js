@@ -216,6 +216,75 @@ const removeFavorite = async (req, res) => {
     return res.status(500).json({ message: error.message, error });
   }
 };
+const getCart = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    if (!userId) {
+      return res.status(400).json({
+        status: "Err",
+        message: "User ID is required",
+      });
+    }
+
+    const response = await UserService.getCart(userId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error });
+  }
+};
+const addToCart = async (req, res) => {
+  try {
+    const userId = req.headers.userid;
+    const product = req.body.productId;
+    if (!userId || !product) {
+      return res.status(400).json({
+        status: "Err",
+        message: "User ID and Product are required",
+      });
+    }
+
+    const response = await UserService.addToCart(userId, product);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error });
+  }
+};
+const updateCart = async (req, res) => {
+  try {
+    const userId = req.headers.userid;
+    const { id, amount } = req.body;
+
+    if (!userId || !id || amount === undefined) {
+      return res.status(400).json({
+        status: "Err",
+        message: "User ID, Product ID, and amount are required",
+      });
+    }
+
+    const response = await UserService.updateCart(userId, id, amount);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error });
+  }
+};
+const removeFromCart = async (req, res) => {
+  try {
+    const userId = req.headers.userid;
+    const { id } = req.body;
+
+    if (!userId || !id) {
+      return res.status(400).json({
+        status: "Err",
+        message: "User ID and id are required",
+      });
+    }
+    const response = await UserService.removeFromCart(userId, id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error });
+  }
+};
 module.exports = {
   createUser,
   loginUser,
@@ -228,4 +297,8 @@ module.exports = {
   refreshToken,
   logoutUser,
   checkToken,
+  getCart,
+  addToCart,
+  updateCart,
+  removeFromCart,
 };

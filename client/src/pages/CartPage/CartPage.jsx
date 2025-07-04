@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Checkbox, Input, Button, Card, message } from "antd";
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import styles from "./CartPage.module.css";
@@ -13,6 +13,7 @@ import ChangeInfo from "../../utils/changeInfo";
 import { useNavigate } from "react-router-dom";
 import SignInPage from "../SignInPage/SignInPage";
 import SignUpPage from "../SignUpPage/SignUpPage";
+import { removeFromCart, updateCartItem } from "../../services/userService";
 
 function CartPage() {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -24,8 +25,26 @@ function CartPage() {
   const order = useSelector((state) => state.order);
   const cartItems = order.orderItems;
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
+  const debounceTimeout = useRef(null);
+
+  // Debounced function to update the cart on the server
+  const debouncedUpdateAPI = useCallback((itemId, newQuantity) => {
+    // Clear the previous timeout if it exists
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    // Set a new timeout
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        await updateCartItem(itemId, newQuantity);
+      } catch (error) {
+        console.error("Failed to update cart item:", error);
+        message.error("Có lỗi khi cập nhật giỏ hàng.");
+      }
+    }, 500); // 500ms delay
+  }, []);
 
   // Auto scroll to top when component mounts
   useEffect(() => {
@@ -80,7 +99,7 @@ function CartPage() {
   const summaryDiscount = selectedItems.reduce((acc, item) => {
     const itemData = cartItems.find((cartItem) => cartItem.id === item);
     if (itemData && itemData.isDiscount) {
-      const discountPerItem = itemData.originalPrice - itemData.price;
+      const discountPerItem = itemData.originalPrice - itemData.newPrice;
       const totalDiscount = discountPerItem * itemData.amount;
       return acc + totalDiscount;
     }
@@ -117,6 +136,8 @@ function CartPage() {
           amount: newQuantity,
         })
       );
+      // Call the debounced function to update the backend
+      debouncedUpdateAPI(itemId, newQuantity);
     }
   };
 
@@ -125,8 +146,14 @@ function CartPage() {
     return new Intl.NumberFormat("vi-VN").format(roundedPrice) + "đ";
   };
 
-  const handleRemoveItem = (itemId) => {
+  const handleRemoveItem = async (itemId) => {
     dispatch(removeOrderItem(itemId));
+    const res = await removeFromCart(itemId);
+    if (res) {
+      message.success("Xóa sản phẩm khỏi giỏ hàng thành công!", res);
+    } else {
+      message.error("Có lỗi xảy ra khi xóa sản phẩm khỏi giỏ hàng.", res);
+    }
   };
 
   const handleChangeInfo = () => {
@@ -331,7 +358,7 @@ function CartPage() {
               {item.isDiscount ? (
                 <div className={styles.itemPrice}>
                   <div className={styles.discountedPrice}>
-                    {formatPrice(Math.floor(item.price))}
+                    {formatPrice(Math.floor(item.newPrice))}
                   </div>
                   <div className={styles.originalPrice}>
                     {formatPrice(Math.floor(item.originalPrice))}
@@ -339,7 +366,7 @@ function CartPage() {
                 </div>
               ) : (
                 <div className={styles.currentPrice}>
-                  {formatPrice(Math.floor(item.price))}
+                  {formatPrice(Math.floor(item.newPrice))}
                 </div>
               )}
               <div className={styles.quantityControl}>
@@ -371,7 +398,9 @@ function CartPage() {
               </div>
 
               <div className={styles.totalPrice}>
-                {formatPrice(item.price * (quantities[item.id] || item.amount))}
+                {formatPrice(
+                  item.newPrice * (quantities[item.id] || item.amount)
+                )}
               </div>
 
               <DeleteOutlined

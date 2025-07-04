@@ -1,5 +1,5 @@
 // src/pages/SignInPage/SignInPage.jsx
-import React from "react";
+import React, { use } from "react";
 import { Form, Input, Button, Divider, message as antdMessage } from "antd";
 import {
   FacebookFilled,
@@ -15,7 +15,11 @@ import { signInUser } from "../../services/userService";
 import { getDetailUser } from "../../services/userService";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../../redux/slices/userSlice";
-import { updateShippingInfo } from "../../redux/slices/orderSlice";
+import {
+  addOrderItem,
+  updateShippingInfo,
+} from "../../redux/slices/orderSlice";
+import { add } from "lodash";
 function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
@@ -40,6 +44,7 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
       let userDetail = null;
       if (userId) {
         const res = await getDetailUser(userId, access_token);
+
         userDetail = res.data;
       } else {
         console.error("Không thể lấy userId từ token", userDetail);
@@ -55,10 +60,16 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
         email: userDetail?.email || decodedToken?.email || "",
         phone: userDetail?.phone || decodedToken?.phone || "",
         favorite: userDetail?.favorite || decodedToken?.favorite || [],
+        cart: userDetail?.cart || decodedToken?.cart || [],
         isAdmin: userDetail?.isAdmin || false,
         access_token: access_token,
       };
-      dispatch(updateUser(userDataToDispatch)); // Cập nhật Redux store
+
+      dispatch(updateUser(userDataToDispatch));
+      userDataToDispatch.cart.map((item) => {
+        dispatch(addOrderItem(item));
+      });
+
       dispatch(
         updateShippingInfo({
           fullName: userDataToDispatch.fullName,
@@ -67,6 +78,7 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
           email: userDataToDispatch.email,
         })
       );
+
       if (onLoginSuccess) {
         onLoginSuccess(userDataToDispatch);
       }

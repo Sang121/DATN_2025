@@ -8,6 +8,7 @@ const initialState = {
   address: "",
   email: "",
   favorite: [],
+  cart: [],
   phone: "",
   access_token: "",
   isAuthenticated: false,
@@ -28,6 +29,7 @@ export const userSlice = createSlice({
       state.address = action.payload.address || "";
       state.gender = action.payload.gender || "";
       state.favorite = action.payload.favorite || [];
+      state.cart = action.payload.cart || [];
       state.phone = action.payload.phone || "";
       state.access_token = action.payload.access_token || "";
       state.isAdmin = action.payload.isAdmin || false;

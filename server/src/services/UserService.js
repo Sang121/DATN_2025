@@ -292,6 +292,106 @@ const removeFavorite = (userId, productId) => {
     }
   });
 };
+const getCart = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return reject({ status: "Err", message: "User not found" });
+      }
+      resolve({
+        status: "Ok",
+        message: "Cart retrieved successfully",
+        data: user.cart,
+      });
+    } catch (error) {
+      reject({ message: "Server error while retrieving cart", error });
+    }
+  });
+};
+const addToCart = (userId, product) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return reject({ status: "Err", message: "User not found" });
+      }
+      const existingCartItem = user.cart.find(
+        (item) => item.variantId === product.id
+      );
+      console.log("existingCartItem", existingCartItem);
+      console.log("product", product);
+      if (existingCartItem) {
+        const oldAmount = existingCartItem.amount;
+
+        existingCartItem.amount = oldAmount + (product.amount || 1);
+
+        await user.save();
+
+        resolve({
+          status: "Ok",
+          message: "Product amount updated in cart",
+          data: {
+            productId: product.productId,
+            variantId: product.variantId,
+            oldAmount: oldAmount,
+            newAmount: existingCartItem.amount,
+          },
+        });
+      } else {
+        product.amount = product.amount || 1;
+        user.cart.push(product);
+        await user.save();
+        resolve({
+          status: "Ok",
+          message: "Product added to cart",
+          data: {
+            productId: product.productId,
+            variantId: product.variantId,
+            amount: product.amount,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error in addToCart:", error);
+      reject({ message: "Server error while adding to cart", error });
+    }
+  });
+};
+const updateCart = (userId, id, amount) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return reject({ status: "Err", message: "User not found" });
+      }
+      const cartItem = user.cart.find((item) => item.id === id);
+      if (!cartItem) {
+        return reject({ status: "Err", message: "Product not found in cart" });
+      }
+      cartItem.amount = amount;
+      await user.save();
+      resolve({ status: "Ok", message: "Cart updated successfully" });
+    } catch (error) {
+      reject({ message: "Server error while updating cart", error });
+    }
+  });
+};
+const removeFromCart = (userId, id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return reject({ status: "Err", message: "User not found" });
+      }
+      user.cart = user.cart.filter((item) => item.id !== id);
+      await user.save();
+      resolve({ status: "Ok", message: "Product removed from cart" });
+    } catch (error) {
+      reject({ message: "Server error while removing from cart", error });
+    }
+  });
+};
 
 module.exports = {
   createUser,
@@ -304,4 +404,8 @@ module.exports = {
   getDetailUser,
   refreshToken,
   logoutUser,
+  getCart,
+  addToCart,
+  updateCart,
+  removeFromCart,
 };

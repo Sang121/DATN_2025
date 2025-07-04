@@ -148,3 +148,49 @@ export const removeFavorite = async (productId) => {
     throw error;
   }
 };
+
+export const addToCart = async (productId, variantId, amount) => {
+  try {
+    const response = await axiosInstance.post(`/user/addToCart`, {
+      productId,
+      variantId,
+      amount,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error adding product ${productId} to cart with amount ${amount}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+export const updateCartItem = async (id, amount) => {
+  try {
+    const response = await axiosInstance.put(`/user/updateCartItem`, {
+      id,
+      amount,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error updating product ${id} in cart with amount ${amount}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+export const removeFromCart = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/user/removeFromCart`, {
+      data: { id },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error removing product ${id} from cart:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};

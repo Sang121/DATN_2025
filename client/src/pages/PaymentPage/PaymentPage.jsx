@@ -10,6 +10,7 @@ import {
 } from "../../services/orderService";
 import { useNavigate } from "react-router-dom";
 import vnpayLogo from "../../assets/VnpayLogo.png"; // Ensure you have this logo in your assets
+import { removeFromCart } from "../../services/userService";
 function PaymentPage() {
   const order = useSelector((state) => state.order);
   const [paymentMethod, setPaymentMethod] = useState("COD");
@@ -54,6 +55,10 @@ function PaymentPage() {
         const res = await createOrder(orderData);
         if (res.status === "Success") {
           message.success("Đặt hàng thành công!");
+          order.items.map(async (item) => {
+            const res = await removeFromCart(item.id);
+            console.log(" Removed item from cart:", res);
+          });
           navigate("/payment-success", {
             state: {
               orderId: res.data._id,
@@ -86,6 +91,7 @@ function PaymentPage() {
           // Step 2: Prepare data and get payment URL from server
           const paymentData = {
             amount: `${orderData.totalPrice}`,
+
             orderId: newOrderId,
             bankCode: "", // Explicitly set bankCode
           };
@@ -105,7 +111,6 @@ function PaymentPage() {
               "Không thể lấy được URL thanh toán. Đơn hàng đã được hủy."
             );
 
-            // Hủy đơn hàng với ID đúng (newOrderId thay vì order._id)
             const cancelResult = await cancelOrder(newOrderId);
             if (cancelResult.status === "Success") {
               message.info("Đơn hàng đã được hủy thành công.");

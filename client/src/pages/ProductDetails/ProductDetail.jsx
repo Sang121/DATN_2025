@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getDetailProduct } from "../../services/productService";
 import { useDispatch } from "react-redux";
 import { addOrderItem } from "../../redux/slices/orderSlice";
+import { addToCart } from "../../services/userService";
 function ProductDetail() {
   const { id } = useParams();
   const [selectedSize, setSelectedSize] = useState("");
@@ -179,7 +180,7 @@ function ProductDetail() {
       setAvailableSizes(getSizesForColor(color));
     }
   };
-  const handleAddToCart = (size, color, quantity) => {
+  const handleAddToCart = async (size, color, quantity) => {
     if (userId === undefined) {
       message.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
       return;
@@ -190,7 +191,7 @@ function ProductDetail() {
         name: product.name,
         amount: quantity,
         originalPrice: productPrice.oldPrice,
-        price: productPrice.newPrice,
+        newPrice: productPrice.newPrice,
         image: selectedImage,
         isDiscount: product.discount > 0,
         variant: {
@@ -200,9 +201,26 @@ function ProductDetail() {
           stock: getStockForVariant(selectedSize, selectedColor),
         },
         product: product._id,
-        isUpdate: false,
       })
     );
+    const cartItemPayload = {
+      id: getIdForVariant(selectedSize, selectedColor),
+      name: product.name,
+      amount: quantity,
+      originalPrice: productPrice.oldPrice,
+      newPrice: productPrice.newPrice,
+      image: selectedImage,
+      isDiscount: product.discount > 0,
+      variant: {
+        idVariant: getIdForVariant(selectedSize, selectedColor),
+        size: selectedSize,
+        color: selectedColor,
+        stock: getStockForVariant(selectedSize, selectedColor),
+      },
+      product: product._id,
+    };
+    const res = await addToCart(cartItemPayload);
+    console.log("Add to cart response:", res);
     message.success("Sản phẩm đã được thêm vào giỏ hàng");
   };
   return (

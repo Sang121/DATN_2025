@@ -11,6 +11,38 @@ const modelUser = new Schema(
     phone: { type: String, require: true },
     address: { type: String, require: true },
     isAdmin: { type: Boolean, default: false },
+    cart: [
+      {
+        _id: false,
+        id: {
+          type: String,
+          required: true,
+        },
+        product: {
+          type: String,
+          required: true,
+        },
+
+        name: { type: String },
+
+        amount: {
+          type: Number,
+          required: true,
+          default: 1,
+        },
+        originalPrice: { type: Number, required: true },
+        image: { type: String, required: true },
+
+        newPrice: { type: Number, required: true },
+        isDiscount: { type: Boolean, default: false },
+        variant: {
+          idVariant: { type: String, required: true },
+          size: { type: String, required: true },
+          color: { type: String, required: true },
+          stock: { type: Number, required: true },
+        },
+      },
+    ],
     favorite: { type: Array, default: [] },
     access_token: { type: String, default: null },
     refresh_token: { type: String, default: null },

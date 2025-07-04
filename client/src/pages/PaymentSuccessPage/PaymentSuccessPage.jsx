@@ -6,6 +6,7 @@ import styles from "./PaymentSuccessPage.module.css";
 import { useDispatch } from "react-redux";
 import { clearImmediateOrder } from "../../redux/slices/orderSlice";
 import { updateOrderAfterPayment } from "../../services/orderService";
+import { removeFromCart } from "../../redux/slices/orderSlice";
 
 function PaymentSuccessPage() {
   const dispatch = useDispatch();
@@ -16,7 +17,6 @@ function PaymentSuccessPage() {
   const [totalAmount, setTotalAmount] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const code = location.state?.code;
-
   useEffect(() => {
     // Log for debugging
     console.log("Location search:", location.search);
@@ -65,12 +65,12 @@ function PaymentSuccessPage() {
             }
           } catch (updateError) {
             console.error("Lỗi khi cập nhật trạng thái đơn hàng:", updateError);
-            // Vẫn hiển thị thành công vì thanh toán đã thành công,
-            // chỉ có cập nhật frontend bị lỗi
           }
 
           setPaymentSuccess(true);
           dispatch(clearImmediateOrder());
+
+          // const res = await removeFromCart(itemId);
           console.log(
             "VNPAY payment success (from URL), order ID:",
             originalOrderId
@@ -98,6 +98,7 @@ function PaymentSuccessPage() {
       setTotalAmount(location.state.totalAmount);
       setPaymentSuccess(true);
       dispatch(clearImmediateOrder());
+
       console.log(
         "Payment success (fallback), order ID:",
         location.state.orderId
