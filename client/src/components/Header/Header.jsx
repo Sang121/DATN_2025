@@ -262,6 +262,12 @@ function AppHeader({ onShowSignIn }) {
                 trigger={["click"]}
                 placement="bottomRight"
                 className={styles.userDropdown}
+                getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                destroyPopupOnHide={true}
+                overlayStyle={{
+                  position: 'fixed',
+                  zIndex: 9999,
+                }}
               >
                 <div className={styles.userProfile}>
                   <Avatar

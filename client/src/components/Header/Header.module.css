@@ -284,6 +284,15 @@
 }
 
 /* === User Profile === */
+.userDropdown {
+  position: relative;
+}
+
+.userDropdown :global(.ant-dropdown) {
+  position: fixed !important;
+  z-index: 9999 !important;
+}
+
 .userProfile {
   display: flex;
   align-items: center;
@@ -635,6 +644,16 @@
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15) !important;
   border: none !important;
   padding: 8px !important;
+  position: relative !important;
+  z-index: 9999 !important;
+  margin-top: 8px !important;
+  transform: none !important;
+}
+
+/* Đảm bảo dropdown hiển thị đúng vị trí khi header scroll */
+.header :global(.ant-dropdown) {
+  position: fixed !important;
+  z-index: 9999 !important;
 }
 
 .header :global(.ant-dropdown-menu-item) {
@@ -880,3 +899,4 @@
     display: none !important;
   }
 }
+
