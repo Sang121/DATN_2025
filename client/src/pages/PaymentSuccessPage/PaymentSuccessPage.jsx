@@ -6,7 +6,7 @@ import styles from "./PaymentSuccessPage.module.css";
 import { useDispatch } from "react-redux";
 import { clearImmediateOrder } from "../../redux/slices/orderSlice";
 import { updateOrderAfterPayment } from "../../services/orderService";
-import { removeFromCart } from "../../redux/slices/orderSlice";
+import { removeFromCart } from "../../services/userService";
 
 function PaymentSuccessPage() {
   const dispatch = useDispatch();
@@ -87,6 +87,24 @@ function PaymentSuccessPage() {
         setTotalAmount(location.state.totalAmount);
         setPaymentSuccess(true);
         dispatch(clearImmediateOrder());
+        (async () => {
+          if (location.state?.orderItems) {
+            const removalPromises = location.state.orderItems.map((item) => {
+              console.log("Removing item from cart (COD):", item);
+              return removeFromCart(item.variant?.idVariant || item.id);
+            });
+            try {
+              const results = await Promise.all(removalPromises);
+              console.log(
+                "Tất cả sản phẩm đã được xóa khỏi giỏ hàng (COD):",
+                results
+              );
+            } catch (error) {
+              console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng (COD):", error);
+              message.error("Có lỗi xảy ra khi cập nhật giỏ hàng của bạn.");
+            }
+          }
+        })();
         console.log("COD payment success, order ID:", location.state.orderId);
       } else {
         console.error("Missing order info in state for COD payment");
@@ -98,6 +116,25 @@ function PaymentSuccessPage() {
       setTotalAmount(location.state.totalAmount);
       setPaymentSuccess(true);
       dispatch(clearImmediateOrder());
+
+      // Xóa sản phẩm khỏi giỏ hàng cho fallback case
+      (async () => {
+        if (location.state?.orderItems) {
+          const removalPromises = location.state.orderItems.map((item) => {
+            console.log("Removing item from cart (fallback):", item);
+            return removeFromCart(item.variant?.idVariant || item.id);
+          });
+          try {
+            const results = await Promise.all(removalPromises);
+            console.log(
+              "Tất cả sản phẩm đã được xóa khỏi giỏ hàng (fallback):",
+              results
+            );
+          } catch (error) {
+            console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng (fallback):", error);
+          }
+        }
+      })();
 
       console.log(
         "Payment success (fallback), order ID:",

@@ -55,12 +55,10 @@ function PaymentPage() {
         const res = await createOrder(orderData);
         if (res.status === "Success") {
           message.success("Đặt hàng thành công!");
-          order.items.map(async (item) => {
-            const res = await removeFromCart(item.id);
-            console.log(" Removed item from cart:", res);
-          });
+
           navigate("/payment-success", {
             state: {
+              orderItems: order.items,
               orderId: res.data._id,
               totalAmount: order.totalPrice,
               code: "01",
