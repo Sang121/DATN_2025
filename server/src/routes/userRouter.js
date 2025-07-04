@@ -20,5 +20,15 @@ router.get(
 );
 router.get("/refreshToken", userController.refreshToken);
 router.get("/check-token", authUserMiddleware, userController.checkToken);
+router.post(
+  "/add-favorite/:productId",
+  authUserMiddleware,
+  userController.addFavorite
+);
+router.post(
+  "/remove-favorite/:productId",
+  authUserMiddleware,
+  userController.removeFavorite
+);
 
 module.exports = router;

@@ -11,6 +11,7 @@ const modelUser = new Schema(
     phone: { type: String, require: true },
     address: { type: String, require: true },
     isAdmin: { type: Boolean, default: false },
+    favorite: { type: Array, default: [] },
     access_token: { type: String, default: null },
     refresh_token: { type: String, default: null },
     avatar: { type: String, default: null },

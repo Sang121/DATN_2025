@@ -7,6 +7,7 @@ const initialState = {
   avatar: "",
   address: "",
   email: "",
+  favorite: [],
   phone: "",
   access_token: "",
   isAuthenticated: false,
@@ -26,10 +27,14 @@ export const userSlice = createSlice({
       state.email = action.payload.email || "";
       state.address = action.payload.address || "";
       state.gender = action.payload.gender || "";
+      state.favorite = action.payload.favorite || [];
       state.phone = action.payload.phone || "";
       state.access_token = action.payload.access_token || "";
       state.isAdmin = action.payload.isAdmin || false;
       state.isAuthenticated = !!action.payload.access_token; // Đặt isAuthenticated dựa trên access_token
+    },
+    updateFavorite: (state, action) => {
+      state.favorite = action.payload.favorite || [];
     },
     logout: (state) => {
       state._id = "";
@@ -39,6 +44,7 @@ export const userSlice = createSlice({
       state.address = "";
       state.email = "";
       state.gender = "";
+      state.favorite = [];
       state.phone = "";
       state.isAdmin = false;
       state.isAuthenticated = false;
@@ -46,5 +52,5 @@ export const userSlice = createSlice({
     },
   },
 });
-export const { updateUser, logout } = userSlice.actions;
+export const { updateUser, logout, updateFavorite } = userSlice.actions;
 export default userSlice.reducer;

@@ -54,6 +54,7 @@ function SignInPage({ open, onClose, onSwitchToSignUp, onLoginSuccess }) {
         address: userDetail?.address || decodedToken?.address || "",
         email: userDetail?.email || decodedToken?.email || "",
         phone: userDetail?.phone || decodedToken?.phone || "",
+        favorite: userDetail?.favorite || decodedToken?.favorite || [],
         isAdmin: userDetail?.isAdmin || false,
         access_token: access_token,
       };

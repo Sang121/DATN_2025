@@ -178,12 +178,51 @@ const checkToken = async (req, res) => {
     });
   }
 };
+const addFavorite = async (req, res) => {
+  try {
+    const userId = req.headers.userid;
 
+    const { productId } = req.params;
+
+    if (!userId || !productId) {
+      return res.status(400).json({
+        status: "Err",
+        message: "User ID and Product ID are required",
+      });
+    }
+
+    const response = await UserService.addFavorite(userId, productId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error });
+  }
+};
+const removeFavorite = async (req, res) => {
+  try {
+    const userId = req.headers.userid;
+
+    const { productId } = req.params;
+
+    if (!userId || !productId) {
+      return res.status(400).json({
+        status: "Err",
+        message: "User ID and Product ID are required",
+      });
+    }
+
+    const response = await UserService.removeFavorite(userId, productId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error });
+  }
+};
 module.exports = {
   createUser,
   loginUser,
   updateUser,
   deleteUser,
+  addFavorite,
+  removeFavorite,
   getAllUser,
   getDetailUser,
   refreshToken,

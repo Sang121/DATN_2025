@@ -12,7 +12,7 @@
   position: relative;
   border: 1px solid #f0f0f0;
   height: auto;
-  min-height: 350px;
+  min-height: 300px;
 }
 
 .product-card:hover {
@@ -96,7 +96,7 @@
   padding: 12px;
   gap: 8px;
   flex: 1;
-  min-height: 150px;
+
 }
 
 /* === Product Name === */
@@ -153,9 +153,34 @@
 .product-sold {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   font-size: 11px;
   color: #666;
   margin-top: auto;
+}
+.favorite-button {
+  color: black;
+  font-size: 20px;
+  margin-left: 4px;
+}
+.favorite-button:hover {
+  content: "Thêm vào yêu thích";
+}
+
+.favoriteIconAnimate {
+  animation: heartBeat 0.5s ease-in-out;
+}
+
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .sold-count {

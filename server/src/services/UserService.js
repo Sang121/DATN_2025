@@ -250,11 +250,56 @@ const logoutUser = (token) => {
     }
   });
 };
+const addFavorite = (userId, productId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return reject({ status: "Err", message: "User not found" });
+      }
+      if (user.favorite.includes(productId)) {
+        return reject({
+          status: "Err",
+          message: "Product already in favorites",
+        });
+      }
+      user.favorite.push(productId);
+      await user.save();
+      resolve({ status: "Ok", message: "Product added to favorites" });
+    } catch (error) {
+      reject({ message: "Server error while adding favorite", error });
+    }
+  });
+};
+const removeFavorite = (userId, productId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return reject({ status: "Err", message: "User not found" });
+      }
+      if (!user.favorite.includes(productId)) {
+        return reject({
+          status: "Err",
+          message: "Product not found in favorites",
+        });
+      }
+      user.favorite = user.favorite.filter((id) => id !== productId);
+      await user.save();
+      resolve({ status: "Ok", message: "Product removed from favorites" });
+    } catch (error) {
+      reject({ message: "Server error while removing favorite", error });
+    }
+  });
+};
+
 module.exports = {
   createUser,
   loginUser,
   updateUser,
   deleteUser,
+  addFavorite,
+  removeFavorite,
   getAllUser,
   getDetailUser,
   refreshToken,

@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./ProductCard.module.css";
 import { Link } from "react-router-dom";
-
+import { HeartFilled, HeartOutlined } from "@ant-design/icons";
+import { Button, message } from "antd";
+import { addFavorite, removeFavorite } from "../../services/userService";
+import { useSelector, useDispatch } from "react-redux";
+import { updateFavorite } from "../../redux/slices/userSlice";
 function ProductCard({
   productId,
   image,
@@ -11,6 +15,11 @@ function ProductCard({
   sold,
   discount,
 }) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const dispatch = useDispatch();
+  const userId = sessionStorage.getItem("userId");
+  const favoriteProducts = useSelector((state) => state.user.favorite);
+  const isFavorite = favoriteProducts?.some((product) => product === productId);
   const newPrice = price - (price * discount) / 100;
   const formattedPrice = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -19,6 +28,25 @@ function ProductCard({
   const productPrice = {
     newPrice: formattedPrice,
     oldPrice: price?.toLocaleString("vi-VN"),
+  };
+  const handleFavorite = (e) => {
+    e.stopPropagation();
+    if (!userId) {
+      message.error("Vui lòng đăng nhập để thêm sản phẩm vào yêu thích.");
+      return;
+    }
+    if (isFavorite) {
+      removeFavorite(userId, productId);
+      dispatch(
+        updateFavorite({
+          favorite: favoriteProducts.filter((id) => id !== productId),
+        })
+      );
+    } else {
+      addFavorite(userId, productId);
+      dispatch(updateFavorite({ favorite: [...favoriteProducts, productId] }));
+      setIsAnimating(true);
+    }
   };
   return (
     <div className={styles["product-card"]}>
@@ -90,6 +118,21 @@ function ProductCard({
               {" "}
               Đã bán {sold ? sold : 0} sản phẩm
             </span>
+            <Button
+              type="text"
+              className={styles["favorite-button"]}
+              onClick={handleFavorite}
+            >
+              {isFavorite ? (
+                <HeartFilled
+                  className={isAnimating ? styles.favoriteIconAnimate : ""}
+                  style={{ color: "#ff424e", border: "none" }}
+                  onAnimationEnd={() => setIsAnimating(false)}
+                />
+              ) : (
+                <HeartOutlined />
+              )}
+            </Button>
           </div>
         </div>
       </div>

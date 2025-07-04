@@ -49,7 +49,6 @@ const { Search } = Input;
 function AppHeader({ onShowSignIn }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -119,15 +118,6 @@ function AppHeader({ onShowSignIn }) {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
-
-  // Cập nhật thời gian hiện tại
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
   }, []);
 
   // Xử lý tìm kiếm
@@ -224,7 +214,17 @@ function AppHeader({ onShowSignIn }) {
             <div className={styles.navItems}>
               <Tooltip title="Yêu thích" placement="bottom">
                 <Link to="/favoriteProducts" className={styles.navItem}>
-                  <HeartOutlined className={styles.navIcon} />
+                  <Badge
+                    count={user.favorite?.length || 0}
+                    size="small"
+                    className={
+                      user.favorite?.length > 0
+                        ? `${styles.badge} ${styles.hasNotifications}`
+                        : styles.badge
+                    }
+                  >
+                    <HeartOutlined className={styles.navIcon} />{" "}
+                  </Badge>
                 </Link>
               </Tooltip>
 
@@ -297,7 +297,19 @@ function AppHeader({ onShowSignIn }) {
                   <ShoppingCartOutlined className={styles.navIcon} />
                 </Badge>
               </Link>
-
+              <Tooltip title="Thông báo" placement="bottom">
+                <div className={styles.navItem}>
+                  <Badge
+                    count={3}
+                    size="small"
+                    className={`${styles.badge} ${styles.hasNotifications}`}
+                  >
+                    <BellOutlined
+                      className={`${styles.navIcon} ${styles.notificationBell}`}
+                    />
+                  </Badge>
+                </div>
+              </Tooltip>
               <Button
                 type="primary"
                 icon={<LoginOutlined />}

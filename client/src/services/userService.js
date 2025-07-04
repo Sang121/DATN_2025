@@ -103,7 +103,7 @@ export const getAllUser = async () => {
   }
 };
 export const deleteUser = async (userId) => {
- try {
+  try {
     const response = await axiosInstance.delete(
       `/user/delete-user/${userId.id}`
     );
@@ -112,6 +112,37 @@ export const deleteUser = async (userId) => {
   } catch (error) {
     console.error(
       `Error delete user  :`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+export const addFavorite = async (productId) => {
+  try {
+    const response = await axiosInstance.post(
+      `/user/add-favorite/${productId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error adding favorite for ${productId}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+export const removeFavorite = async (productId) => {
+  try {
+    const response = await axiosInstance.post(
+      `/user/remove-favorite/${productId}`,
+      {
+        productId,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error removing favorite for ${productId}:`,
       error.response?.data || error.message
     );
     throw error;
