@@ -376,7 +376,7 @@ function MyOrder() {
                                   Số lượng: {item.amount}
                                 </Text>
                                 <Text className={styles.itemPrice}>
-                                  {(item.price * item.amount).toLocaleString(
+                                  {(item.newPrice * item.amount).toLocaleString(
                                     "vi-VN"
                                   )}
                                   đ
