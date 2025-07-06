@@ -30,6 +30,23 @@ function PaymentSuccessPage() {
     const vnp_TxnRef = searchParams.get("vnp_TxnRef");
     const vnp_Amount = searchParams.get("vnp_Amount");
 
+    // Hàm xử lý xóa sản phẩm tuần tự
+    const removeItemsSequentially = async (orderItems, paymentMethod) => {
+      if (!orderItems || orderItems.length === 0) return;
+
+      for (const item of orderItems) {
+        try {
+          const itemId = item.variant?.idVariant || item.id;
+
+          await removeFromCart(itemId);
+
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        } catch (error) {
+          console.error(`❌ Lỗi khi xóa sản phẩm:`, item, error);
+        }
+      }
+    };
+
     // Kiểm tra VNPAY Response trực tiếp từ URL (trường hợp redirect bị lỗi 404)
     if (vnp_ResponseCode === "00" && vnp_TxnRef) {
       // VNPAY success
@@ -70,7 +87,8 @@ function PaymentSuccessPage() {
           setPaymentSuccess(true);
           dispatch(clearImmediateOrder());
 
-          // const res = await removeFromCart(itemId);
+          await removeItemsSequentially(location.state?.orderItems, "VNPAY");
+
           console.log(
             "VNPAY payment success (from URL), order ID:",
             originalOrderId
@@ -87,24 +105,11 @@ function PaymentSuccessPage() {
         setTotalAmount(location.state.totalAmount);
         setPaymentSuccess(true);
         dispatch(clearImmediateOrder());
+
         (async () => {
-          if (location.state?.orderItems) {
-            const removalPromises = location.state.orderItems.map((item) => {
-              console.log("Removing item from cart (COD):", item);
-              return removeFromCart(item.variant?.idVariant || item.id);
-            });
-            try {
-              const results = await Promise.all(removalPromises);
-              console.log(
-                "Tất cả sản phẩm đã được xóa khỏi giỏ hàng (COD):",
-                results
-              );
-            } catch (error) {
-              console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng (COD):", error);
-              message.error("Có lỗi xảy ra khi cập nhật giỏ hàng của bạn.");
-            }
-          }
+          await removeItemsSequentially(location.state?.orderItems, "COD");
         })();
+
         console.log("COD payment success, order ID:", location.state.orderId);
       } else {
         console.error("Missing order info in state for COD payment");
@@ -117,23 +122,9 @@ function PaymentSuccessPage() {
       setPaymentSuccess(true);
       dispatch(clearImmediateOrder());
 
-      // Xóa sản phẩm khỏi giỏ hàng cho fallback case
+      // Xóa sản phẩm khỏi giỏ hàng cho fallback case - Sử dụng phương án tuần tự
       (async () => {
-        if (location.state?.orderItems) {
-          const removalPromises = location.state.orderItems.map((item) => {
-            console.log("Removing item from cart (fallback):", item);
-            return removeFromCart(item.variant?.idVariant || item.id);
-          });
-          try {
-            const results = await Promise.all(removalPromises);
-            console.log(
-              "Tất cả sản phẩm đã được xóa khỏi giỏ hàng (fallback):",
-              results
-            );
-          } catch (error) {
-            console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng (fallback):", error);
-          }
-        }
+        await removeItemsSequentially(location.state?.orderItems, "Fallback");
       })();
 
       console.log(

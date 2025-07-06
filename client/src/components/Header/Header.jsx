@@ -131,13 +131,13 @@ function AppHeader({ onShowSignIn }) {
 
   // Xử lý đăng xuất
   const handleLogout = () => {
-    sessionStorage.clear();
-    dispatch(logout());
-    dispatch(clearOrder());
-
     logoutUser()
       .then(() => {
         message.success("Đăng xuất thành công!");
+        sessionStorage.clear();
+        dispatch(logout());
+        dispatch(clearOrder());
+
         setDrawerOpen(false);
         navigate("/");
       })
@@ -265,7 +265,7 @@ function AppHeader({ onShowSignIn }) {
                 getPopupContainer={(triggerNode) => triggerNode.parentNode}
                 destroyPopupOnHide={true}
                 overlayStyle={{
-                  position: 'fixed',
+                  position: "fixed",
                   zIndex: 9999,
                 }}
               >
