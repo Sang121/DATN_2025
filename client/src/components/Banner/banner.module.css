@@ -1,0 +1,345 @@
+/* === Banner Khuyến Mãi - Phù hợp với header xanh dương === */
+.promoBanner {
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 50%, #0f4c75 100%);
+    color: white;
+    font-weight: 500;
+    font-size: 10px;
+    padding: 10px 0;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(15, 76, 117, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    height:25px;
+}
+
+.promoBannerContent {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.promoText {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    justify-content: center;
+}
+
+.promoIcon {
+    font-size: 16px;
+    margin-right: 4px;
+    color: #ffd700;
+}
+
+.promoMessage {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 13px;
+    color: #ffffff;
+}
+
+.promoAction {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%);
+    color: #0f4c75;
+    padding: 6px 16px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 11px;
+    border: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
+}
+
+.promoAction:hover {
+    background: linear-gradient(135deg, #ffed4a 0%, #ffd700 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.promoAction:active {
+    transform: translateY(0);
+}
+
+.promoBannerClose {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    padding: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.promoBannerClose:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.closeIcon {
+    font-size: 12px;
+    color: white;
+}
+
+/* === Responsive Design === */
+@media (max-width: 1024px) {
+    .promoBanner {
+        font-size: 13px;
+        padding: 8px 0;
+    }
+
+    .promoBannerContent {
+        padding: 0 20px;
+    }
+
+    .promoText {
+        gap: 10px;
+    }
+
+    .promoMessage {
+        font-size: 12px;
+    }
+
+    .promoAction {
+        padding: 5px 14px;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .promoBanner {
+        font-size: 12px;
+        padding: 7px 0;
+    }
+
+    .promoBannerContent {
+        padding: 0 16px;
+    }
+
+    .promoText {
+        gap: 8px;
+    }
+
+    .promoMessage {
+        font-size: 11px;
+        letter-spacing: 0.3px;
+    }
+
+    .promoAction {
+        padding: 4px 12px;
+        font-size: 9px;
+    }
+
+    .promoBannerClose {
+        right: 16px;
+        padding: 3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .promoBanner {
+        font-size: 11px;
+        padding: 6px 0;
+    }
+
+    .promoBannerContent {
+        padding: 0 12px;
+    }
+
+    .promoMessage {
+        font-size: 10px;
+        letter-spacing: 0.2px;
+    }
+
+    .promoAction {
+        padding: 3px 10px;
+        font-size: 8px;
+    }
+
+    .promoBannerClose {
+        right: 12px;
+        padding: 2px;
+    }
+
+    .closeIcon {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .promoBanner {
+        padding: 8px 0;
+    }
+
+    .promoText {
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .promoMessage {
+        font-size: 9px;
+        text-align: center;
+    }
+
+    .promoAction {
+        font-size: 7px;
+        padding: 2px 8px;
+        margin-top: 3px;
+    }
+
+    .promoIcon {
+        font-size: 14px;
+    }
+}
+
+/* === Dark Mode Support === */
+@media (prefers-color-scheme: dark) {
+    .promoBanner {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .promoAction {
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        color: white;
+    }
+
+    .promoAction:hover {
+        background: linear-gradient(135deg, #357abd 0%, #4a90e2 100%);
+    }
+}
+
+/* === Tối ưu cho các thiết bị touch === */
+@media (hover: none) and (pointer: coarse) {
+    .promoAction {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .promoBannerClose {
+        padding: 6px;
+    }
+}
+
+/* === Tối ưu cho màn hình siêu nhỏ === */
+@media (max-width: 320px) {
+    .promoBanner {
+        font-size: 10px;
+        padding: 5px 0;
+    }
+
+    .promoBannerContent {
+        padding: 0 8px;
+    }
+
+    .promoMessage {
+        font-size: 8px;
+    }
+
+    .promoAction {
+        font-size: 6px;
+        padding: 2px 6px;
+    }
+}
+
+/* === Accessibility improvements === */
+@media (prefers-reduced-motion: reduce) {
+    .promoAction,
+    .promoBannerClose {
+        transition: none;
+    }
+}
+
+/* === High contrast mode === */
+@media (prefers-contrast: high) {
+    .promoBanner {
+        background: #000;
+        color: #fff;
+        border-bottom: 2px solid #fff;
+    }
+
+    .promoAction {
+        background: #fff;
+        color: #000;
+        border: 2px solid #000;
+    }
+
+    .promoBannerClose {
+        background: #fff;
+        border: 2px solid #fff;
+    }
+
+    .closeIcon {
+        color: #000;
+    }
+}
+
+/* === Hiệu ứng nhẹ nhàng cho banner === */
+.promoBanner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.promoBanner:hover::before {
+    opacity: 1;
+}
+
+/* === Tương thích với header === */
+.promoBanner + .header {
+    border-top: none;
+}
+
+/* === Focus states cho accessibility === */
+.promoAction:focus {
+    outline: 2px solid #ffd700;
+    outline-offset: 2px;
+}
+
+.promoBannerClose:focus {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+/* === Animation cho icon === */
+.promoIcon {
+    animation: gentle-pulse 3s ease-in-out infinite;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* === Tối ưu loading performance === */
+.promoBanner * {
+    will-change: auto;
+}
+
+.promoAction,
+.promoBannerClose {
+    will-change: transform;
+}
