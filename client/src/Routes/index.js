@@ -28,7 +28,7 @@ const MyOrdersPage = lazy(() => import("../components/myOrder/MyOrder"));
 const AdminOrderDetail = lazy(() =>
   import("../pages/AdminPage/component/adminOrderDetail/AdminOrderDetail")
 );
-
+import FavoriteProduct from "../pages/favoriteProduct/FavoriteProduct";
 export const routes = [
   {
     path: "/",
@@ -49,7 +49,13 @@ export const routes = [
     isShowHeader: true,
     isPrivate: false,
   },
+{
+  path: "/favoriteProducts",
+  page: FavoriteProduct,
+  isShowHeader: true,
+  isPrivate: false,
 
+},
   {
     path: "/category/:category",
     page: TypeProductPage,
