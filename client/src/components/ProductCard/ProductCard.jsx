@@ -17,8 +17,9 @@ function ProductCard({
 }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const dispatch = useDispatch();
-  const userId = sessionStorage.getItem("userId");
   const favoriteProducts = useSelector((state) => state.user.favorite);
+  const userId = useSelector((state) => state.user._id);
+
   const isFavorite = favoriteProducts?.some((product) => product === productId);
   const newPrice = price - (price * discount) / 100;
   const formattedPrice = new Intl.NumberFormat("vi-VN", {
@@ -36,14 +37,14 @@ function ProductCard({
       return;
     }
     if (isFavorite) {
-      removeFavorite(userId, productId);
+      removeFavorite(productId);
       dispatch(
         updateFavorite({
           favorite: favoriteProducts.filter((id) => id !== productId),
         })
       );
     } else {
-      addFavorite(userId, productId);
+      addFavorite(productId);
       dispatch(updateFavorite({ favorite: [...favoriteProducts, productId] }));
       setIsAnimating(true);
     }
