@@ -1,0 +1,61 @@
+/* FavoriteProduct.module.css */
+
+.favoritePageContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: 80vh;
+}
+
+.pageTitle {
+  font-size: 28px !important;
+  font-weight: 600 !important;
+  margin-bottom: 24px !important;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pageTitle .anticon {
+  color: #ff4d4f; /* Red color for the heart icon */
+}
+
+.productGrid {
+  width: 100%;
+}
+
+.loadingContainer,
+.emptyContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  flex-direction: column;
+}
+
+.productCol {
+  display: flex;
+  justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .favoritePageContainer {
+    padding: 16px;
+  }
+
+  .pageTitle {
+    font-size: 24px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .favoritePageContainer {
+    padding: 12px;
+  }
+
+  .pageTitle {
+    font-size: 20px !important;
+  }
+}

@@ -15,6 +15,8 @@ import UserManager from "./component/userManager/UserManager";
 import ProductManager from "./component/productManager/ProductManager";
 import OrderManager from "./component/orderManager/OrderManager";
 import Statistics from "./component/StatisticsPage/Statistics";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const items = [
   {
@@ -45,7 +47,6 @@ const AdminPage = () => {
   const handleOnClick = ({ key }) => {
     setSelectedKey(key);
   };
-
   const renderContent = () => {
     switch (selectedKey) {
       case "user":
@@ -60,6 +61,10 @@ const AdminPage = () => {
         return <UserManager />;
     }
   };
+  const location = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
 
   return (
     <>
