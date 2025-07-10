@@ -104,6 +104,22 @@ function UserManager() {
         ),
     },
     {
+      title: "Type Login",
+      dataIndex: "typeLogin",
+      key: "typeLogin",
+      render: (text, record) =>
+        editingRowId === record._id ? (
+          <Input
+            value={editedData.address ?? record.address}
+            onChange={(e) =>
+              setEditedData({ ...editedData, address: e.target.value })
+            }
+          />
+        ) : (
+          text
+        ),
+    },
+    {
       title: "Trạng thái",
       dataIndex: "isAdmin",
       key: "isAdmin",
