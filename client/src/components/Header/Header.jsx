@@ -273,6 +273,7 @@ function AppHeader({ onShowSignIn }) {
                   <Avatar
                     size={32}
                     className={styles.userAvatar}
+                    src={user.avatar || null}
                     icon={<UserOutlined />}
                   />
                   <div className={styles.userInfo}>
