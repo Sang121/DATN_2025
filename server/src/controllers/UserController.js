@@ -1,5 +1,6 @@
+const { request } = require("express");
 const UserService = require("../services/UserService");
-
+const { jwtDecode } = require("jwt-decode");
 const createUser = async (req, res) => {
   try {
     const { username, email, password, address, confirmPassword, phone } =
@@ -62,6 +63,29 @@ const loginUser = async (req, res) => {
     return res.status(500).json({ message: "Server error when login", error });
   }
 };
+const loginGoogle = async (req, res) => {
+  try {
+    const credential = req.body;
+    if (!credential) {
+      return res.status(400).json({
+        status: "Err",
+        message: "Google token is required",
+      });
+    }
+    const response = await UserService.loginGoogle(credential);
+    const { refresh_token, ...newResponse } = response;
+    res.cookie("refresh_token", refresh_token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    return res.status(201).json(newResponse);
+  } catch (error) {
+    return res.status(500).json({ message: "Server error when login", error });
+  }
+};
+
 const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -305,6 +329,7 @@ const getFavorite = async (req, res) => {
 module.exports = {
   createUser,
   loginUser,
+  loginGoogle,
   updateUser,
   deleteUser,
   addFavorite,

@@ -4,12 +4,12 @@ const Schema = mongoose.Schema;
 
 const modelUser = new Schema(
   {
-    fullName: { type: String, require: true },
-    username: { type: String, require: true },
-    email: { type: String, require: true },
-    password: { type: String, require: true },
-    phone: { type: String, require: true },
-    address: { type: String, require: true },
+    fullName: { type: String },
+    username: { type: String },
+    email: { type: String },
+    password: { type: String },
+    phone: { type: String },
+    address: { type: String },
     isAdmin: { type: Boolean, default: false },
     cart: [
       {
@@ -36,7 +36,11 @@ const modelUser = new Schema(
         newPrice: { type: Number, required: true },
         isDiscount: { type: Boolean, default: false },
         variant: {
-          idVariant: { type: String, required: true },
+          _id: {
+            type: mongoose.Schema.Types.ObjectId,
+
+            ref: "Order",
+          }, // ID của biến thể sản phẩm
           size: { type: String, required: true },
           color: { type: String, required: true },
           stock: { type: Number, required: true },
@@ -48,7 +52,7 @@ const modelUser = new Schema(
     refresh_token: { type: String, default: null },
     avatar: { type: String, default: null },
     gender: { type: String, enum: ["male", "female", "other"] },
-    typeLogin: { type: String, enum: ["email", "google"] },
+    typeLogin: { type: String, enum: ["Email", "Google"] },
     totalOrder: { type: Number, default: 0 },
     isAuthenticated: { type: Boolean, default: false },
   },

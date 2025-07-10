@@ -9,10 +9,6 @@ const orderSchema = new mongoose.Schema(
         newPrice: { type: Number, required: true }, // Giá sản phẩm,
         image: { type: String, required: true }, // Hình ảnh sản phẩm,
         variant: {
-          _id: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true,
-          }, // ID của biến thể sản phẩm,
           size: {
             type: String,
             required: true,

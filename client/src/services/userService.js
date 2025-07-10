@@ -29,7 +29,22 @@ export const signUpUser = async (userData) => {
     throw new Error(errorMessage);
   }
 };
-
+export const loginGoogle = async (credential) => {
+  try {
+    const response = await axiosInstance.post(
+      `/user/signin-google`,
+      credential
+    );
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Unknown error occurred during Google login.";
+    console.error("Error during Google login:", errorMessage);
+    throw new Error(errorMessage);
+  }
+};
 // Hàm getDetailUser
 export const getDetailUser = async (userId) => {
   try {

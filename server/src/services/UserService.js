@@ -1,8 +1,8 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const { processImageUrls } = require("./productService");
 const { genneralRefreshToken, genneralAccessToken } = require("./jwtService");
+const { jwtDecode } = require("jwt-decode");
 //const genneralRefreshToken = require('./jwtService');
 const validateEmail = (email) => {
   const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
@@ -53,6 +53,7 @@ const createUser = (newUser) => {
         address,
         password: hashedPassword,
         phone,
+        typeLogin: "Email",
       });
       if (createUser) {
         resolve({
@@ -110,6 +111,82 @@ const loginUser = (loginData) => {
     } catch (error) {
       console.error("Error during login:", error); // Log lỗi chi tiết
       reject({ status: "Err", message: "Server error while login", error });
+    }
+  });
+};
+const loginGoogle = (credential) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!credential) {
+        return reject({
+          status: "Err",
+          message: "Google token is required",
+        });
+      }
+      const stringifyCredential = JSON.stringify(credential);
+      console.log("tokenGoogle", stringifyCredential);
+      const dataUser = jwtDecode(stringifyCredential);
+      const findUser = await User.findOne({
+        email: dataUser.email.trim().toLowerCase(),
+      });
+      if (findUser) {
+        await findUser.save();
+        // Nếu người dùng đã tồn tại, tạo access_token và refresh_token mới
+        const access_token = await genneralAccessToken({
+          id: findUser._id,
+          isAdmin: findUser.isAdmin,
+        });
+        const refresh_token = await genneralRefreshToken({
+          id: findUser._id,
+          isAdmin: findUser.isAdmin,
+        });
+
+        return resolve({
+          status: "Ok",
+          message: "Login success",
+          access_token,
+          refresh_token,
+        });
+      } else {
+        // Nếu người dùng chưa tồn tại, tạo mới
+        const newUser = await User.create({
+          fullName: dataUser.name,
+          email: dataUser.email.trim().toLowerCase(),
+          avatar: dataUser.picture,
+          typeLogin: "Google",
+        });
+        await newUser.save();
+
+        if (newUser) {
+          const access_token = await genneralAccessToken({
+            id: newUser._id,
+            isAdmin: newUser.isAdmin,
+          });
+          const refresh_token = await genneralRefreshToken({
+            id: newUser._id,
+            isAdmin: newUser.isAdmin,
+          });
+
+          return resolve({
+            status: "Ok",
+            message: "Login success",
+            access_token,
+            refresh_token,
+          });
+        } else {
+          return reject({
+            status: "Err",
+            message: "Failed to create user from Google login",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error during Google login:", error); // Log lỗi chi tiết
+      reject({
+        status: "Err",
+        message: "Server error when login",
+        error,
+      });
     }
   });
 };
@@ -424,6 +501,7 @@ const getFavorite = (userId) => {
 module.exports = {
   createUser,
   loginUser,
+  loginGoogle,
   updateUser,
   deleteUser,
   addFavorite,
