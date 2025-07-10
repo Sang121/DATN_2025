@@ -25,6 +25,7 @@ router.post(
   authUserMiddleware,
   userController.addFavorite
 );
+router.get("/getFavorite/", authUserMiddleware, userController.getFavorite);
 router.post(
   "/remove-favorite/:productId",
   authUserMiddleware,

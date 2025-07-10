@@ -43,7 +43,7 @@ const modelUser = new Schema(
         },
       },
     ],
-    favorite: { type: Array, default: [] },
+    favorite: { default: [], type: Array, ref: "Product" },
     access_token: { type: String, default: null },
     refresh_token: { type: String, default: null },
     avatar: { type: String, default: null },

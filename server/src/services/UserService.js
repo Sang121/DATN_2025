@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { processImageUrls } = require("./productService");
 const { genneralRefreshToken, genneralAccessToken } = require("./jwtService");
 //const genneralRefreshToken = require('./jwtService');
 const validateEmail = (email) => {
@@ -257,6 +258,8 @@ const addFavorite = (userId, productId) => {
       if (!user) {
         return reject({ status: "Err", message: "User not found" });
       }
+      console.log("userId", userId);
+      console.log("productId", productId);
       if (user.favorite.includes(productId)) {
         return reject({
           status: "Err",
@@ -265,6 +268,7 @@ const addFavorite = (userId, productId) => {
       }
       user.favorite.push(productId);
       await user.save();
+      console.log("user.favorite", user.favorite);
       resolve({ status: "Ok", message: "Product added to favorites" });
     } catch (error) {
       reject({ message: "Server error while adding favorite", error });
@@ -392,7 +396,31 @@ const removeFromCart = (userId, id) => {
     }
   });
 };
+const getFavorite = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findById(userId).populate("favorite");
+      if (!user) {
+        return reject({ status: "Err", message: "User not found" });
+      }
+      if (user.favorite.length === 0) {
+        return reject({ status: "Err", message: "No favorite products found" });
+      }
+      const processedProducts = user.favorite.map(processImageUrls);
 
+      resolve({
+        status: "Ok",
+        message: "Favorite products retrieved successfully",
+        data: processedProducts,
+      });
+    } catch (error) {
+      reject({
+        message: "Server error while retrieving favorite products",
+        error,
+      });
+    }
+  });
+};
 module.exports = {
   createUser,
   loginUser,
@@ -408,4 +436,5 @@ module.exports = {
   addToCart,
   updateCart,
   removeFromCart,
+  getFavorite,
 };

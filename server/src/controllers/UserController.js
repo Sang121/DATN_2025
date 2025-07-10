@@ -285,6 +285,23 @@ const removeFromCart = async (req, res) => {
     return res.status(500).json({ message: error.message, error });
   }
 };
+const getFavorite = async (req, res) => {
+  try {
+    const userId = req.headers.userid;
+
+    if (!userId) {
+      return res.status(400).json({
+        status: "Err",
+        message: "User ID is required",
+      });
+    }
+
+    const response = await UserService.getFavorite(userId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error });
+  }
+};
 module.exports = {
   createUser,
   loginUser,
@@ -301,4 +318,5 @@ module.exports = {
   addToCart,
   updateCart,
   removeFromCart,
+  getFavorite,
 };

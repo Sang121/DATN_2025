@@ -345,11 +345,11 @@ const removeVariant = (productId, variantId) => {
           message: "Variant not found",
           data: null,
         });
-      }      // Xóa variant
+      } // Xóa variant
       const updatedProduct = await Product.findByIdAndUpdate(
         productId,
         {
-          $pull: { variants: { _id: variantId } }
+          $pull: { variants: { _id: variantId } },
         },
         { new: true }
       );
@@ -405,7 +405,9 @@ const addVariant = (productId, variantData) => {
 
       // Kiểm tra variant đã tồn tại chưa (same size + color)
       const duplicateVariant = existingProduct.variants.some(
-        (variant) => variant.size === variantData.size && variant.color === variantData.color
+        (variant) =>
+          variant.size === variantData.size &&
+          variant.color === variantData.color
       );
 
       if (duplicateVariant) {
@@ -420,7 +422,7 @@ const addVariant = (productId, variantData) => {
       const updatedProduct = await Product.findByIdAndUpdate(
         productId,
         {
-          $push: { variants: variantData }
+          $push: { variants: variantData },
         },
         { new: true }
       );
@@ -445,6 +447,7 @@ const addVariant = (productId, variantData) => {
 
 module.exports = {
   createProduct,
+  processImageUrls,
   updateProduct,
   getDetailProduct,
   deleteProduct,

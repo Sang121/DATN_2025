@@ -9,6 +9,10 @@ const orderSchema = new mongoose.Schema(
         newPrice: { type: Number, required: true }, // Giá sản phẩm,
         image: { type: String, required: true }, // Hình ảnh sản phẩm,
         variant: {
+          _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+          }, // ID của biến thể sản phẩm,
           size: {
             type: String,
             required: true,
@@ -26,7 +30,7 @@ const orderSchema = new mongoose.Schema(
         },
         product: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "products",
+          ref: "Product",
           required: true,
         },
       },
@@ -62,13 +66,13 @@ const orderSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "user",
       required: true,
     },
     statusHistory: [
       {
         status: { type: String },
-        updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+        updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
         updatedAt: { type: Date, default: Date.now },
         note: { type: String },
       },
