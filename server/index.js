@@ -4,8 +4,6 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
-const logger = require("morgan");
-
 
 // --- Configure dotenv
 dotenv.config();
@@ -23,6 +21,7 @@ mongoose.set("strictQuery", false);
 connectDB();
 
 // --- Middlewares
+const logger = require("morgan");
 app.use(logger("dev"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -49,7 +48,6 @@ app.use(function (req, res, next) {
   next(err);
 });
 
-// General error handler
 app.use(function (err, req, res, next) {
   res.status(err.status || 500).json({
     message: err.message,
