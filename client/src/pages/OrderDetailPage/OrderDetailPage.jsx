@@ -296,10 +296,10 @@ function OrderDetailPage() {
                     }
                   />
                   <div className={styles.priceInfo}>
-                    <Text>{item.price.toLocaleString()}đ</Text>
+                    <Text>{item.newPrice.toLocaleString()}đ</Text>
                     <Text type="secondary">x {item.amount}</Text>
                     <Text strong>
-                      {(item.price * item.amount).toLocaleString()}đ
+                      {(item.newPrice * item.amount).toLocaleString()}đ
                     </Text>
                   </div>
                 </List.Item>
