@@ -194,3 +194,15 @@ export const removeFromCart = async (id) => {
     throw error;
   }
 };
+export const getFavorite = async () => {
+  try {
+    const response = await axiosInstance.get(`/user/getFavorite/`);
+    return response.data.data;
+  } catch (error) {
+    console.error(
+      `Error fetching favorite products:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
