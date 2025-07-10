@@ -286,9 +286,21 @@ function AppHeader({ onShowSignIn }) {
             </div>
           ) : (
             <div className={styles.navItems}>
-              <Link to="/favoriteProducts" className={styles.navItem}>
-                <HeartOutlined className={styles.navIcon} />
-              </Link>
+              <Tooltip title="Yêu thích" placement="bottom">
+                <Link to="/favoriteProducts" className={styles.navItem}>
+                  <Badge
+                    count={user.favorite?.length || 0}
+                    size="small"
+                    className={
+                      user.favorite?.length > 0
+                        ? `${styles.badge} ${styles.hasNotifications}`
+                        : styles.badge
+                    }
+                  >
+                    <HeartOutlined className={styles.navIcon} />{" "}
+                  </Badge>
+                </Link>
+              </Tooltip>
 
               <Link to="/cart" className={styles.navItem}>
                 <Badge
@@ -444,6 +456,10 @@ function AppHeader({ onShowSignIn }) {
               <Link to="/favoriteProducts" className={styles.drawerMenuLink}>
                 <HeartOutlined className={styles.drawerMenuIcon} />
                 <span>Yêu thích</span>
+                <Badge
+                  count={user.favorite?.length || 0}
+                  className={styles.drawerBadge}
+                />
               </Link>
             </div>
 
