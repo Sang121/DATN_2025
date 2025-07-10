@@ -135,6 +135,7 @@ function AppHeader({ onShowSignIn }) {
       .then(() => {
         message.success("Đăng xuất thành công!");
         sessionStorage.clear();
+        localStorage.clear();
         dispatch(logout());
         dispatch(clearOrder());
 

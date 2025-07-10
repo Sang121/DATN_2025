@@ -6,6 +6,7 @@ import SignInPage from "../SignInPage/SignInPage";
 import SignUpPage from "../SignUpPage/SignUpPage";
 import ChatbotUser from "../../components/AI/UserChatbot";
 import "./DefauPage.css";
+import Banner from "../../components/Banner/Banner";
 
 const DefauPage = ({ children }) => {
   const [showSignIn, setShowSignIn] = useState(false);
@@ -22,6 +23,7 @@ const DefauPage = ({ children }) => {
 
   return (
     <div>
+      <Banner />
       <Header onShowSignIn={() => setShowSignIn(true)} />
 
       <SignInPage

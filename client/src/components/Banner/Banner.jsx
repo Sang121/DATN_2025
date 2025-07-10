@@ -22,6 +22,8 @@ function Banner() {
     const bannerClosed = localStorage.getItem("defaultPageBannerClosed");
     if (bannerClosed === "true") {
       setShowPromoBanner(false);
+    } else {
+      setShowPromoBanner(true);
     }
   }, []);
 
