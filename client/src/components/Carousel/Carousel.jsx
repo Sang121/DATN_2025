@@ -88,14 +88,8 @@ function Carousel() {
         {slides.map((slide) => (
           <div key={slide.id} className={styles.slider}>
             <Link to={slide.images.link} className={styles.imageLink}>
-              <img
-                className={styles.imageSlider}
-                alt={slide.images.alt}
-                src={slide.images.src}
-              />
-              <div className={styles.imageOverlay}>
-                <span className={styles.imageText}>{slide.images.alt}</span>
-              </div>
+              <img className={styles.imageSlider} src={slide.images.src} />
+              <div className={styles.imageOverlay}></div>
             </Link>
           </div>
         ))}

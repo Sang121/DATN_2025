@@ -180,7 +180,12 @@ function AppHeader({ onShowSignIn }) {
     <Header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.headerContainer}>
         {/* Logo Section */}
-        <div className={styles.logoSection}>
+        <div
+          className={styles.logoSection}
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
           <Link to="/" className={styles.logoLink}>
             <div className={styles.logo}>
               <span className={styles.logoIcon}>S</span>

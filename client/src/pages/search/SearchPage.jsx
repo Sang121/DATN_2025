@@ -14,6 +14,7 @@ function SearchPage() {
 
   useEffect(() => {
     setSearchQuery(query);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [query]);
 
   const {

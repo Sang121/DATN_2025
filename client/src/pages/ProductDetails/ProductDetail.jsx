@@ -469,7 +469,7 @@ function ProductDetail() {
         </div>
       </div>
       <div className={styles["product-detail-related"]}>
-        <h2>Sản phẩm cùng danh mục</h2>
+        <h2>Sản phẩm tương tự</h2>
         <div className={styles["product-detail-related-list"]}>
           {product.category && <ListProducts query={product.category} />}
         </div>
