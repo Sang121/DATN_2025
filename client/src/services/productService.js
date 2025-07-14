@@ -39,7 +39,6 @@ const timeout = (ms) =>
 
 export const createProduct = async (productData) => {
   try {
-    console.log("Sending product data:", productData);
     validateProduct(productData);
     const url = `${import.meta.env.VITE_API_URL}/product/createProduct`;
     const response = await Promise.race([
@@ -50,10 +49,8 @@ export const createProduct = async (productData) => {
       }),
       timeout(5000),
     ]);
-    console.log("Create product response:", response);
     return response.data;
   } catch (error) {
-    console.error("Error creating product:", error);
     if (error.response) {
       throw new Error(
         `Failed to create product: ${
@@ -104,7 +101,6 @@ export const updateProduct = async (id, data) => {
       axiosInstance.put(url, data),
       timeout(5000),
     ]);
-    console.log("response", response);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -126,7 +122,6 @@ export const deleteProduct = async (id) => {
       axiosInstance.delete(url),
       timeout(5000),
     ]);
-    console.log("response", response);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -213,7 +208,6 @@ export const getProductByCategory = async (category) => {
 
 export const searchProduct = async (query) => {
   try {
-    console.log("query", query);
     validateQuery(query);
     const url = `${import.meta.env.VITE_API_URL}/product/search/${query}`;
     const response = await Promise.race([
@@ -234,7 +228,7 @@ export const searchProduct = async (query) => {
 };
 
 export const deleteImage = (imageName) => {
-  return new Promise( async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const imagePath = path.join("../uploads", imageName);
 

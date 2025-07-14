@@ -8,6 +8,8 @@ import ListProduct from "../../components/ListProducts/ListProduct";
 import FilterPrice from "../../components/FilterPrice/FilterPrice";
 import { BackTop, Col } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
+import Promo from "../../components/promo/Promo";
+import ProductSlider from "../../components/ProductSlider/ProductSlider";
 function HomePage() {
   return (
     <div>
@@ -18,35 +20,40 @@ function HomePage() {
           </div>
           <div className={styles["home-page"]}>
             <Col
-              xs={0}
-              sm={0}
-              md={4}
-              lg={4}
-              className={styles["home-page-sidebar"]}
-            >
-              <Sidebar />
-              <FilterPrice />
-            </Col>
-            <Col
               xs={24}
               sm={24}
-              md={20}
-              lg={20}
+              md={24}
+              lg={24}
               className={styles["home-page-contain"]}
             >
+              <Promo />
               <div className={styles["home-page-list"]}>
-                <h2>Thời trang nam</h2>
-                <ListProduct query={"Nam"} />
+                <ProductSlider
+                  query={"Quần"}
+                  title={"Hàng mới về"}
+                  slidesToShow={5}
+                />
+                <ProductSlider
+                  query={"Nam"}
+                  title={"Thời trang nam"}
+                  slidesToShow={5}
+                />
               </div>
               <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" />
               <div className={styles["home-page-list"]}>
-                <h2> Thời Trang Nữ</h2>
-                <ListProduct query={"Nữ"} />
+                <ProductSlider
+                  query={"Nữ"}
+                  title={"Thời trang nữ"}
+                  slidesToShow={5}
+                />
               </div>
               <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" />
               <div className={styles["home-page-list"]}>
-                <h2> Phụ Kiện </h2>
-                <ListProduct query={"Phụ kiện"} />
+                <ProductSlider
+                  query={"Áo"}
+                  title={"Áo"}
+                  slidesToShow={5}
+                />
               </div>
             </Col>
           </div>
