@@ -39,21 +39,40 @@ const UserChatbot = async (req, res) => {
   try {
     // Fetch product data for the customer-facing chatbot
     const products = await Product.find({});
+    const orderData = await Order.find({ user: userId });
+
+    // Format product data more concisely
     const productData = products
+      .filter((product) => product.totalStock > 0) // Only show in-stock products
+      .slice(0, 20) // Limit to 20 products to keep prompt manageable
+      .map((product) => {
+        const availableVariants = product.variants.filter((v) => v.stock > 0);
+        const sizeOptions = [
+          ...new Set(availableVariants.map((v) => v.size)),
+        ].join(", ");
+        const colorOptions = [
+          ...new Set(availableVariants.map((v) => v.color)),
+        ].join(", ");
+
+        return `• ${product.name} - ${product.price.toLocaleString()}đ ${
+          product.discount > 0 ? `(Giảm ${product.discount}%)` : ""
+        }
+   Danh mục: ${product.category} | Giới tính: ${product.gender} | Đã bán: ${
+     product.sold
+   }
+   Size: ${sizeOptions || "N/A"} | Màu: ${colorOptions || "N/A"}`;
+      })
+      .join("\n");
+
+    const orderDataString = orderData
+      .slice(-3) // Only show last 3 orders
       .map(
-        (product) =>
-          `Tên: ${product.name}, Giá: ${product.price}, Mô tả: ${
-            product.description
-          }, Danh mục: ${product.category}, Giới tính: ${
-            product.gender
-          }, Giảm giá: ${product.discount}%, Đã bán: ${
-            product.sold
-          }, Tổng kho: ${product.totalStock}, Các biến thể: ${product.variants
-            .map(
-              (variant) =>
-                `[Kích thước: ${variant.size}, Màu sắc: ${variant.color}, Đã bán: ${variant.sold}, Tồn kho: ${variant.stock}]`
-            )
-            .join("; ")}` // Join variants with a semicolon for better readability
+        (order) =>
+          `• Đơn ${order._id
+            .toString()
+            .slice(-6)} - ${order.createdAt.toLocaleDateString(
+            "vi-VN"
+          )} - ${order.totalPrice.toLocaleString()}đ - ${order.orderStatus}`
       )
       .join("\n");
 
@@ -63,8 +82,10 @@ const UserChatbot = async (req, res) => {
       .startChat({
         history: conversationHistory[userId],
         generationConfig: {
-          maxOutputTokens: 500, // Limit response length to control token usage and verbosity
-          temperature: 0.7, // Adjust for more natural and less repetitive responses
+          maxOutputTokens: 400, // Reduced for more concise responses
+          temperature: 0.8, // Slightly higher for more creative suggestions
+          topP: 0.9,
+          topK: 40,
         },
       });
 
@@ -75,18 +96,41 @@ const UserChatbot = async (req, res) => {
 
       Đây là danh sách sản phẩm hiện có trong cửa hàng:
       ${productData}
-      Bạn có thể đưa ra một lời khuyên phong cách thời trang nam ngắn gọn và hữu ích cho một dịp cụ thể (ví dụ: đi làm, đi chơi, dự tiệc) mà bạn có thể hỏi người dùng. Hoặc một gợi ý phối đồ đơn giản dựa vào các sản phẩm có trong cửa hàng.
-      Hãy trả lời câu hỏi của khách hàng một cách tự nhiên và thân thiện, dựa trên toàn bộ lịch sử trò chuyện và thông tin sản phẩm đã cung cấp. Đảm bảo câu trả lời của bạn luôn duy trì ngữ cảnh của cuộc hội thoại.
-      
-      Nếu câu hỏi không liên quan trực tiếp đến sản phẩm hoặc khách hàng yêu cầu hỗ trợ ngoài phạm vi tư vấn bán hàng (ví dụ: vấn đề thanh toán, vận chuyển, đổi trả, hoặc các vấn đề nội bộ quản lý), hãy lịch sự từ chối và khuyên khách hàng liên hệ với bộ phận hỗ trợ khách hàng hoặc đọc các chính sách của cửa hàng.
-      Hãy kiểm tra kỹ câu hỏi của khách hàng và đảm bảo rằng bạn đang trả lời đúng câu hỏi mà họ đã đặt ra và không vi phạm các nguyên tắc đã nêu
-      
-      Câu hỏi của khách hàng: ${question} 
+      Đây là thông tin đơn hàng của khách hàng:
+      ${orderDataString || "Chưa có đơn hàng nào."}
+
+      🎯 VAI TRÒ CỦA BẠN:
+      • Tư vấn sản phẩm phù hợp với nhu cầu và ngân sách khách hàng
+      • Gợi ý phối đồ theo từng dịp: công sở, dạo phố, hẹn hò, dự tiệc
+      • Tư vấn size, màu sắc dựa trên sở thích cá nhân
+      • Giải đáp thắc mắc về chất liệu, cách bảo quản sản phẩm
+      • Hỗ trợ đặt hàng và theo dõi đơn hàng hiện có
+
+      💡 CÁCH TƯ VẤN:
+      • Hỏi rõ dịp sử dụng, sở thích màu sắc, ngân sách
+      • Đề xuất 2-3 sản phẩm phù hợp với giải thích lý do
+      • Gợi ý cách phối đồ tạo nhiều outfit khác nhau
+      • Thông báo tình trạng còn hàng và khuyến mãi (nếu có)
+
+      🚫 GIỚI HẠN:
+      • Không tư vấn về thanh toán, vận chuyển, đổi trả (chuyển sang CSKH)
+      • Không thảo luận chủ đề ngoài thời trang
+      • Chỉ đề xuất sản phẩm có trong danh sách
+
+      Hãy trả lời ngắn gọn, thân thiện và hữu ích. Sử dụng emoji để tạo sự sinh động.
+
+      Câu hỏi: ${question}
     `;
 
     // Send the prompt to the generative model
     const result = await chat.sendMessage(promptText);
-    const answer = result.response.text();
+    let answer = result.response.text();
+
+    // Add helpful suggestions if the response is too short
+    if (answer.length < 100 && !question.toLowerCase().includes("cảm ơn")) {
+      answer +=
+        "\n\n💭 Bạn có muốn tôi gợi ý thêm sản phẩm phù hợp hoặc cách phối đồ không?";
+    }
 
     // Store the current turn (user question and AI answer) in history for future context
     conversationHistory[userId].push({
@@ -97,6 +141,11 @@ const UserChatbot = async (req, res) => {
       role: "model",
       parts: [{ text: answer }],
     });
+
+    // Limit conversation history to prevent memory issues
+    if (conversationHistory[userId].length > 20) {
+      conversationHistory[userId] = conversationHistory[userId].slice(-20);
+    }
 
     res.status(200).json({ answer });
   } catch (error) {
