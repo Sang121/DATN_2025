@@ -37,7 +37,7 @@ const DefauPage = ({ children }) => {
         onSwitchToSignIn={handleSwitchToSignIn}
       />
 
-      {/* <BelowHeader /> */}
+     
       {children}
       <Footer />
       <div className="global-chatbot-container">
