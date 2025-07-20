@@ -3,13 +3,12 @@ import Sidebar from "../../components/SideBar/SideBar";
 import BelowHeader from "../../components/BelowHeader/BelowHeader";
 import styles from "./HomePage.module.css";
 import Carousel from "../../components/Carousel/Carousel";
-import ImgAds from "../../components/imgAds/ImgAds";
-import ListProduct from "../../components/ListProducts/ListProduct";
-import FilterPrice from "../../components/FilterPrice/FilterPrice";
+import ImgAds from "../../components/ListCategory/ListCategory";
 import { BackTop, Col } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
-import Promo from "../../components/promo/Promo";
 import ProductSlider from "../../components/ProductSlider/ProductSlider";
+import SliderProduct from "../../components/SliderProduct/TopSeller";
+import TopSeller from "../../components/SliderProduct/TopSeller";
 function HomePage() {
   return (
     <div>
@@ -26,33 +25,62 @@ function HomePage() {
               lg={24}
               className={styles["home-page-contain"]}
             >
-              <Promo />
               <div className={styles["home-page-list"]}>
-                <ProductSlider
-                  query={"Quần"}
-                  title={"Hàng mới về"}
-                  slidesToShow={5}
-                />
-                <ProductSlider
-                  query={"Nam"}
-                  title={"Thời trang nam"}
-                  slidesToShow={5}
+                <TopSeller
+                  title="Top sản phẩm bán chạy"
+                  subtitle="Khám phá xu hướng thời trang mới nhất"
+                  autoPlayInterval={4000}
+                  showArrows={true}
+                  cardProps={{
+                    showFavorite: true,
+                    showSold: true,
+                    variant: "slider",
+                  }}
                 />
               </div>
-              <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" />
+              <div className={styles["home-page-list"]}>
+                <ProductSlider
+                  query={"Nam"}
+                  title="Thời trang nam"
+                  subtitle="Khám phá xu hướng thời trang nam mới nhất"
+                  autoPlayInterval={4000}
+                  showArrows={true}
+                  cardProps={{
+                    showFavorite: true,
+                    showSold: true,
+                    variant: "slider",
+                  }}
+                />
+              </div>
+              {/* <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" /> */}
               <div className={styles["home-page-list"]}>
                 <ProductSlider
                   query={"Nữ"}
-                  title={"Thời trang nữ"}
-                  slidesToShow={5}
+                  title="Thời trang nữ"
+                  subtitle="Khám phá xu hướng thời trang nữ mới nhất"
+                  autoPlayInterval={4000}
+                  showArrows={true}
+                  cardProps={{
+                    showFavorite: true,
+                    showSold: true,
+                    variant: "slider",
+                  }}
                 />
               </div>
-              <ImgAds img="https://1557691689.e.cdneverest.net/fast/2826x0/filters:format(webp)/static.5sfashion.vn/storage/home/collect/iW0O0Erw6eTGQwt2ASd9OUyyvz9GRMY6.png" />
               <div className={styles["home-page-list"]}>
                 <ProductSlider
-                  query={"Áo"}
-                  title={"Áo"}
-                  slidesToShow={5}
+                  query={"Phụ kiện"}
+                  title="Phụ kiện thời trang"
+                  subtitle="Hoàn thiện phong cách với phụ kiện độc đáo"
+                  autoPlay={true}
+                  autoPlayInterval={5000}
+                  showArrows={true}
+                  showDots={true}
+                  cardProps={{
+                    showFavorite: true,
+                    showSold: true,
+                    variant: "slider",
+                  }}
                 />
               </div>
             </Col>
