@@ -1,0 +1,293 @@
+/* ProductSlider.module.css */
+.sliderContainer {
+  position: relative;
+  margin: 20px 0;
+  padding: 0 20px;
+}
+
+.sliderHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sliderHeader {
+  text-align: left;
+}
+
+.sliderTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #333;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sliderSubtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.viewMoreContainer {
+  display: flex;
+  align-items: center;
+}
+
+.viewMoreLink {
+  display: flex;
+  align-items: center;
+  color: #1890ff;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.viewMoreLink:hover {
+  color: #096dd9;
+  background: rgba(24, 144, 255, 0.1);
+}
+
+.viewMoreLink svg {
+  margin-left: 4px;
+  font-size: 12px;
+  transition: transform 0.3s;
+}
+
+.viewMoreLink:hover svg {
+  transform: translateX(3px);
+}
+
+.sliderWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sliderTrack {
+  flex: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.sliderTrack:active {
+  cursor: grabbing;
+}
+
+.sliderContent {
+  display: flex;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.sliderContent.animating {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sliderItem {
+  flex-shrink: 0;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+/* Arrows */
+.sliderArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.sliderArrow:hover {
+  background: #f0f0f0;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.sliderArrow:active {
+  transform: scale(0.95);
+}
+
+.sliderArrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sliderArrowPrev {
+  order: -1;
+}
+
+.sliderArrowNext {
+  order: 1;
+}
+
+
+/* Responsive Design */
+@media (max-width: 1199px) {
+  .sliderContainer {
+    padding: 0 16px;
+  }
+
+  .sliderItem {
+    padding: 0 6px;
+  }
+}
+
+@media (max-width: 991px) {
+  .sliderContainer {
+    padding: 0 12px;
+  }
+
+  .sliderItem {
+    padding: 0 4px;
+  }
+
+  .sliderArrow {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .sliderHeaderContainer {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .sliderTitle {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .sliderContainer {
+    padding: 0 8px;
+  }
+
+  .sliderWrapper {
+    gap: 8px;
+  }
+
+  .sliderItem {
+    padding: 0 2px;
+  }
+
+  .sliderArrow {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .sliderTitle {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+  }
+
+  .sliderHeaderContainer {
+    margin-bottom: 15px;
+  }
+
+  .viewMoreLink {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .sliderContainer {
+    padding: 0 4px;
+  }
+
+  .sliderWrapper {
+    gap: 4px;
+  }
+
+  .sliderArrow {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Hide arrows on very small screens */
+  .sliderArrow {
+    display: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .sliderContent {
+    transition: none;
+  }
+
+  .sliderArrow {
+    transition: none;
+  }
+}
+
+
+/* Loading and Empty States */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  min-height: 300px;
+}
+
+.emptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  min-height: 200px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  margin: 20px;
+}
+
+.emptyState p {
+  font-size: 1.1rem;
+  color: #999;
+  margin: 0;
+}
+
+
+
+/* Loading state */
+.sliderContainer.loading .sliderContent {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Performance optimizations */
+.sliderContent {
+  transform: translateZ(0);
+  /* Force hardware acceleration */
+}
+
+/* Smooth scrolling for touch devices */
+.sliderTrack {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
