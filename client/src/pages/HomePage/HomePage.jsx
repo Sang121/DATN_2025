@@ -9,6 +9,7 @@ import { ArrowUpOutlined } from "@ant-design/icons";
 import ProductSlider from "../../components/ProductSlider/ProductSlider";
 import SliderProduct from "../../components/SliderProduct/TopSeller";
 import TopSeller from "../../components/SliderProduct/TopSeller";
+import ListCategory from "../../components/ListCategory/ListCategory";
 function HomePage() {
   return (
     <div>
@@ -38,6 +39,10 @@ function HomePage() {
                   }}
                 />
               </div>
+              <div className={styles["home-page-list"]}>
+                <ListCategory />
+              </div>
+
               <div className={styles["home-page-list"]}>
                 <ProductSlider
                   query={"Nam"}
