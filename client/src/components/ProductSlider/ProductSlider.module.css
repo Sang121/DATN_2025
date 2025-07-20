@@ -1,388 +1,292 @@
 /* ProductSlider.module.css */
-
 .sliderContainer {
-    position: relative;
-    width: 100%;
-    padding: 0;
+  position: relative;
+  margin: 20px 0;
+  padding: 0 20px;
+}
+
+.sliderHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sliderHeader {
+  text-align: left;
 }
 
 .sliderTitle {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 24px;
-    color: #333;
-    text-align: left;
-    padding: 0 16px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #333;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sliderSubtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.viewMoreContainer {
+  display: flex;
+  align-items: center;
+}
+
+.viewMoreLink {
+  display: flex;
+  align-items: center;
+  color: #1890ff;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.viewMoreLink:hover {
+  color: #096dd9;
+  background: rgba(24, 144, 255, 0.1);
+}
+
+.viewMoreLink svg {
+  margin-left: 4px;
+  font-size: 12px;
+  transition: transform 0.3s;
+}
+
+.viewMoreLink:hover svg {
+  transform: translateX(3px);
 }
 
 .sliderWrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0;
-    /* No gap between sliderContent and buttons, gap is inside sliderTrack */
-    padding: 0 60px;
-    /* Space for buttons */
-}
-
-.sliderContent {
-    flex: 1;
-    overflow: hidden;
-    border-radius: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .sliderTrack {
-    display: flex;
-    transition: transform 0.3s ease-in-out;
-    gap: 16px;
-    /* Gap between product cards */
-    cursor: grab;
-    padding: 0 8px;
-    /* Slight padding inside the track if needed */
+  flex: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: grab;
+  touch-action: pan-y;
 }
 
 .sliderTrack:active {
-    cursor: grabbing;
-}   
-
-.slideItem {
-    flex-shrink: 0;
-    padding: 0;
-    box-sizing: border-box;
-    /* Default width for large screens */
-    width: calc((100% - 5 * 12px) / 5);
+  cursor: grabbing;
 }
 
-.sliderButton {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1px solid #e0e0e0;
-    background: white;
-    color: #666;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-    font-size: 16px;
+.sliderContent {
+  display: flex;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
-.sliderButton:hover:not(:disabled) {
-    background: #1890ff;
-    /* Changed to a more vibrant hover */
-    border-color: #1890ff;
-    color: white;
-    transform: translateY(-50%) scale(1.05);
-    /* Slightly larger on hover */
-    box-shadow: 0 4px 20px rgba(24, 144, 255, 0.3);
+.sliderContent.animating {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sliderButton:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    transform: translateY(-50%);
-    /* Keep original transform */
-    background: #f5f5f5;
-    /* Lighter background for disabled */
-    color: #ccc;
+.sliderItem {
+  flex-shrink: 0;
+  padding: 0 8px;
+  box-sizing: border-box;
 }
 
-/* Specific button positioning, relative to sliderWrapper padding */
-.prevButton {
-    left: 12px;
-    /* Adjusted to be inside sliderWrapper padding */
+/* Arrows */
+.sliderArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
-.nextButton {
-    right: 12px;
-    /* Adjusted to be inside sliderWrapper padding */
+.sliderArrow:hover {
+  background: #f0f0f0;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
 }
 
-.dotsContainer {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 24px;
-    padding: 0 16px;
-}
-.title{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-}
-.seeMore{
-    font-size: 14px;
-    text-align: right;
-    margin-right: 16px;
-    
-    cursor: pointer;
-          
-}
-.loading,
-.error,
-.noProducts {
-    text-align: center;
-    padding: 60px 20px;
-    color: #666;
-    font-size: 16px;
+.sliderArrow:active {
+  transform: scale(0.95);
 }
 
-.error {
-    color: #ff4d4f;
+.sliderArrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.loading {
-    position: relative;
+.sliderArrowPrev {
+  order: -1;
 }
 
-.loading::after {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-left: 10px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #1890ff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.sliderArrowNext {
+  order: 1;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.noProducts {
-    text-align: center;
-    padding: 40px 20px;
-    color: #999;
-    font-size: 16px;
-}
 
 /* Responsive Design */
-@media (max-width: 1400px) {
-    .sliderContainer {
-        margin: 24px 0;
-    }
-
-    .sliderWrapper {
-        padding: 0 50px;
-    }
-
-    .sliderButton {
-        width: 40px;
-        height: 40px;
-        font-size: 14px;
-    }
-    
-    .slideItem {
-        width: calc((100% - 4 * 16px) / 5);
-    }
+@media (max-width: 1199px) {
+  .sliderContainer {
+    padding: 0 16px;
+  }
+  
+  .sliderItem {
+    padding: 0 6px;
+  }
 }
 
-@media (max-width: 1200px) {
-    .sliderTitle {
-        font-size: 22px;
-        margin-bottom: 20px;
-    }
-
-    .sliderTrack {
-        gap: 16px;
-        /* Adjusted gap for smaller screens */
-    }
-    
-    .slideItem {
-        width: calc((100% - 3 * 16px) / 4);
-    }
+@media (max-width: 991px) {
+  .sliderContainer {
+    padding: 0 12px;
+  }
+  
+  .sliderItem {
+    padding: 0 4px;
+  }
+  
+  .sliderArrow {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+  
+  .sliderHeaderContainer {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .sliderTitle {
+    font-size: 1.5rem;
+  }
 }
 
-@media (max-width: 992px) {
-    .sliderWrapper {
-        padding: 0 40px;
-    }
-
-    .sliderButton {
-        width: 36px;
-        height: 36px;
-        font-size: 12px;
-    }
-
-    .prevButton {
-        left: 8px;
-    }
-
-    .nextButton {
-        right: 8px;
-    }
-    
-    .slideItem {
-        width: calc((100% - 2 * 16px) / 3);
-    }
+@media (max-width: 767px) {
+  .sliderContainer {
+    padding: 0 8px;
+  }
+  
+  .sliderWrapper {
+    gap: 8px;
+  }
+  
+  .sliderItem {
+    padding: 0 2px;
+  }
+  
+  .sliderArrow {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  
+  .sliderTitle {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+  }
+  
+  .sliderHeaderContainer {
+    margin-bottom: 15px;
+  }
+  
+  .viewMoreLink {
+    font-size: 0.9rem;
+  }
 }
 
-@media (max-width: 768px) {
-    .sliderContainer {
-        margin: 20px 0;
-    }
-
-    .sliderTitle {
-        font-size: 20px;
-        margin-bottom: 16px;
-    }
-
-    .sliderWrapper {
-        padding: 0 35px;
-    }
-
-    .sliderTrack {
-        gap: 10px;
-        padding: 0 4px;
-    }
-
-    .sliderButton {
-        width: 32px;
-        height: 32px;
-    }
-
-    .prevButton {
-        left: 4px;
-    }
-
-    .nextButton {
-        right: 4px;
-    }
-
-    .dotsContainer {
-        margin-top: 20px;
-        gap: 6px;
-    }
-
-    .dot {
-        width: 8px;
-        height: 8px;
-    }
-    
-    .slideItem {
-        width: calc((100% - 2 * 10px) / 3);
-    }
+@media (max-width: 575px) {
+  .sliderContainer {
+    padding: 0 4px;
+  }
+  
+  .sliderWrapper {
+    gap: 4px;
+  }
+  
+  .sliderArrow {
+    width: 28px;
+    height: 28px;
+  }
+  
+  /* Hide arrows on very small screens */
+  .sliderArrow {
+    display: none;
+  }
 }
 
-@media (max-width: 576px) {
-    .sliderContainer {
-        margin: 16px 0;
-    }
-
-    .sliderTitle {
-        font-size: 18px;
-        margin-bottom: 14px;
-        padding: 0 12px;
-    }
-
-    .sliderWrapper {
-        padding: 0 30px;
-    }
-
-    .sliderTrack {
-        gap: 8px;
-        padding: 0 2px;
-    }
-
-    .prevButton {
-        left: 4px;
-    }
-
-    .nextButton {
-        right: 4px;
-    }
-
-    .sliderButton {
-        width: 28px;
-        height: 28px;
-        font-size: 10px;
-    }
-    
-    .slideItem {
-        width: calc((100% - 1 * 8px) / 2);
-    }
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .sliderContent {
+    transition: none;
+  }
+  
+  .sliderArrow {
+    transition: none;
+  }
 }
 
-@media (max-width: 480px) {
-    .sliderTitle {
-        font-size: 16px;
-        margin-bottom: 12px;
-    }
 
-    .sliderWrapper {
-        padding: 0 25px;
-    }
-
-    .sliderButton {
-        width: 24px;
-        height: 24px;
-        font-size: 8px;
-    }
-    
-    .sliderTrack {
-        gap: 8px;
-    }
-    
-    .slideItem {
-        width: calc((100% - 1 * 8px) / 2);
-    }
+/* Loading and Empty States */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  min-height: 300px;
 }
 
-/* Animation for smooth scrolling */
-@media (prefers-reduced-motion: no-preference) {
-    .slideItem {
-        animation: slideIn 0.5s ease-out;
-    }
+.emptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  min-height: 200px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  margin: 20px;
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+.emptyState p {
+  font-size: 1.1rem;
+  color: #999;
+  margin: 0;
 }
 
-/* Touch device optimizations */
-@media (hover: none) and (pointer: coarse) {
-    .sliderButton:hover {
-        transform: translateY(-50%);
-        background: white;
-        border-color: #e8e8e8;
-    }
 
-    .sliderTrack {
-        cursor: default;
-    }
 
-    .sliderTrack:active {
-        cursor: default;
-    }
+/* Loading state */
+.sliderContainer.loading .sliderContent {
+  opacity: 0.7;
+  pointer-events: none;
 }
 
-/* High DPI displays */
-@media (-webkit-min-device-pixel-ratio: 2),
-(min-resolution: 192dpi) {
-    .sliderButton {
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    }
+/* Performance optimizations */
+.sliderContent {
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Smooth scrolling for touch devices */
+.sliderTrack {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
