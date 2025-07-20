@@ -8,6 +8,7 @@ import { BackTop, Col } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import ProductSlider from "../../components/ProductSlider/ProductSlider";
 import SliderProduct from "../../components/SliderProduct/TopSeller";
+import bottomBanner from "../../assets/img/banner/BottomBanner.png";
 import TopSeller from "../../components/SliderProduct/TopSeller";
 import ListCategory from "../../components/ListCategory/ListCategory";
 function HomePage() {
@@ -72,11 +73,31 @@ function HomePage() {
                   }}
                 />
               </div>
+
+              <img className={styles.Banner} src={bottomBanner} alt="Banner" />
+
               <div className={styles["home-page-list"]}>
                 <ProductSlider
                   query={"Phụ kiện"}
                   title="Phụ kiện thời trang"
                   subtitle="Hoàn thiện phong cách với phụ kiện độc đáo"
+                  autoPlay={true}
+                  autoPlayInterval={5000}
+                  showArrows={true}
+                  showDots={true}
+                  cardProps={{
+                    showFavorite: true,
+                    showSold: true,
+                    variant: "slider",
+                  }}
+                />
+              </div>
+
+              <div className={styles["home-page-list"]}>
+                <ProductSlider
+                  query={"Giày Dép"}
+                  title="Giày Dép"
+                  subtitle="Hoàn thiện phong cách với giày dép độc đáo"
                   autoPlay={true}
                   autoPlayInterval={5000}
                   showArrows={true}
