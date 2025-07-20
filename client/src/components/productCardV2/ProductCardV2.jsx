@@ -8,7 +8,8 @@ import { addFavorite, removeFavorite } from "../../services/userService";
 import { useSelector, useDispatch } from "react-redux";
 import { updateFavorite } from "../../redux/slices/userSlice";
 
-function ProductCard({
+function ProductCardV2({
+  // Renamed function for consistency
   productId,
   image,
   name,
@@ -23,9 +24,8 @@ function ProductCard({
   const userId = useSelector((state) => state.user._id);
 
   const isFavorite = favoriteProducts?.some((product) => product === productId);
-  const newPriceValue = price - (price * discount) / 100; // Keep as number for calculation
+  const newPriceValue = price - (price * discount) / 100;
 
-  // Format prices using Intl.NumberFormat for currency display
   const formattedNewPrice = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -35,28 +35,40 @@ function ProductCard({
     currency: "VND",
   }).format(price);
 
-  const productPrice = {
-    newPrice: formattedNewPrice,
-    oldPrice: formattedOldPrice,
-  };
+  // No need for a separate productPrice object if used immediately
+  // const productPrice = {
+  //   newPrice: formattedNewPrice,
+  //   oldPrice: formattedOldPrice,
+  // };
 
-  const handleFavorite = (e) => {
+  const handleFavorite = async (e) => {
+    // Made async to handle API calls
     e.stopPropagation();
     if (!userId) {
       message.error("Vui lòng đăng nhập để thêm sản phẩm vào yêu thích.");
       return;
     }
-    if (isFavorite) {
-      removeFavorite(productId);
-      dispatch(
-        updateFavorite({
-          favorite: favoriteProducts.filter((id) => id !== productId),
-        })
-      );
-    } else {
-      addFavorite(productId);
-      dispatch(updateFavorite({ favorite: [...favoriteProducts, productId] }));
-      setIsAnimating(true);
+
+    try {
+      if (isFavorite) {
+        await removeFavorite(productId); // Await the API call
+        dispatch(
+          updateFavorite({
+            favorite: favoriteProducts.filter((id) => id !== productId),
+          })
+        );
+        message.success("Đã xóa sản phẩm khỏi danh sách yêu thích.");
+      } else {
+        await addFavorite(productId); // Await the API call
+        dispatch(
+          updateFavorite({ favorite: [...favoriteProducts, productId] })
+        );
+        setIsAnimating(true);
+        message.success("Đã thêm sản phẩm vào danh sách yêu thích.");
+      }
+    } catch (error) {
+      console.error("Failed to update favorite:", error);
+      message.error("Lỗi khi cập nhật sản phẩm yêu thích. Vui lòng thử lại.");
     }
   };
 
@@ -66,12 +78,15 @@ function ProductCard({
         <div className={styles["product-card-discount"]}>-{discount}%</div>
       )}
 
+      {/* Simplified stock/sold badge logic for clarity */}
       {totalStock > 0 ? (
-        sold > 20 ? (
+        sold > 20 && (
           <div className={styles["product-card-badge"]}>Bán chạy</div>
-        ) : null
+        )
       ) : (
-        <div className={styles["product-card-badge-out-of-stock"]}></div>
+        <div className={styles["product-card-badge-out-of-stock"]}>
+          Hết hàng
+        </div> // Added "Hết hàng" text
       )}
       <Link to={`/products/${productId}`}>
         <img src={image} alt={name} className={styles["product-image"]} />
@@ -86,11 +101,12 @@ function ProductCard({
             <div>
               <div className={styles["productPrice"]}>
                 <span style={{ color: "#ff424e" }}>
-                  {productPrice.newPrice}
+                  {formattedNewPrice} {/* Use formatted value directly */}
                 </span>
                 <div className={styles["productOldPriceContainer"]}>
                   <div className={styles["productOldPrice"]}>
-                    <del>{productPrice.oldPrice}</del>
+                    <del>{formattedOldPrice}</del>{" "}
+                    {/* Use formatted value directly */}
                   </div>
                 </div>
               </div>
@@ -136,4 +152,4 @@ function ProductCard({
   );
 }
 
-export default ProductCard;
+export default ProductCardV2; // Export with consistent name
