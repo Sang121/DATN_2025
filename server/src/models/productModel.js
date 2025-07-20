@@ -27,9 +27,14 @@ const productSchema = new mongoose.Schema(
       enum: [
         "Áo",
         "Quần",
+        "Đồ thể thao",
+        "Đồ lót",
+        "Đồ ngủ",
+        "Áo khoác",
         "Váy",
         "Đồng hồ",
         "Phụ kiện",
+        "Đồ bơi",
         "Giày dép",
         "Túi xách",
         "Balo",
@@ -93,8 +98,6 @@ productSchema.pre("findOneAndUpdate", function (next) {
       // Set totalStock mới
       update.$set.totalStock = newTotalStock;
       update.$set.sold = newTotalSold;
-
-  
     }
   }
 
@@ -118,7 +121,6 @@ productSchema.post("findOneAndUpdate", async function (doc) {
       doc.totalStock !== calculatedTotalStock ||
       doc.sold !== calculatedTotalSold
     ) {
-     
       await this.model.updateOne(
         { _id: doc._id },
         {
