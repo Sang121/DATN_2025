@@ -444,7 +444,38 @@ const addVariant = (productId, variantData) => {
     }
   });
 };
+const bestSellerProduct = (limit = 10) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const bestSellers = await Product.find()
+        .sort({ sold: -1 }) // Giả sử có trường 'sold' để xác định sản phẩm bán chạy
+        .limit(limit);
 
+      if (!bestSellers || bestSellers.length === 0) {
+        return resolve({
+          status: "Ok",
+          message: "No best seller products found",
+          data: [],
+        });
+      }
+
+      const processedProducts = bestSellers.map(processImageUrls);
+
+      resolve({
+        status: "Ok",
+        message: "Best seller products retrieved successfully",
+        data: processedProducts,
+      });
+    } catch (error) {
+      console.error("Error retrieving best seller products:", error);
+      reject({
+        status: "Err",
+        message: "Error retrieving best seller products",
+        error: error.message || "Unknown error occurred",
+      });
+    }
+  });
+};
 module.exports = {
   createProduct,
   processImageUrls,
@@ -457,4 +488,5 @@ module.exports = {
   deleteImage,
   removeVariant,
   addVariant,
+  bestSellerProduct,
 };

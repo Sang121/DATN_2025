@@ -6,7 +6,6 @@ const BASE_URL =
 
 const createProduct = async (req, res) => {
   try {
-
     // Validate request body
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
@@ -49,7 +48,6 @@ const createProduct = async (req, res) => {
       variants: req.body.variants || [],
       images: images || [],
     };
-
 
     const response = await productService.createProduct(productData);
     return res.status(200).json(response);
@@ -186,7 +184,14 @@ const searchProduct = async (req, res) => {
     return res.status(404).json({ message: "Server error", error });
   }
 };
-
+const bestSellerProduct = async (req, res) => {
+  try {
+    const response = await productService.bestSellerProduct();
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({ message: "Server error", error });
+  }
+};
 module.exports = {
   createProduct,
   updateProduct,
@@ -197,4 +202,5 @@ module.exports = {
   getProductByCategory,
   searchProduct,
   deleteImage,
+  bestSellerProduct,
 };

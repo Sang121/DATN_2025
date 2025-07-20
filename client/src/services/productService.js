@@ -258,3 +258,35 @@ export const deleteImage = (imageName) => {
     }
   });
 };
+export const bestSeller = async () => {
+  try {
+    const url = `${import.meta.env.VITE_API_URL}/product/bestSeller`;
+    const response = await axiosInstance.get(url);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        `Failed to fetch best sellers: ${
+          error.response.data.message || error.message
+        }`
+      );
+    }
+    throw error;
+  }
+};
+export const createCategory = async (category) => {
+  try {
+    const url = `${import.meta.env.VITE_API_URL}/product/createCategory`;
+    const response = await axiosInstance.post(url, category);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        `Failed to create category: ${
+          error.response.data.message || error.message
+        }`
+      );
+    }
+    throw error;
+  }
+};

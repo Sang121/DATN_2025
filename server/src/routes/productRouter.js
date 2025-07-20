@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/productController");
+const CreateDetailController = require("../controllers/CreateDetailController");
 const authAdminMiddleware = require("../middleware/authAdminMiddleware");
 const { upload } = require("../middleware/uploadMiddleware");
-router.post("/createProduct",authAdminMiddleware, productController.createProduct);
+router.post(
+  "/createProduct",
+  authAdminMiddleware,
+  productController.createProduct
+);
 router.put(
   "/updateProduct/:id",
   authAdminMiddleware,
@@ -33,5 +38,7 @@ router.post(
 );
 //router.get('/category/:category',productController.getProductByCategory);
 router.get("/search/:query", productController.searchProduct);
+router.get("/bestSeller", productController.bestSellerProduct);
+router.post("/createCategory", CreateDetailController.createCategory);
 
 module.exports = router;
