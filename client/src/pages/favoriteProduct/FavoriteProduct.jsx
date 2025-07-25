@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  Row, 
-  Col, 
-  Typography, 
-  Spin, 
-  Empty, 
-  Button, 
-  Select, 
+import {
+  Row,
+  Col,
+  Typography,
+  Spin,
+  Empty,
+  Button,
+  Select,
   Input,
   Card,
-  Space
+  Space,
 } from "antd";
-import { 
-  HeartFilled, 
-  SearchOutlined, 
-  SortAscendingOutlined
+import {
+  HeartFilled,
+  SearchOutlined,
+  SortAscendingOutlined,
 } from "@ant-design/icons";
 import { getFavorite } from "../../services/userService";
 import ProductCard from "../../components/ProductCard/ProductCard";
@@ -26,8 +26,8 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 function FavoriteProduct() {
-  const [sortBy, setSortBy] = useState('newest');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState("newest");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const {
     data: favoriteProducts,
@@ -47,23 +47,23 @@ function FavoriteProduct() {
   // Filter and sort products
   const filteredAndSortedProducts = React.useMemo(() => {
     if (!favoriteProducts) return [];
-    
-    let filtered = favoriteProducts.filter(product =>
+
+    let filtered = favoriteProducts.filter((product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Sort products
     switch (sortBy) {
-      case 'price-low':
+      case "price-low":
         filtered.sort((a, b) => a.price - b.price);
         break;
-      case 'price-high':
+      case "price-high":
         filtered.sort((a, b) => b.price - a.price);
         break;
-      case 'name':
+      case "name":
         filtered.sort((a, b) => a.name.localeCompare(b.name));
         break;
-      case 'rating':
+      case "rating":
         filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       default: // newest
@@ -101,10 +101,11 @@ function FavoriteProduct() {
                   Oops! Có lỗi xảy ra
                 </Title>
                 <Text className={styles.errorMessage}>
-                  {error?.message || "Không thể tải sản phẩm yêu thích. Vui lòng thử lại sau."}
+                  {error?.message ||
+                    "Không thể tải sản phẩm yêu thích. Vui lòng thử lại sau."}
                 </Text>
-                <Button 
-                  type="primary" 
+                <Button
+                  type="primary"
                   className={styles.retryButton}
                   onClick={() => window.location.reload()}
                 >
@@ -120,7 +121,6 @@ function FavoriteProduct() {
 
   return (
     <div className={styles.favoritePageContainer}>
-
       {favoriteProducts && favoriteProducts.length > 0 ? (
         <>
           {/* Control Panel */}
@@ -136,7 +136,7 @@ function FavoriteProduct() {
                   size="large"
                 />
               </Col>
-              
+
               <Col xs={12} sm={6} md={6}>
                 <Select
                   value={sortBy}
@@ -156,8 +156,8 @@ function FavoriteProduct() {
               <Col xs={12} md={8}>
                 <div className={styles.resultInfo}>
                   <Text className={styles.resultText}>
-                    Hiển thị <strong>{filteredAndSortedProducts.length}</strong> 
-                    {' '}trong số <strong>{favoriteProducts.length}</strong> sản phẩm
+                    Hiển thị <strong>{filteredAndSortedProducts.length}</strong>{" "}
+                    trong số <strong>{favoriteProducts.length}</strong> sản phẩm
                   </Text>
                 </div>
               </Col>
@@ -167,10 +167,7 @@ function FavoriteProduct() {
           {/* Products Grid */}
           {filteredAndSortedProducts.length > 0 ? (
             <div className={styles.productsSection}>
-              <Row 
-                gutter={[24, 24]} 
-                className={styles.productGrid}
-              >
+              <Row gutter={[24, 24]} className={styles.productGrid}>
                 {filteredAndSortedProducts.map((product, index) => (
                   <Col
                     key={product._id}
@@ -180,10 +177,10 @@ function FavoriteProduct() {
                     lg={6}
                     className={styles.productCol}
                   >
-                    <div 
+                    <div
                       className={styles.productWrapper}
-                      style={{ 
-                        animationDelay: `${index * 0.1}s` 
+                      style={{
+                        animationDelay: `${index * 0.1}s`,
                       }}
                     >
                       <ProductCard
@@ -215,11 +212,11 @@ function FavoriteProduct() {
                     <Text className={styles.noResultsText}>
                       Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc
                     </Text>
-                    <Button 
-                      type="link" 
+                    <Button
+                      type="link"
                       onClick={() => {
-                        setSearchTerm('');
-                        setSortBy('newest');
+                        setSearchTerm("");
+                        setSortBy("newest");
                       }}
                       className={styles.clearButton}
                     >
@@ -241,13 +238,14 @@ function FavoriteProduct() {
               Chưa có sản phẩm yêu thích
             </Title>
             <Text className={styles.emptyDescription}>
-              Hãy khám phá và thêm những sản phẩm bạn yêu thích vào danh sách này
+              Hãy khám phá và thêm những sản phẩm bạn yêu thích vào danh sách
+              này
             </Text>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               size="large"
               className={styles.shopButton}
-              onClick={() => window.location.href = '/products'}
+              onClick={() => (window.location.href = "/products")}
             >
               Khám phá sản phẩm
             </Button>

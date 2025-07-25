@@ -206,12 +206,32 @@ export const getProductByCategory = async (category) => {
   }
 };
 
-export const searchProduct = async (query) => {
+export const searchProduct = async (query, filters = {}) => {
   try {
     validateQuery(query);
+
+    // Build URL with query parameters
     const url = `${import.meta.env.VITE_API_URL}/product/search/${query}`;
+    const params = new URLSearchParams();
+
+    // Add filters as query parameters
+    if (filters.category) {
+      params.append("category", filters.category);
+    }
+    if (filters.minPrice) {
+      params.append("minPrice", filters.minPrice);
+    }
+    if (filters.maxPrice) {
+      params.append("maxPrice", filters.maxPrice);
+    }
+    if (filters.sortBy) {
+      params.append("sortBy", filters.sortBy);
+    }
+
+    const finalUrl = params.toString() ? `${url}?${params.toString()}` : url;
+
     const response = await Promise.race([
-      axiosInstance.get(url),
+      axiosInstance.get(finalUrl),
       timeout(5000),
     ]);
     return response.data;
