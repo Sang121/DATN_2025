@@ -271,7 +271,7 @@ function UserUpdate() {
                 className={styles.cancelButton}
                 onClick={() => form.resetFields()}
               >
-                Hủy bỏ
+                Đặt lại
               </Button>
               <Button
                 type="primary"
