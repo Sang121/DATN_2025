@@ -1,0 +1,91 @@
+/* Admin Page Global Styles */
+@import './AdminPage.module.css';
+
+/* Global admin variables */
+:root {
+  --admin-primary-color: #1890ff;
+  --admin-success-color: #52c41a;
+  --admin-warning-color: #faad14;
+  --admin-error-color: #ff4d4f;
+  --admin-background-color: #f0f2f5;
+  --admin-card-background: #ffffff;
+  --admin-border-color: #d9d9d9;
+  --admin-text-color: #262626;
+  --admin-text-secondary: #8c8c8c;
+  --admin-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --admin-border-radius: 6px;
+  --admin-spacing-sm: 8px;
+  --admin-spacing-md: 16px;
+  --admin-spacing-lg: 24px;
+  --admin-spacing-xl: 32px;
+}
+
+/* Common animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Common classes */
+.admin-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.admin-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.admin-card {
+  background: var(--admin-card-background);
+  border-radius: var(--admin-border-radius);
+  box-shadow: var(--admin-box-shadow);
+  border: 1px solid var(--admin-border-color);
+}
+
+.admin-section {
+  margin-bottom: var(--admin-spacing-lg);
+}
+
+.admin-text-center {
+  text-align: center;
+}
+
+.admin-text-right {
+  text-align: right;
+}
+
+.admin-text-muted {
+  color: var(--admin-text-secondary);
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  :root {
+    --admin-spacing-lg: 16px;
+    --admin-spacing-xl: 24px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .admin-no-print {
+    display: none !important;
+  }
+}

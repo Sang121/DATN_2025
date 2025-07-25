@@ -20,7 +20,7 @@ import AddProduct from "./AddProduct/AddProduct";
 import {
   deleteProduct,
   getAllProduct,
-} from "../../../../services/productService";
+} from "../../../../../services/productService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const cx = classNames.bind(styles);

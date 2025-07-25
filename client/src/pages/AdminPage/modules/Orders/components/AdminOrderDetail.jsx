@@ -25,7 +25,7 @@ import {
   getOrderDetails,
   updateOrderStatus,
   updatePaymentStatus,
-} from "../../../../services/orderService";
+} from "../../../../../services/orderService";
 import styles from "./AdminOrderDetail.module.css";
 import {
   SmileOutlined,

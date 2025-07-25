@@ -22,7 +22,7 @@ import {
   uploadImage,
   updateProduct,
   deleteImage,
-} from "../../../../../services/productService";
+} from "../../../../../../services/productService";
 import classNames from "classnames/bind";
 import styles from "./AddProduct.module.css";
 

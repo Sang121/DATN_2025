@@ -26,7 +26,7 @@ const OrderDetailPage = lazy(() =>
 );
 const MyOrdersPage = lazy(() => import("../components/myOrder/MyOrder"));
 const AdminOrderDetail = lazy(() =>
-  import("../pages/AdminPage/component/adminOrderDetail/AdminOrderDetail")
+  import("../pages/AdminPage/modules/Orders/components/AdminOrderDetail")
 );
 import FavoriteProduct from "../pages/favoriteProduct/FavoriteProduct";
 export const routes = [

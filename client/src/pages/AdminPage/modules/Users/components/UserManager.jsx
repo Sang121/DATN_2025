@@ -6,7 +6,7 @@ import {
   deleteUser,
   getAllUser,
   updateUser,
-} from "../../../../services/userService";
+} from "../../../../../services/userService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import RegUser from "./RegUser/RegUser";
 import styles from "./userManager.module.css";

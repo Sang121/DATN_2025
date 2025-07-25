@@ -10,13 +10,14 @@ import {
   ShoppingCartOutlined, // Thêm icon cho đơn hàng
   BarChartOutlined, // Thêm icon cho thống kê
 } from "@ant-design/icons";
-import styles from "./AdminPage.module.css";
+import styles from "./styles/AdminPage.module.css";
+import "./styles/index.css"; // Import global admin styles
 import { Col, Divider, Menu, Switch } from "antd";
-import UserManager from "./component/userManager/UserManager";
-import ProductManager from "./component/productManager/ProductManager";
-import OrderManager from "./component/orderManager/OrderManager";
-import OptimizedStatistics from "./component/StatisticsPage/OptimizedStatistics";
-import StatisticsFallback from "./component/StatisticsPage/components/StatisticsFallback";
+import UserManager from "./modules/Users";
+import ProductManager from "./modules/Products";
+import OrderManager from "./modules/Orders";
+import OptimizedStatistics from "./modules/Statistics/OptimizedStatistics";
+import StatisticsFallback from "./modules/Statistics/components/StatisticsFallback";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 

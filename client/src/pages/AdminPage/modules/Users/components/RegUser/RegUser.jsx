@@ -23,7 +23,7 @@ import {
 } from "@ant-design/icons";
 import styles from "./RegUser.module.css";
 import { useMutation } from "@tanstack/react-query";
-import { signUpUser } from "../../../../../services/userService";
+import { signUpUser } from "../../../../../../services/userService";
 
 const { Title } = Typography;
 

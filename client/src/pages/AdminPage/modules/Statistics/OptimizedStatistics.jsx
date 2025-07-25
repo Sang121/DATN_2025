@@ -11,7 +11,7 @@ import DashboardOverview from "./components/DashboardOverview";
 import AdvancedAnalytics from "./components/AdvancedAnalytics";
 import StatisticsQueryProvider from "./providers/StatisticsQueryProvider";
 import StatisticsErrorBoundary from "./components/StatisticsErrorBoundary";
-import "./StatisticsPage.css";
+import "./styles/Statistics.css";
 
 const { TabPane } = Tabs;
 
