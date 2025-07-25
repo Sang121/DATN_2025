@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./SideBar.module.css";
 import { Link } from "react-router-dom";
-import { Menu, Typography, Badge, Avatar } from "antd";
+import { Menu, Typography } from "antd";
 import {
   TagsOutlined,
   ManOutlined,
@@ -11,7 +11,6 @@ import {
   ThunderboltOutlined,
   ClockCircleOutlined,
   InboxOutlined,
-  StarOutlined,
 } from "@ant-design/icons";
 
 const { Title } = Typography;
@@ -78,12 +77,6 @@ function Sidebar() {
       image:
         "https://salt.tikicdn.com/cache/100x100/ts/category/31/a7/94/6524d2ecbec216816d91b6066452e3f2.png",
     },
-    {
-      name: "Khác",
-      category: "Khác",
-      image:
-        "https://salt.tikicdn.com/cache/100x100/ts/category/31/a7/94/6524d2ecbec216816d91b6066452e3f2.png",
-    },
   ];
   // Tạo các items cho Menu của Ant Design
   const menuItems = typeProductsList.map((product, index) => {
@@ -121,7 +114,11 @@ function Sidebar() {
     return {
       key: index.toString(),
       icon: icon,
-      label: <Link to={`/search/${product.category}`}>{product.name}</Link>,
+      label: (
+        <Link to={`/searchproduct?category=${product.category}`}>
+          {product.name}
+        </Link>
+      ),
     };
   });
 

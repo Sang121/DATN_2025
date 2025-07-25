@@ -273,17 +273,6 @@
     padding: 20px;
   }
 
-  .titleContainer {
-    flex-direction: column;
-    text-align: center;
-    gap: 16px;
-  }
-
-  .titleContent {
-    flex-direction: column;
-    gap: 12px;
-  }
-
   .resultInfo {
     text-align: center;
   }
@@ -294,24 +283,13 @@
     padding: 16px;
   }
 
-  .titleContainer {
-    padding: 24px 20px;
-  }
-
-  .titleContent {
-    gap: 16px;
-  }
-
-  .heartIcon {
-    font-size: 36px;
+  .simpleTitleSection {
+    padding: 16px 0;
+    margin-bottom: 24px;
   }
 
   .controlPanel :global(.ant-card-body) {
     padding: 16px;
-  }
-
-  .viewModeContainer {
-    justify-content: center;
   }
 
   .productGrid {
@@ -328,16 +306,12 @@
     padding: 12px;
   }
 
-  .titleContainer {
-    padding: 20px 16px;
-    border-radius: 16px;
+  .simpleTitleSection {
+    padding: 12px 0;
+    margin-bottom: 20px;
   }
 
-  .titleContent {
-    width: 100%;
-  }
-
-  .pageTitle {
+  .simplePageTitle {
     font-size: 24px !important;
   }
 
