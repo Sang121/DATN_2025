@@ -1,0 +1,223 @@
+/* Statistics Page Styles */
+
+.statistics-page {
+  padding: 20px;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.statistics-header {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.statistics-tabs .ant-tabs-content-holder {
+  padding: 20px 0;
+}
+
+/* Overview Cards */
+.overview-card {
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.overview-card .ant-statistic-title {
+  color: #666;
+  font-weight: 500;
+}
+
+.overview-card .ant-statistic-content {
+  color: #1890ff;
+}
+
+/* Charts */
+.chart-container {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.chart-title {
+  margin: 0 !important;
+  color: #262626;
+}
+
+/* Tables */
+.statistics-table .ant-table-thead > tr > th {
+  background: #fafafa;
+  color: #262626;
+  font-weight: 600;
+}
+
+.statistics-table .ant-table-tbody > tr:hover > td {
+  background: #f5f5f5;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.completed {
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.status-badge.pending {
+  background: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.status-badge.processing {
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.status-badge.cancelled {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border: 1px solid #ffccc7;
+}
+
+/* Loading states */
+.statistics-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  flex-direction: column;
+}
+
+.statistics-loading .ant-spin {
+  margin-bottom: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .statistics-page {
+    padding: 10px;
+  }
+  
+  .statistics-header {
+    padding: 15px;
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .overview-card {
+    margin-bottom: 10px;
+  }
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tooltip enhancements */
+.recharts-tooltip-wrapper {
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.recharts-default-tooltip {
+  border-radius: 6px !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Advanced analytics specific styles */
+.advanced-controls {
+  background: white;
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.advanced-controls .ant-row {
+  align-items: center;
+}
+
+.advanced-controls label {
+  font-weight: 500;
+  color: #666;
+  margin-right: 8px;
+}
+
+.comparison-card {
+  text-align: center;
+  height: 100%;
+}
+
+.comparison-card .ant-card-head-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.comparison-card .ant-card-body {
+  padding: 12px;
+}
+
+.comparison-card .ant-card-body > div {
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.growth-indicator {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.growth-positive {
+  color: #52c41a;
+}
+
+.growth-negative {
+  color: #ff4d4f;
+}
+
+.growth-neutral {
+  color: #666;
+}

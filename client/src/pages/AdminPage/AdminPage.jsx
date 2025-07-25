@@ -8,13 +8,15 @@ import {
   SettingOutlined,
   UserOutlined,
   ShoppingCartOutlined, // Thêm icon cho đơn hàng
+  BarChartOutlined, // Thêm icon cho thống kê
 } from "@ant-design/icons";
 import styles from "./AdminPage.module.css";
 import { Col, Divider, Menu, Switch } from "antd";
 import UserManager from "./component/userManager/UserManager";
 import ProductManager from "./component/productManager/ProductManager";
 import OrderManager from "./component/orderManager/OrderManager";
-import Statistics from "./component/StatisticsPage/Statistics";
+import OptimizedStatistics from "./component/StatisticsPage/OptimizedStatistics";
+import StatisticsFallback from "./component/StatisticsPage/components/StatisticsFallback";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
@@ -36,7 +38,7 @@ const items = [
   },
   {
     key: "Statistics", // Thêm key cho thống kê
-    icon: <ShoppingCartOutlined />,
+    icon: <BarChartOutlined />,
     label: "Thống kê doanh số",
   },
 ];
@@ -48,17 +50,25 @@ const AdminPage = () => {
     setSelectedKey(key);
   };
   const renderContent = () => {
-    switch (selectedKey) {
-      case "user":
-        return <UserManager />;
-      case "product":
-        return <ProductManager />;
-      case "order":
-        return <OrderManager />;
-      case "Statistics":
-        return <Statistics />;
-      default:
-        return <UserManager />;
+    try {
+      switch (selectedKey) {
+        case "user":
+          return <UserManager />;
+        case "product":
+          return <ProductManager />;
+        case "order":
+          return <OrderManager />;
+        case "Statistics":
+          return <OptimizedStatistics />;
+        default:
+          return <UserManager />;
+      }
+    } catch (error) {
+      console.error("Error rendering content:", error);
+      if (selectedKey === "Statistics") {
+        return <StatisticsFallback />;
+      }
+      return <UserManager />;
     }
   };
   const location = useLocation();
