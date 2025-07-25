@@ -1,12 +1,27 @@
-import React, { useState } from "react";
-import { Slider, InputNumber, Button, Card, Typography, Divider } from "antd";
+import React, { useState, useEffect } from "react";
+import { Slider, InputNumber, Button, Typography, Card, Divider } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
+import { useSearchParams } from "react-router-dom";
 import styles from "./FilterPrice.module.css";
 
 const { Title } = Typography;
 
 function FilterPrice() {
-  const [priceRange, setPriceRange] = useState([0, 5000000]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [priceRange, setPriceRange] = useState([0, 2000000]);
+
+  // Initialize price from URL params
+  useEffect(() => {
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+
+    if (minPrice || maxPrice) {
+      setPriceRange([
+        minPrice ? parseInt(minPrice) : 0,
+        maxPrice ? parseInt(maxPrice) : 2000000,
+      ]);
+    }
+  }, [searchParams]);
 
   const handleSliderChange = (value) => {
     setPriceRange(value);
@@ -17,12 +32,34 @@ function FilterPrice() {
   };
 
   const handleMaxInputChange = (value) => {
-    setPriceRange([priceRange[0], value || 5000000]);
+    setPriceRange([priceRange[0], value || 2000000]);
   };
 
   const handleApply = () => {
+    const params = new URLSearchParams(searchParams);
+
+    if (priceRange[0] > 0) {
+      params.set("minPrice", priceRange[0].toString());
+    } else {
+      params.delete("minPrice");
+    }
+
+    if (priceRange[1] < 2000000) {
+      params.set("maxPrice", priceRange[1].toString());
+    } else {
+      params.delete("maxPrice");
+    }
+
+    setSearchParams(params);
     console.log("Áp dụng lọc giá:", priceRange);
-    // Tại đây sẽ kết nối với logic lọc sản phẩm theo giá
+  };
+
+  const handleReset = () => {
+    setPriceRange([0, 2000000]);
+    const params = new URLSearchParams(searchParams);
+    params.delete("minPrice");
+    params.delete("maxPrice");
+    setSearchParams(params);
   };
 
   // Format giá tiền
@@ -38,10 +75,12 @@ function FilterPrice() {
         <FilterOutlined /> Lọc theo giá
       </Title>
       <Divider className={styles.divider} />
+
       <Slider
         range
         min={0}
-        max={5000000}
+        max={2000000}
+        step={50000}
         value={priceRange}
         onChange={handleSliderChange}
         tooltip={{
@@ -49,6 +88,7 @@ function FilterPrice() {
         }}
         className={styles.priceSlider}
       />
+
       <div className={styles.filterPriceRange}>
         <InputNumber
           min={0}
@@ -78,14 +118,20 @@ function FilterPrice() {
           addonBefore="₫"
         />
       </div>
-      <Button
-        type="primary"
-        onClick={handleApply}
-        className={styles.filterPriceBtn}
-        icon={<FilterOutlined />}
-      >
-        Áp dụng
-      </Button>
+
+      <div className={styles.filterActions}>
+        <Button
+          type="primary"
+          onClick={handleApply}
+          className={styles.filterPriceBtn}
+          icon={<FilterOutlined />}
+        >
+          Áp dụng
+        </Button>
+        <Button onClick={handleReset} className={styles.resetBtn}>
+          Đặt lại
+        </Button>
+      </div>
     </Card>
   );
 }

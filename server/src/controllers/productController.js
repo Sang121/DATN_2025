@@ -178,7 +178,15 @@ const getProductByCategory = async (req, res) => {
 const searchProduct = async (req, res) => {
   const query = req.params.query;
   try {
-    const response = await productService.searchProduct(query);
+    // Extract filters from query parameters
+    const filters = {
+      category: req.query.category,
+      minPrice: req.query.minPrice ? Number(req.query.minPrice) : undefined,
+      maxPrice: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
+      sortBy: req.query.sortBy || "relevance",
+    };
+
+    const response = await productService.searchProduct(query, filters);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({ message: "Server error", error });

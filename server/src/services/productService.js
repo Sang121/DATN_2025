@@ -291,10 +291,11 @@ const getProductByCategory = (category) => {
     }
   });
 };
-const searchProduct = (query) => {
+const searchProduct = (query, filters = {}) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const productSearch = await Product.find({
+      // Build search query
+      let searchQuery = {
         $or: [
           { name: { $regex: query, $options: "i" } },
           { category: { $regex: query, $options: "i" } },
@@ -302,13 +303,58 @@ const searchProduct = (query) => {
           { description: { $regex: query, $options: "i" } },
           { brand: { $regex: query, $options: "i" } },
         ],
-      });
-      if (!productSearch) {
-        resolve({
+      };
+
+      // Apply category filter
+      if (filters.category) {
+        searchQuery.category = { $regex: filters.category, $options: "i" };
+      }
+
+      // Apply price range filter
+      if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+        searchQuery.price = {};
+        if (filters.minPrice !== undefined) {
+          searchQuery.price.$gte = filters.minPrice;
+        }
+        if (filters.maxPrice !== undefined) {
+          searchQuery.price.$lte = filters.maxPrice;
+        }
+      }
+
+      // Execute search query
+      let productSearch = await Product.find(searchQuery);
+
+      if (!productSearch || productSearch.length === 0) {
+        return resolve({
           status: "Ok",
-          message: "Product not found",
+          message: "No products found",
+          data: [],
         });
       }
+
+      // Apply sorting
+      if (filters.sortBy) {
+        switch (filters.sortBy) {
+          case "price_asc":
+            productSearch.sort((a, b) => a.price - b.price);
+            break;
+          case "price_desc":
+            productSearch.sort((a, b) => b.price - a.price);
+            break;
+          case "newest":
+            productSearch.sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            break;
+          case "popular":
+            productSearch.sort((a, b) => (b.sold || 0) - (a.sold || 0));
+            break;
+          default:
+            // relevance - keep original order
+            break;
+        }
+      }
+
       const processedProducts = productSearch.map(processImageUrls);
 
       resolve({
