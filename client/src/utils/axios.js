@@ -11,6 +11,22 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+// Global variable để tracking refresh token process
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   async (config) => {
@@ -38,96 +54,122 @@ axiosInstance.interceptors.request.use(
         const currentTime = Date.now() / 1000;
 
         if (decodedAccessToken.exp < currentTime + 5) {
-          // console.warn(
-          //   "Access Token expired or about to expire. Attempting to refresh..."
-          // );
+          // Token sắp hết hạn hoặc đã hết hạn
 
-          // Sử dụng _retry flag để chỉ cho phép thử làm mới token một lần duy nhất cho mỗi request
-          if (!config._retry) {
-            config._retry = true; // Mark the request as retried
-            try {
-              // GỌI HÀM REFRESH TOKEN TỪ userService.js ĐÃ IMPORT
-              const response = await callRefreshTokenAPI();
-              //console.log("Response when refreshing token:", response);
+          // Nếu đang refresh, thêm request vào queue
+          if (isRefreshing) {
+            return new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            })
+              .then((token) => {
+                config.headers.token = `Bearer ${token}`;
+                // Thêm userId từ Redux store mới nhất
+                const currentUserState = Store.getState().user;
+                const userId = currentUserState?.user?._id;
+                if (userId) {
+                  config.headers.userId = `${userId}`;
+                }
+                return config;
+              })
+              .catch((err) => {
+                return Promise.reject(err);
+              });
+          }
 
-              // Backend của bạn nên trả về một object có access_token bên trong
-              const newAccessToken = response?.access_token;
-              const newUser = response.newUser;
+          // Đánh dấu đang refresh
+          isRefreshing = true;
 
-              if (newAccessToken) {
-                // console.log(
-                //   "New access token successfully received from refresh API."
-                // );
+          try {
+            // GỌI HÀM REFRESH TOKEN TỪ userService.js ĐÃ IMPORT
+            const response = await callRefreshTokenAPI();
+            console.log("Response when refreshing token:", response);
 
-                // Cập nhật Redux store: Chỉ cập nhật thuộc tính 'user' bên trong state user
-                Store.dispatch(
-                  updateUser({
-                    _id: newUser._id,
-                    username: newUser.username,
-                    fullName: newUser.fullName,
-                    avatar: newUser.avatar,
-                    address: newUser.address,
-                    email: newUser.email,
-                    phone: newUser.phone,
-                    isAdmin: newUser.isAdmin,
-                    gender: newUser.gender,
-                    isAuthenticated: newUser.isAuthenticated,
-                    loading: newUser.loading,
-                    access_token: newAccessToken,
-                  })
+            // Backend của bạn nên trả về một object có access_token bên trong
+            const newAccessToken = response?.access_token;
+            const newUser = response.newUser;
+
+            if (newAccessToken) {
+              console.log(
+                "New access token successfully received from refresh API."
+              );
+
+              // Cập nhật Redux store: Chỉ cập nhật thuộc tính 'user' bên trong state user
+              Store.dispatch(
+                updateUser({
+                  _id: newUser._id,
+                  username: newUser.username,
+                  fullName: newUser.fullName,
+                  avatar: newUser.avatar,
+                  address: newUser.address,
+                  email: newUser.email,
+                  phone: newUser.phone,
+                  isAdmin: newUser.isAdmin,
+                  gender: newUser.gender,
+                  isAuthenticated: newUser.isAuthenticated,
+                  loading: newUser.loading,
+                  access_token: newAccessToken,
+                })
+              );
+
+              // Cập nhật sessionStorage
+              sessionStorage.setItem("access_token", newAccessToken);
+
+              // Cập nhật Authorization header cho request hiện tại
+              config.headers.token = `Bearer ${newAccessToken}`;
+
+              // Cập nhật userId header cho request hiện tại
+              const userId = newUser?._id;
+              if (userId) {
+                config.headers.userId = `${userId}`;
+                console.log(
+                  `Added userId to request headers after refresh: ${userId} for URL: ${config.url}`
                 );
-
-                // Cập nhật sessionStorage
-                sessionStorage.setItem("access_token", newAccessToken);
-
-                // Cập nhật Authorization header cho request hiện tại
-                config.headers.token = `Bearer ${newAccessToken}`;
-              } else {
-                console.error(
-                  "No valid new access token received from refresh API. Logging out."
-                );
-                // Nếu không có token mới, coi như làm mới thất bại và đăng xuất
-                throw new Error("No new access token after refresh.");
               }
-            } catch (e) {
-              console.error(
-                "Failed to refresh token in request interceptor:",
-                e
-              );
-              // Đăng xuất và clear session khi không thể làm mới token
-              Store.dispatch(logout());
-              Cookies.remove("refresh_token");
-              message.error(
-                "Phiên đăng nhập đã hết hạn hoặc không thể làm mới. Vui lòng đăng nhập lại."
-              );
-              sessionStorage.clear();
 
-              // Từ chối request ban đầu
-              return Promise.reject(e);
+              // Process queued requests
+              processQueue(null, newAccessToken);
+            } else {
+              console.error(
+                "No valid new access token received from refresh API. Logging out."
+              );
+              processQueue(
+                new Error("No new access token after refresh."),
+                null
+              );
+              throw new Error("No new access token after refresh.");
             }
-          } else {
-            console.error(
-              "Request already retried for token refresh. Preventing infinite loop."
+          } catch (e) {
+            console.error("Failed to refresh token in request interceptor:", e);
+            processQueue(e, null);
+
+            // Đăng xuất và clear session khi không thể làm mới token
+            Store.dispatch(logout());
+            Cookies.remove("refresh_token");
+            message.error(
+              "Phiên đăng nhập đã hết hạn hoặc không thể làm mới. Vui lòng đăng nhập lại."
             );
-            return Promise.reject(
-              new Error("Request retry limit reached for token refresh.")
-            );
+            sessionStorage.clear();
+
+            // Từ chối request ban đầu
+            return Promise.reject(e);
+          } finally {
+            isRefreshing = false;
           }
         } else {
           // Access Token vẫn còn hạn, thêm vào header
           config.headers.token = `Bearer ${accessToken}`;
+
+          // Lấy userId từ đúng cấu trúc Redux: currentUserState.user._id
+          const userId = currentUserState?.user?._id;
           console.log("currentUserState", currentUserState);
-          if (currentUserState && currentUserState._id !== "") {
-            const userId = currentUserState?._id;
-            console.log("userState:", currentUserState._id);
-            if (userId) {
-              config.headers.userId = `${userId}`;
-              console.log(
-                `Added userId to request headers: ${userId} for URL: ${config.url}`
-              );
-            } else {
-              console.warn(`No userId available for request to: ${config.url}`);
-            }
+
+          if (userId) {
+            config.headers.userId = `${userId}`;
+            console.log(
+              `Added userId to request headers: ${userId} for URL: ${config.url}`
+            );
+          } else {
+            console.warn(`No userId available for request to: ${config.url}`);
           }
         }
       } catch (error) {
@@ -168,12 +210,33 @@ axiosInstance.interceptors.response.use(
 
     // Nếu lỗi là 401 (Unauthorized) và request chưa được thử lại sau khi refresh
     if (error.response.status === 401 && !originalRequest._retry) {
+      // Nếu đang refresh token, thêm request vào queue
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: (token) => {
+              originalRequest.headers.token = `Bearer ${token}`;
+              // Thêm userId từ Redux store mới nhất
+              const currentUserState = Store.getState().user;
+              const userId = currentUserState?.user?._id;
+              if (userId) {
+                originalRequest.headers.userId = `${userId}`;
+              }
+              resolve(axiosInstance(originalRequest));
+            },
+            reject,
+          });
+        });
+      }
+
       originalRequest._retry = true; // Đánh dấu là đã thử lại
+      isRefreshing = true;
 
       try {
         console.warn(
           "Received 401 Unauthorized. Attempting to refresh token from response interceptor..."
         );
+
         // GỌI HÀM REFRESH TOKEN TỪ userService.js ĐÃ IMPORT
         const response = await callRefreshTokenAPI();
         console.log("Response after 401 refresh attempt:", response);
@@ -184,6 +247,7 @@ axiosInstance.interceptors.response.use(
           console.log(
             "Successfully refreshed token after 401. Retrying original request."
           );
+
           // Cập nhật Redux store và sessionStorage
           Store.dispatch(
             updateUser({
@@ -195,9 +259,27 @@ axiosInstance.interceptors.response.use(
 
           // Cập nhật Authorization header cho request ban đầu và gửi lại
           originalRequest.headers.token = `Bearer ${newAccessToken}`;
+
+          // Cập nhật userId header cho request retry
+          const currentUserState = Store.getState().user;
+          const userId = currentUserState?.user?._id;
+          if (userId) {
+            originalRequest.headers.userId = `${userId}`;
+            console.log(
+              `Added userId to retry request headers: ${userId} for URL: ${originalRequest.url}`
+            );
+          }
+
+          // Process queued requests
+          processQueue(null, newAccessToken);
+
           return axiosInstance(originalRequest);
         } else {
           console.error("No new access token after 401 refresh. Logging out.");
+          processQueue(
+            new Error("No new access token from refresh after 401."),
+            null
+          );
           throw new Error("No new access token from refresh after 401.");
         }
       } catch (refreshError) {
@@ -205,6 +287,8 @@ axiosInstance.interceptors.response.use(
           "Failed to refresh token after 401 or refresh_token is invalid:",
           refreshError
         );
+        processQueue(refreshError, null);
+
         // Đăng xuất và clear session khi không thể làm mới token
         Store.dispatch(logout());
         Cookies.remove("refresh_token");
@@ -214,6 +298,8 @@ axiosInstance.interceptors.response.use(
         sessionStorage.clear();
         window.location.href = "/login";
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
