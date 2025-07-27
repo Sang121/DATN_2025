@@ -82,6 +82,18 @@ const getStatusInfo = (status) => {
         tag: <Tag color="red">Thanh toán thất bại</Tag>,
         description: "Thanh toán cho đơn hàng này đã thất bại.",
       };
+    case "returned":
+      return {
+        current: 3,
+        tag: <Tag color="orange">Đã trả hàng</Tag>,
+        description: "Khách hàng đã trả hàng, chờ hoàn tiền.",
+      };
+    case "refunded":
+      return {
+        current: 4,
+        tag: <Tag color="red">Đã hoàn tiền</Tag>,
+        description: "Đã hoàn tiền cho khách hàng.",
+      };
     default:
       return { current: 0, tag: <Tag>{status}</Tag> };
   }
@@ -89,20 +101,48 @@ const getStatusInfo = (status) => {
 
 // Validate trạng thái chuyển đổi
 const isValidStatusTransition = (currentStatus, newStatus) => {
-  // Không thể chuyển từ đã giao hoặc đã hủy sang trạng thái khác
-  if (currentStatus === "delivered" && newStatus !== "delivered") {
+  // Không thể chuyển từ đã giao sang trạng thái khác (trừ returned)
+  if (
+    currentStatus === "delivered" &&
+    newStatus !== "delivered" &&
+    newStatus !== "returned"
+  ) {
     return {
       valid: false,
-      message: "Không thể thay đổi trạng thái của đơn hàng đã giao.",
+      message: "Đơn hàng đã giao chỉ có thể chuyển sang trạng thái trả hàng.",
     };
   }
 
+  // Không thể chuyển từ đã hủy sang trạng thái khác
   if (currentStatus === "cancelled" && newStatus !== "cancelled") {
     return {
       valid: false,
       message: "Không thể thay đổi trạng thái của đơn hàng đã hủy.",
     };
   }
+
+  // Từ "returned" (đã trả hàng) chỉ có thể chuyển sang "refunded" (đã hoàn tiền)
+  if (
+    currentStatus === "returned" &&
+    newStatus !== "returned" &&
+    newStatus !== "refunded"
+  ) {
+    return {
+      valid: false,
+      message:
+        "Đơn hàng đã trả hàng chỉ có thể chuyển sang trạng thái đã hoàn tiền.",
+    };
+  }
+
+  // Không thể chuyển từ "refunded" (đã hoàn tiền) sang trạng thái khác
+  if (currentStatus === "refunded" && newStatus !== "refunded") {
+    return {
+      valid: false,
+      message: "Không thể thay đổi trạng thái của đơn hàng đã hoàn tiền.",
+    };
+  }
+
+  // Không thể chuyển từ thanh toán thất bại sang pending/processing/delivered
   if (
     currentStatus === "payment_failed" &&
     (newStatus === "pending" ||
@@ -111,19 +151,52 @@ const isValidStatusTransition = (currentStatus, newStatus) => {
   ) {
     return {
       valid: false,
-      message: "Không thể thay đổi trạng thái của đơn hàng đã thất bại.",
+      message: "Đơn hàng thanh toán thất bại chỉ có thể hủy đơn hàng",
     };
   }
 
-  // Không thể chuyển từ đang xử lý hoặc chờ xử lý về trạng thái thanh toán thất bại
-  if (
-    (currentStatus === "processing" || currentStatus === "pending") &&
-    newStatus === "payment_failed"
-  ) {
-    return {
-      valid: false,
-      message: "Không thể chuyển về trạng thái thanh toán thất bại.",
-    };
+  // Validation cho flow logic
+  if (currentStatus === "pending") {
+    const allowedFromPending = ["processing", "cancelled", "payment_failed"];
+    if (!allowedFromPending.includes(newStatus)) {
+      return {
+        valid: false,
+        message:
+          "Từ 'Chờ xử lý' chỉ có thể chuyển sang: Đang xử lý, Đã hủy, hoặc Thanh toán thất bại.",
+      };
+    }
+  }
+
+  if (currentStatus === "processing") {
+    const allowedFromProcessing = ["delivered", "cancelled", "returned"];
+    if (!allowedFromProcessing.includes(newStatus)) {
+      return {
+        valid: false,
+        message:
+          "Từ 'Đang xử lý' chỉ có thể chuyển sang: Đã giao hàng, Đã hủy, hoặc Trả hàng.",
+      };
+    }
+  }
+
+  // Validation business logic cho return/refund
+  if (newStatus === "returned") {
+    // Chỉ cho phép trả hàng từ đơn đã giao
+    if (currentStatus !== "delivered") {
+      return {
+        valid: false,
+        message: "Chỉ có thể trả hàng từ đơn hàng đã giao.",
+      };
+    }
+  }
+
+  if (newStatus === "refunded") {
+    // Chỉ cho phép hoàn tiền từ đơn đã trả hàng
+    if (currentStatus !== "returned") {
+      return {
+        valid: false,
+        message: "Chỉ có thể hoàn tiền từ đơn hàng đã trả hàng.",
+      };
+    }
   }
 
   return { valid: true };
@@ -354,6 +427,73 @@ function AdminOrderDetail() {
         </Steps>
       );
     }
+    if (order.orderStatus === "returned") {
+      return (
+        <Steps current={3} status="process" className={styles.orderSteps}>
+          <Step
+            title="Chờ xử lý"
+            description="Đơn hàng đã được tạo."
+            icon={<SolutionOutlined />}
+            status="finish"
+          />
+          <Step
+            title="Đang xử lý"
+            description="Đang chuẩn bị và giao hàng."
+            icon={<ShoppingCartOutlined />}
+            status="finish"
+          />
+          <Step
+            title="Đã giao hàng"
+            description="Đơn hàng đã hoàn thành."
+            icon={<SmileOutlined />}
+            status="finish"
+          />
+          <Step
+            title="Đã trả hàng"
+            description="Khách hàng đã trả hàng, chờ hoàn tiền."
+            icon={<CloseCircleOutlined />}
+            status="process"
+          />
+        </Steps>
+      );
+    }
+
+    if (order.orderStatus === "refunded") {
+      return (
+        <Steps current={4} status="finish" className={styles.orderSteps}>
+          <Step
+            title="Chờ xử lý"
+            description="Đơn hàng đã được tạo."
+            icon={<SolutionOutlined />}
+            status="finish"
+          />
+          <Step
+            title="Đang xử lý"
+            description="Đang chuẩn bị và giao hàng."
+            icon={<ShoppingCartOutlined />}
+            status="finish"
+          />
+          <Step
+            title="Đã giao hàng"
+            description="Đơn hàng đã hoàn thành."
+            icon={<SmileOutlined />}
+            status="finish"
+          />
+          <Step
+            title="Đã trả hàng"
+            description="Khách hàng đã trả hàng."
+            icon={<CloseCircleOutlined />}
+            status="finish"
+          />
+          <Step
+            title="Đã hoàn tiền"
+            description="Đã hoàn tiền cho khách hàng."
+            icon={<SmileOutlined />}
+            status="finish"
+          />
+        </Steps>
+      );
+    }
 
     return (
       <Steps
@@ -427,6 +567,8 @@ function AdminOrderDetail() {
                       <Option value="processing">Đang xử lý</Option>
                       <Option value="delivered">Đã giao hàng</Option>
                       <Option value="cancelled">Đã hủy</Option>
+                      <Option value="returned">Đã trả hàng</Option>
+                      <Option value="refunded">Đã hoàn tiền</Option>
                     </Select>
                     <Button
                       type="primary"
@@ -588,6 +730,14 @@ function AdminOrderDetail() {
                       case "payment_failed":
                         color = "red";
                         statusText = "Thanh toán thất bại";
+                        break;
+                      case "returned":
+                        color = "orange";
+                        statusText = "Đã trả hàng";
+                        break;
+                      case "refunded":
+                        color = "red";
+                        statusText = "Đã hoàn tiền";
                         break;
                       default:
                         color = "blue";
@@ -764,6 +914,24 @@ function AdminOrderDetail() {
           <Alert
             message="Cảnh báo"
             description="Hành động này sẽ hủy đơn hàng và không thể hoàn tác. Nếu đơn hàng đã thanh toán, hệ thống sẽ đánh dấu để hoàn tiền cho khách hàng."
+            type="warning"
+            showIcon
+            className={styles.modalAlert}
+          />
+        )}
+        {selectedStatus === "returned" && (
+          <Alert
+            message="Thông báo"
+            description="Hành động này sẽ đánh dấu đơn hàng là đã trả hàng. Bạn có thể cập nhật sang 'Đã hoàn tiền' sau khi hoàn tất việc hoàn tiền cho khách hàng."
+            type="info"
+            showIcon
+            className={styles.modalAlert}
+          />
+        )}
+        {selectedStatus === "refunded" && (
+          <Alert
+            message="Cảnh báo"
+            description="Hành động này sẽ đánh dấu đã hoàn tiền cho khách hàng và không thể hoàn tác. Hãy đảm bảo bạn đã thực hiện hoàn tiền thành công."
             type="warning"
             showIcon
             className={styles.modalAlert}

@@ -484,9 +484,9 @@ const cancelOrder = (orderId, userId) => {
 
       // Nếu là gọi từ VNPAY callback (userId không được cung cấp)
       // hoặc nếu người dùng là chủ đơn hàng
-      const isSystemCancel = !userId; 
+      const isSystemCancel = !userId;
       const isOwnerCancel = userId && order.user.toString() === userId;
-      
+
       if (!isSystemCancel && !isOwnerCancel) {
         return reject({
           status: "Err",
@@ -495,7 +495,10 @@ const cancelOrder = (orderId, userId) => {
       }
 
       // Chỉ cho phép hủy khi đơn hàng đang ở trạng thái "pending" hoặc "pending payment"
-      if (order.orderStatus !== "pending" && order.orderStatus !== "pending payment") {
+      if (
+        order.orderStatus !== "pending" &&
+        order.orderStatus !== "pending payment"
+      ) {
         return reject({
           status: "Err",
           message: `Order cannot be cancelled. Status: ${order.orderStatus}`,
@@ -506,21 +509,21 @@ const cancelOrder = (orderId, userId) => {
       await revertProductStock(order.items);
 
       order.orderStatus = "cancelled";
-      
+
       // Thêm vào lịch sử trạng thái
       if (!order.statusHistory) {
         order.statusHistory = [];
       }
-      
+
       order.statusHistory.push({
         status: "cancelled",
         updatedBy: userId || null,
         updatedAt: new Date(),
-        note: isSystemCancel 
+        note: isSystemCancel
           ? "Đơn hàng bị hủy do không hoàn tất thanh toán"
           : "Đơn hàng bị hủy bởi người dùng",
       });
-      
+
       const updatedOrder = await order.save();
 
       resolve({
@@ -568,6 +571,16 @@ const getOrdersCount = (userId) => {
         orderStatus: "cancelled",
       });
 
+      const returnedOrders = await Order.countDocuments({
+        user: userId,
+        orderStatus: "returned",
+      });
+
+      const refundedOrders = await Order.countDocuments({
+        user: userId,
+        orderStatus: "refunded",
+      });
+
       resolve({
         status: "Success",
         message: "Order counts retrieved successfully",
@@ -576,6 +589,8 @@ const getOrdersCount = (userId) => {
         processing: processingOrders,
         delivered: deliveredOrders,
         cancelled: cancelledOrders,
+        returned: returnedOrders,
+        refunded: refundedOrders,
       });
     } catch (error) {
       reject({
@@ -602,7 +617,11 @@ const updateOrderStatus = (orderId, newStatus, adminUserId, note) => {
       const previousStatus = order.orderStatus;
 
       // Kiểm tra logic trước khi cập nhật trạng thái
-      if (previousStatus === "delivered" && newStatus !== "delivered") {
+      if (
+        previousStatus === "delivered" &&
+        newStatus !== "delivered" &&
+        newStatus !== "returned"
+      ) {
         return reject({
           status: "Err",
           message: "Không thể thay đổi trạng thái của đơn hàng đã giao",
@@ -641,6 +660,39 @@ const updateOrderStatus = (orderId, newStatus, adminUserId, note) => {
       if (newStatus === "cancelled" && previousStatus !== "cancelled") {
         // Nếu hủy đơn hàng, hoàn trả số lượng sản phẩm vào kho
         await revertProductStock(order.items);
+      }
+
+      // Xử lý logic cho trạng thái returned
+      if (newStatus === "returned") {
+        // Chỉ cho phép chuyển sang returned từ trạng thái delivered
+        if (previousStatus !== "delivered") {
+          return reject({
+            status: "Err",
+            message: "Chỉ có thể trả hàng từ đơn hàng đã giao thành công",
+          });
+        }
+        // Đánh dấu thời gian trả hàng
+        order.returnedAt = new Date();
+
+        // Hoàn trả số lượng sản phẩm vào kho
+        await revertProductStock(order.items);
+      }
+
+      // Xử lý logic cho trạng thái refunded
+      if (newStatus === "refunded") {
+        // Chỉ cho phép chuyển sang refunded từ trạng thái returned
+        if (previousStatus !== "returned") {
+          return reject({
+            status: "Err",
+            message: "Chỉ có thể hoàn tiền từ đơn hàng đã được trả về",
+          });
+        }
+        // Đánh dấu thời gian hoàn tiền
+        order.refundedAt = new Date();
+
+        // Cập nhật trạng thái thanh toán (đã hoàn tiền)
+        order.isPaid = false;
+        order.isRefunded = true;
       }
 
       // Cập nhật trạng thái mới

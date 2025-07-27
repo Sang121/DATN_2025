@@ -308,7 +308,6 @@ const vnpayIpn = async (req, res) => {
           message = "Unknown error";
         }
 
-         
         return res
           .status(200)
           .json({ RspCode: responseCode, Message: message });
@@ -380,6 +379,8 @@ const updateOrderStatus = async (req, res) => {
       "delivered",
       "cancelled",
       "payment_failed",
+      "returned",
+      "refunded",
     ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -459,8 +460,6 @@ const updateOrderAfterPaymentClient = async (req, res) => {
         message: "Missing required parameters (orderId or vnpResponseCode)",
       });
     }
-
-   
 
     const response = await orderService.updateOrderAfterPayment(
       orderId,

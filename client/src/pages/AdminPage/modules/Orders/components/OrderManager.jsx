@@ -162,6 +162,10 @@ const OrderManager = () => {
         return "Đã hủy";
       case "payment_failed":
         return "Thanh toán thất bại";
+      case "returned":
+        return "Đã trả hàng";
+      case "refunded":
+        return "Đã hoàn tiền";
       default:
         return status;
     }
@@ -246,6 +250,14 @@ const OrderManager = () => {
             color = "red";
             text = "Thanh toán thất bại";
             break;
+          case "returned":
+            color = "orange";
+            text = "Đã trả hàng";
+            break;
+          case "refunded":
+            color = "red";
+            text = "Đã hoàn tiền";
+            break;
         }
         return <Tag color={color}>{text}</Tag>;
       },
@@ -255,6 +267,8 @@ const OrderManager = () => {
         { text: "Đã giao", value: "delivered" },
         { text: "Đã hủy", value: "cancelled" },
         { text: "Thanh toán thất bại", value: "payment_failed" },
+        { text: "Đã trả hàng", value: "returned" },
+        { text: "Đã hoàn tiền", value: "refunded" },
       ],
       onFilter: (value, record) => record.orderStatus === value,
     },
