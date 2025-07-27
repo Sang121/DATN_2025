@@ -87,15 +87,7 @@ const ProductSlider = ({
       setItemsToShow(newItemsToShow);
     }
   }, [breakpoints, listProducts.length]);
-  console.log(
-    "query:",
-    query,
 
-    "Items to show:",
-    itemsToShow,
-    "List products length:",
-    listProducts.length
-  );
   useEffect(() => {
     updateItemsToShow();
     const handleResize = () => updateItemsToShow();
