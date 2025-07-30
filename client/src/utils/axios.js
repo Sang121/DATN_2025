@@ -11,7 +11,6 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Global variable để tracking refresh token process
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -30,20 +29,11 @@ const processQueue = (error, token = null) => {
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   async (config) => {
-    // Lấy user state hiện tại từ Redux store.
-    // currentUser ở đây là toàn bộ slice state của user (ví dụ: { user: {...}, isLoading: false, error: null })
     let currentUserState = Store.getState().user;
-    // Lấy access_token từ thuộc tính 'user' trong currentUserState, sau đó là từ sessionStorage
     let accessToken =
-      currentUserState?.user?.access_token ||
+      currentUserState?.access_token ||
       sessionStorage.getItem("access_token");
 
-    // console.log(
-    //   "Current access token (from redux/sessionStorage):",
-    //   accessToken
-    // );
-
-    // Bỏ qua interceptor này cho yêu cầu làm mới token để tránh vòng lặp vô hạn
     if (config.url === "/user/refreshToken") {
       return config;
     }
@@ -65,7 +55,7 @@ axiosInstance.interceptors.request.use(
                 config.headers.token = `Bearer ${token}`;
                 // Thêm userId từ Redux store mới nhất
                 const currentUserState = Store.getState().user;
-                const userId = currentUserState?.user?._id;
+                const userId = currentUserState?._id;
                 if (userId) {
                   config.headers.userId = `${userId}`;
                 }
@@ -121,9 +111,6 @@ axiosInstance.interceptors.request.use(
               const userId = newUser?._id;
               if (userId) {
                 config.headers.userId = `${userId}`;
-                console.log(
-                  `Added userId to request headers after refresh: ${userId} for URL: ${config.url}`
-                );
               }
 
               // Process queued requests
@@ -159,17 +146,11 @@ axiosInstance.interceptors.request.use(
           // Access Token vẫn còn hạn, thêm vào header
           config.headers.token = `Bearer ${accessToken}`;
 
-          // Lấy userId từ đúng cấu trúc Redux: currentUserState.user._id
-          const userId = currentUserState?.user?._id;
-          console.log("currentUserState", currentUserState);
+          // Lấy userId từ đúng cấu trúc Redux: currentUserState._id
+          const userId = currentUserState?._id;
 
           if (userId) {
             config.headers.userId = `${userId}`;
-            console.log(
-              `Added userId to request headers: ${userId} for URL: ${config.url}`
-            );
-          } else {
-            console.warn(`No userId available for request to: ${config.url}`);
           }
         }
       } catch (error) {
@@ -218,7 +199,7 @@ axiosInstance.interceptors.response.use(
               originalRequest.headers.token = `Bearer ${token}`;
               // Thêm userId từ Redux store mới nhất
               const currentUserState = Store.getState().user;
-              const userId = currentUserState?.user?._id;
+              const userId = currentUserState?._id;
               if (userId) {
                 originalRequest.headers.userId = `${userId}`;
               }
@@ -251,7 +232,7 @@ axiosInstance.interceptors.response.use(
           // Cập nhật Redux store và sessionStorage
           Store.dispatch(
             updateUser({
-              ...Store.getState().user.user,
+              ...Store.getState().user,
               access_token: newAccessToken,
             })
           );
@@ -262,12 +243,9 @@ axiosInstance.interceptors.response.use(
 
           // Cập nhật userId header cho request retry
           const currentUserState = Store.getState().user;
-          const userId = currentUserState?.user?._id;
+          const userId = currentUserState?._id;
           if (userId) {
             originalRequest.headers.userId = `${userId}`;
-            console.log(
-              `Added userId to retry request headers: ${userId} for URL: ${originalRequest.url}`
-            );
           }
 
           // Process queued requests
