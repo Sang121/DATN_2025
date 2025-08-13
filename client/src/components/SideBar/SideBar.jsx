@@ -115,7 +115,7 @@ function Sidebar() {
       key: index.toString(),
       icon: icon,
       label: (
-        <Link to={`/searchproduct?category=${product.category}`}>
+        <Link to={`/search/${product.category}`}>
           {product.name}
         </Link>
       ),
