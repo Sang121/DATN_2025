@@ -1,6 +1,6 @@
 import classNames from "classnames/bind";
 import styles from "./ProductManager.module.css";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import {
   message,
   Table,
@@ -10,12 +10,17 @@ import {
   Alert,
   Pagination,
   Input,
+  Select,
 } from "antd";
 import Highlighter from "react-highlight-words";
 import { FileExcelOutlined } from "@ant-design/icons";
 import * as XLSX from "xlsx";
 
-import { DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import AddProduct from "./AddProduct/AddProduct";
 import {
   deleteProduct,
@@ -30,10 +35,31 @@ function ProductManager() {
   const [page, setPage] = useState(1);
   const [limit] = useState(8);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("all"); // State cho filter category
+  const [selectedGender, setSelectedGender] = useState("all"); // State cho filter gender
+
   const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
+
+  // Danh sách category từ enum model
+  const categoryOptions = [
+    "Áo",
+    "Quần",
+    "Đồ thể thao",
+    "Đồ lót",
+    "Đồ ngủ",
+    "Áo khoác",
+    "Váy",
+    "Đồng hồ",
+    "Phụ kiện",
+    "Đồ bơi",
+    "Giày dép",
+    "Túi xách",
+    "Balo",
+    "Khác",
+  ];
   const deleteProductMutation = useMutation({
     mutationFn: (id) => deleteProduct(id),
     onSuccess: () => {
@@ -52,9 +78,28 @@ function ProductManager() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["products", page, limit],
-    queryFn: () => getAllProduct(limit, page),
+    queryKey: ["products"],
+    queryFn: () => getAllProduct(999999, 1), // Fetch with very large limit to get all products
   });
+
+  // Calculate filtered data
+  const filteredData = useMemo(() => {
+    if (!productData?.data) return [];
+    return productData.data.filter((product) => {
+      const categoryMatch =
+        selectedCategory === "all" || product.category === selectedCategory;
+      const genderMatch =
+        selectedGender === "all" || product.gender === selectedGender;
+      return categoryMatch && genderMatch;
+    });
+  }, [productData?.data, selectedCategory, selectedGender]);
+
+  // Calculate paginated data from filtered results
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    return filteredData.slice(startIndex, endIndex);
+  }, [filteredData, page, limit]);
 
   if (isLoading) {
     return (
@@ -230,10 +275,11 @@ function ProductManager() {
       dataIndex: "price",
       key: "price",
       width: 150,
-      render: (price) => `$${Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(price)}`,
+      render: (price) =>
+        `${Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(price)}`,
       sorter: (a, b) => a.price - b.price,
       ...getColumnSearchProps("price"),
     },
@@ -269,21 +315,21 @@ function ProductManager() {
   // Add export to Excel function
   const handleExportExcel = async () => {
     try {
-      // Get all products without pagination
-      const allProducts = await getAllProduct(1000, 1); // Adjust limit as needed
+      // Use already filtered data instead of filtering again
+      const exportProducts = filteredData;
 
       // Prepare data for export
-      const exportData = allProducts.data.map((product, index) => ({
-        "STT": index + 1,
+      const exportData = exportProducts.map((product, index) => ({
+        STT: index + 1,
         "Mã SP": product._id,
         "Tên sản phẩm": product.name,
-        "Giá": product.price,
+        Giá: product.price,
         "Khuyến mãi(%)": product.discount || "",
         "Tổng tồn kho": product.totalStock,
         "Đã bán": product.sold,
         "Danh mục": product.category,
         "Giới tính": product.gender,
-        "Variants": product.variants
+        Variants: product.variants
           .map((v) => `${v.size}-${v.color}: ${v.stock}`)
           .join(", "),
       }));
@@ -308,10 +354,26 @@ function ProductManager() {
       ws["!cols"] = colWidths;
 
       // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(wb, ws, "Danh sách sản phẩm");
+      let sheetName = "Danh sách sản phẩm";
+      if (selectedCategory !== "all" || selectedGender !== "all") {
+        const categoryPart = selectedCategory !== "all" ? selectedCategory : "";
+        const genderPart = selectedGender !== "all" ? selectedGender : "";
+        const filterParts = [categoryPart, genderPart].filter(Boolean);
+        sheetName = `Sản phẩm - ${filterParts.join(" - ")}`;
+      }
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
-      // Generate filename with current date
-      const fileName = `danh_sach_san_pham_${new Date()
+      // Generate filename with current date, category and gender
+      let filenameParts = [];
+      if (selectedCategory !== "all") {
+        filenameParts.push(selectedCategory.replace(/\s+/g, "_"));
+      }
+      if (selectedGender !== "all") {
+        filenameParts.push(selectedGender);
+      }
+      const filterText =
+        filenameParts.length > 0 ? filenameParts.join("_") : "tat_ca";
+      const fileName = `san_pham_${filterText}_${new Date()
         .toLocaleDateString("vi-VN")
         .replace(/\//g, "-")}.xlsx`;
 
@@ -360,9 +422,101 @@ function ProductManager() {
 
       {type === 0 ? (
         <div className={cx("product-list")}>
+          {/* Category and Gender Filters */}
+          <div
+            style={{
+              marginBottom: 16,
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span>Lọc theo danh mục:</span>
+              <Select
+                value={selectedCategory}
+                onChange={(value) => {
+                  setSelectedCategory(value);
+                  setPage(1); // Reset to first page when filtering
+                }}
+                style={{ width: 200 }}
+                placeholder="Chọn danh mục"
+              >
+                <Select.Option value="all">Tất cả danh mục</Select.Option>
+                {categoryOptions.map((category) => (
+                  <Select.Option key={category} value={category}>
+                    {category}
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span>Lọc theo giới tính:</span>
+              <Select
+                value={selectedGender}
+                onChange={(value) => {
+                  setSelectedGender(value);
+                  setPage(1); // Reset to first page when filtering
+                }}
+                style={{ width: 150 }}
+                placeholder="Chọn giới tính"
+              >
+                <Select.Option value="all">Tất cả</Select.Option>
+                <Select.Option value="Nam">Nam</Select.Option>
+                <Select.Option value="Nữ">Nữ</Select.Option>
+                <Select.Option value="Unisex">Unisex</Select.Option>
+              </Select>
+            </div>
+
+            {/* Reset Filters Button */}
+            {(selectedCategory !== "all" || selectedGender !== "all") && (
+              <Button
+                onClick={() => {
+                  setSelectedCategory("all");
+                  setSelectedGender("all");
+                  setPage(1); // Reset to first page when clearing filters
+                }}
+                type="default"
+                size="small"
+              >
+                Reset bộ lọc
+              </Button>
+            )}
+          </div>
+
+          {/* Filter Status Display */}
+          {(selectedCategory !== "all" || selectedGender !== "all") && (
+            <div
+              style={{
+                marginBottom: 16,
+                padding: "8px 12px",
+                backgroundColor: "#f6f6f6",
+                borderRadius: "6px",
+                fontSize: "14px",
+              }}
+            >
+              <span>Đang lọc: </span>
+              {selectedCategory !== "all" && (
+                <span style={{ color: "#1890ff" }}>
+                  Danh mục "{selectedCategory}"
+                </span>
+              )}
+              {selectedCategory !== "all" && selectedGender !== "all" && (
+                <span> và </span>
+              )}
+              {selectedGender !== "all" && (
+                <span style={{ color: "#1890ff" }}>
+                  Giới tính "{selectedGender}"
+                </span>
+              )}
+            </div>
+          )}
+
           <Table
             columns={columns}
-            dataSource={productData.data}
+            dataSource={paginatedData}
             rowKey="_id"
             pagination={false}
             scroll={{ x: 1000 }}
@@ -373,12 +527,18 @@ function ProductManager() {
           <div className={cx("pagination-wrapper")}>
             <Pagination
               current={page}
-              total={productData.total}
+              total={filteredData.length}
               pageSize={limit}
               onChange={handlePageChange}
               showSizeChanger={false}
               showQuickJumper
-              showTotal={(total) => `Tổng số ${total} sản phẩm`}
+              showTotal={(total) => {
+                const isFiltered =
+                  selectedCategory !== "all" || selectedGender !== "all";
+                return isFiltered
+                  ? `Hiển thị ${total} sản phẩm (đã lọc từ ${productData.total} sản phẩm)`
+                  : `Tổng số ${total} sản phẩm`;
+              }}
             />
           </div>
         </div>
