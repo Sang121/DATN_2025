@@ -157,18 +157,14 @@ function PaymentPage() {
                 <Radio value="GHTK">
                   <Space>
                     <span>Giao hàng tiết kiệm</span>
-                    <span className={styles.deliveryTime}>
-                      Giao thứ 6, trước 19h, 20/06
-                    </span>
+
                     <span className={styles.freeShipping}>MIỄN PHÍ</span>
                   </Space>
                 </Radio>
                 <Radio value="GHN">
                   <Space>
                     <span>Giao hàng nhanh</span>
-                    <span className={styles.deliveryTime}>
-                      Giao thứ 6, trước 19h, 20/06
-                    </span>
+
                     <span className={styles.freeShipping}>MIỄN PHÍ</span>
                   </Space>
                 </Radio>
@@ -185,12 +181,16 @@ function PaymentPage() {
               <Space direction="vertical" className={styles.paymentOptions}>
                 {paymentMethods.map((method) => (
                   <Radio key={method.value} value={method.value}>
+                    {method.logo && (
+                      <Space>
+                        <img
+                          src={method.logo}
+                          alt={method.label}
+                          className={styles.paymentLogo}
+                        />
+                      </Space>
+                    )}
                     <Space>
-                      <img
-                        src={method.logo}
-                        alt={method.label}
-                        className={styles.paymentLogo}
-                      />
                       <span>{method.label}</span>
                     </Space>
                   </Radio>
