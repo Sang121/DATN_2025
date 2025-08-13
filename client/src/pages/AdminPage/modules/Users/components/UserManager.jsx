@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { UserAddOutlined, FileExcelOutlined } from "@ant-design/icons";
-import { Button, Input, message, Switch, Typography } from "antd";
+import { Button, Input, message, Switch, Typography, Form } from "antd";
 import { Space, Table, Spin, Tag } from "antd";
 import {
   deleteUser,
@@ -14,7 +14,7 @@ import * as XLSX from "xlsx";
 
 const { Title } = Typography;
 
-function UserManager() {
+const UserManager = () => {
   const [editingRowId, setEditingRowId] = useState(null); // Theo dõi dòng đang chỉnh sửa
   const [editedData, setEditedData] = useState({}); // Lưu dữ liệu đã chỉnh sửa
   const queryClient = useQueryClient();
@@ -24,165 +24,163 @@ function UserManager() {
     setShowRegUser(true);
   };
 
- 
-
   const handleRegUserSuccess = () => {
     setShowRegUser(false);
     queryClient.invalidateQueries(["getAllUsers"]);
   };
 
-  const columns = [
-    {
-      title: "Stt",
-      dataIndex: "_id",
-      key: "stt",
-      render: (id, record, index) => index + 1,
-    },
-    {
-      title: "Name",
-      dataIndex: "username",
-      key: "username",
-      render: (text, record) =>
-        editingRowId === record._id ? (
-          <Input
-            value={editedData.username ?? record.username}
-            onChange={(e) =>
-              setEditedData({ ...editedData, username: e.target.value })
-            }
-          />
-        ) : (
-          text
-        ),
-    },
-
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
-      render: (text, record) =>
-        editingRowId === record._id ? (
-          <Input
-            value={editedData.phone ?? record.phone}
-            onChange={(e) =>
-              setEditedData({ ...editedData, phone: e.target.value })
-            }
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      render: (text, record) =>
-        editingRowId === record._id ? (
-          <Input
-            value={editedData.email ?? record.email}
-            onChange={(e) =>
-              setEditedData({ ...editedData, email: e.target.value })
-            }
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
-      render: (text, record) =>
-        editingRowId === record._id ? (
-          <Input
-            value={editedData.address ?? record.address}
-            onChange={(e) =>
-              setEditedData({ ...editedData, address: e.target.value })
-            }
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Type Login",
-      dataIndex: "typeLogin",
-      key: "typeLogin",
-      render: (text, record) =>
-        editingRowId === record._id ? (
-          <Input
-            value={editedData.address ?? record.address}
-            onChange={(e) =>
-              setEditedData({ ...editedData, address: e.target.value })
-            }
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "isAdmin",
-      key: "isAdmin",
-      render: (isAdmin, record) =>
-        editingRowId === record._id ? (
-          <Switch
-            checked={editedData.isAdmin ?? record.isAdmin}
-            // value={isAdmin}
-            // defaultChecked={isAdmin}
-            checkedChildren="Admin"
-            unCheckedChildren="Người Dùng"
-            onChange={(checked) => {
-              setEditedData({ ...editedData, isAdmin: checked });
-            }}
-          />
-        ) : (
-          <Tag color={isAdmin ? "geekblue" : "green"}>
-            {isAdmin ? "Admin" : "Người dùng"}
-          </Tag>
-        ),
-    },
-    {
-      title: "Action",
-      key: "Action",
-      render: (_, record) => (
-        <Space size="middle">
-          {editingRowId === record._id ? (
-            <>
-              <Button
-                onClick={() => handleUpdateUser(record._id, record)} // Truyền record gốc vào đây
-                type="link"
-                loading={updateUserMutation.isPending}
-              >
-                Lưu
-              </Button>
-              <Button
-                onClick={() => setEditingRowId(null)}
-                type="primary"
-                danger
-                loading={updateUserMutation.isPending}
-              >
-                Hủy
-              </Button>
-            </>
+  const columns = useMemo(
+    () => [
+      {
+        title: "Stt",
+        dataIndex: "_id",
+        key: "stt",
+        render: (id, record, index) => index + 1,
+      },
+      {
+        title: "Name",
+        dataIndex: "username",
+        key: "username",
+        render: (text, record) =>
+          editingRowId === record._id ? (
+            <Form.Item name={`username_${record._id}`}>
+              <Input defaultValue={text} />
+            </Form.Item>
           ) : (
-            <>
-              <Button onClick={() => handleEditRow(record)} type="link">
-                Chỉnh sửa
-              </Button>
-              <Button
-                onClick={() => handleDeleteUser(record._id)}
-                type="primary"
-                danger
-                loading={deleteUserMutation.isPending}
-              >
-                Xóa
-              </Button>
-            </>
-          )}
-        </Space>
-      ),
-    },
-  ];
+            text
+          ),
+      },
+
+      {
+        title: "Phone",
+        dataIndex: "phone",
+        key: "phone",
+        render: (text, record) =>
+          editingRowId === record._id ? (
+            <Input
+              value={editedData.phone ?? record.phone}
+              onChange={(e) =>
+                setEditedData({ ...editedData, phone: e.target.value })
+              }
+            />
+          ) : (
+            text
+          ),
+      },
+      {
+        title: "Email",
+        dataIndex: "email",
+        key: "email",
+        render: (text, record) =>
+          editingRowId === record._id ? (
+            <Input
+              value={editedData.email ?? record.email}
+              onChange={(e) =>
+                setEditedData({ ...editedData, email: e.target.value })
+              }
+            />
+          ) : (
+            text
+          ),
+      },
+      {
+        title: "Address",
+        dataIndex: "address",
+        key: "address",
+        render: (text, record) =>
+          editingRowId === record._id ? (
+            <Input
+              value={editedData.address ?? record.address}
+              onChange={(e) =>
+                setEditedData({ ...editedData, address: e.target.value })
+              }
+            />
+          ) : (
+            text
+          ),
+      },
+      {
+        title: "Type Login",
+        dataIndex: "typeLogin",
+        key: "typeLogin",
+        render: (text, record) =>
+          editingRowId === record._id ? (
+            <Input
+              value={editedData.address ?? record.address}
+              onChange={(e) =>
+                setEditedData({ ...editedData, address: e.target.value })
+              }
+            />
+          ) : (
+            text
+          ),
+      },
+      {
+        title: "Trạng thái",
+        dataIndex: "isAdmin",
+        key: "isAdmin",
+        render: (isAdmin, record) =>
+          editingRowId === record._id ? (
+            <Switch
+              checked={editedData.isAdmin ?? record.isAdmin}
+              // value={isAdmin}
+              // defaultChecked={isAdmin}
+              checkedChildren="Admin"
+              unCheckedChildren="Người Dùng"
+              onChange={(checked) => {
+                setEditedData({ ...editedData, isAdmin: checked });
+              }}
+            />
+          ) : (
+            <Tag color={isAdmin ? "geekblue" : "green"}>
+              {isAdmin ? "Admin" : "Người dùng"}
+            </Tag>
+          ),
+      },
+      {
+        title: "Action",
+        key: "Action",
+        render: (_, record) => (
+          <Space size="middle">
+            {editingRowId === record._id ? (
+              <>
+                <Button
+                  onClick={() => handleUpdateUser(record._id, record)} // Truyền record gốc vào đây
+                  type="link"
+                  loading={updateUserMutation.isPending}
+                >
+                  Lưu
+                </Button>
+                <Button
+                  onClick={() => setEditingRowId(null)}
+                  type="primary"
+                  danger
+                  loading={updateUserMutation.isPending}
+                >
+                  Hủy
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={() => handleEditRow(record)} type="link">
+                  Chỉnh sửa
+                </Button>
+                <Button
+                  onClick={() => handleDeleteUser(record._id)}
+                  type="primary"
+                  danger
+                  loading={deleteUserMutation.isPending}
+                >
+                  Xóa
+                </Button>
+              </>
+            )}
+          </Space>
+        ),
+      },
+    ],
+    [editingRowId, editedData]
+  );
 
   const {
     data: users = [],
@@ -275,11 +273,11 @@ function UserManager() {
   const handleExportExcel = () => {
     // Chuẩn bị data để xuất
     const exportData = users.map((user, index) => ({
-      "STT": index + 1,
+      STT: index + 1,
       "Họ và tên": user.username,
       "Tên đăng nhập": user.username,
       "Số điện thoại": user.phone,
-      "Email": user.email,
+      Email: user.email,
       "Giới tính": user.gender,
       "Địa chỉ": user.address,
       "Vai trò": user.isAdmin ? "Admin" : "Người dùng",
@@ -376,6 +374,6 @@ function UserManager() {
       )}
     </div>
   );
-}
+};
 
 export default UserManager;
