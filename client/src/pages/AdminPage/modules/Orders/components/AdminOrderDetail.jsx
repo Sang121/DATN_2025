@@ -24,7 +24,6 @@ import {
 import {
   getOrderDetails,
   updateOrderStatus,
-  updatePaymentStatus,
 } from "../../../../../services/orderService";
 import styles from "./AdminOrderDetail.module.css";
 import {
@@ -209,12 +208,9 @@ function AdminOrderDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
-  const [updatingPayment, setUpdatingPayment] = useState(false); // Thêm state cho cập nhật thanh toán
   const [selectedStatus, setSelectedStatus] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-  const [paymentModalVisible, setPaymentModalVisible] = useState(false); // Modal xác nhận cập nhật thanh toán
   const [noteForm] = Form.useForm();
-  const [paymentForm] = Form.useForm(); // Form cho ghi chú thanh toán
 
   const fetchOrderDetails = useCallback(async () => {
     try {
@@ -300,52 +296,6 @@ function AdminOrderDetail() {
       });
     } finally {
       setUpdatingStatus(false);
-    }
-  };
-  // Hàm mở modal xác nhận cập nhật thanh toán
-  const showPaymentModal = () => {
-    setPaymentModalVisible(true);
-  };
-
-  // Hàm cập nhật trạng thái thanh toán
-  const handleUpdatePayment = async () => {
-    try {
-      setUpdatingPayment(true);
-      // Lấy note từ form và gửi đến API
-      const paymentNote = paymentForm.getFieldValue("note") || "";
-      // Đảo ngược trạng thái thanh toán hiện tại
-      const newPaymentStatus = !order.isPaid;
-
-      const res = await updatePaymentStatus(
-        orderId,
-        newPaymentStatus,
-        paymentNote
-      );
-      if (res?.status === "Success") {
-        await fetchOrderDetails();
-        notification.success({
-          message: "Thành công",
-          description: `Trạng thái thanh toán đã được cập nhật thành: ${
-            newPaymentStatus ? "Đã thanh toán" : "Chưa thanh toán"
-          }.`,
-        });
-        setPaymentModalVisible(false);
-        paymentForm.resetFields();
-      } else {
-        notification.error({
-          message: "Lỗi",
-          description:
-            res?.message || "Không thể cập nhật trạng thái thanh toán.",
-        });
-      }
-    } catch (err) {
-      notification.error({
-        message: "Lỗi",
-        description:
-          err.message || "Đã có lỗi xảy ra khi cập nhật trạng thái thanh toán.",
-      });
-    } finally {
-      setUpdatingPayment(false);
     }
   };
 
@@ -589,43 +539,21 @@ function AdminOrderDetail() {
                     </Tag>
                   </div>
 
-                  {/* Chỉ hiện nút cập nhật thanh toán cho các trường hợp đặc biệt, không phải VNPAY và chưa giao hàng */}
-                  {order.paymentMethod !== "VNPAY" &&
-                    order.orderStatus !== "delivered" && (
-                      <div className={styles.paymentControls}>
-                        <Text strong>Cập nhật:</Text>
-                        <Button
-                          type="primary"
-                          onClick={showPaymentModal}
-                          icon={<EditOutlined />}
-                        >
-                          {order.isPaid
-                            ? "Đánh dấu chưa thanh toán"
-                            : "Đánh dấu đã thanh toán"}
-                        </Button>
-                        {order.paymentMethod === "COD" && (
-                          <Text type="secondary" className={styles.paymentNote}>
-                            (Sẽ tự động được đánh dấu khi giao hàng)
-                          </Text>
-                        )}
-                      </div>
-                    )}
-
                   {/* Hiển thị thông báo cho VNPAY */}
                   {order.paymentMethod === "VNPAY" && (
-                    <Text type="secondary">
-                      Đơn hàng đã được thanh toán qua VNPAY.
+                    <Text type="secondary" className={styles.paymentNote}>
+                      Tự động cập nhật qua cổng thanh toán VNPAY
                     </Text>
                   )}
 
-                  {/* Hiển thị thông báo cho đơn hàng đã giao */}
-                  {order.orderStatus === "delivered" &&
-                    order.paymentMethod === "COD" && (
-                      <Text type="secondary">
-                        Đơn hàng COD đã được giao, trạng thái thanh toán đã tự
-                        động cập nhật.
-                      </Text>
-                    )}
+                  {/* Hiển thị thông báo cho COD */}
+                  {order.paymentMethod === "COD" && (
+                    <Text type="secondary" className={styles.paymentNote}>
+                      {order.orderStatus === "delivered" 
+                        ? "Đã tự động cập nhật khi giao hàng" 
+                        : "Sẽ tự động cập nhật khi giao hàng"}
+                    </Text>
+                  )}
                 </div>
               </Col>
             </Row>
@@ -943,55 +871,6 @@ function AdminOrderDetail() {
             <Input.TextArea
               rows={4}
               placeholder="Nhập ghi chú về việc thay đổi trạng thái"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-      {/* Modal cập nhật trạng thái thanh toán */}
-      <Modal
-        title="Cập nhật trạng thái thanh toán"
-        visible={paymentModalVisible}
-        onOk={handleUpdatePayment}
-        onCancel={() => setPaymentModalVisible(false)}
-        confirmLoading={updatingPayment}
-      >
-        <p>
-          Bạn có chắc chắn muốn thay đổi trạng thái thanh toán từ{" "}
-          <Tag color={order.isPaid ? "green" : "volcano"}>
-            {order.isPaid ? "ĐÃ THANH TOÁN" : "CHƯA THANH TOÁN"}
-          </Tag>{" "}
-          sang{" "}
-          <Tag color={!order.isPaid ? "green" : "volcano"}>
-            {!order.isPaid ? "ĐÃ THANH TOÁN" : "CHƯA THANH TOÁN"}
-          </Tag>
-          ?
-        </p>
-
-        {order.paymentMethod === "COD" && !order.isPaid && (
-          <Alert
-            message="Thông báo"
-            description="Đơn hàng COD sẽ tự động được đánh dấu là đã thanh toán khi trạng thái đơn hàng chuyển thành 'Đã giao hàng'."
-            type="info"
-            showIcon
-            className={styles.modalAlert}
-          />
-        )}
-
-        {order.isPaid && (
-          <Alert
-            message="Cảnh báo"
-            description="Đánh dấu đơn hàng này là chưa thanh toán có thể ảnh hưởng đến báo cáo tài chính."
-            type="warning"
-            showIcon
-            className={styles.modalAlert}
-          />
-        )}
-
-        <Form form={paymentForm} layout="vertical">
-          <Form.Item name="note" label="Ghi chú (tùy chọn)">
-            <Input.TextArea
-              rows={4}
-              placeholder="Nhập ghi chú về việc thay đổi trạng thái thanh toán"
             />
           </Form.Item>
         </Form>
