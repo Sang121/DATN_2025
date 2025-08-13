@@ -10,11 +10,18 @@ const ChatbotUser = () => {
   const userId = sessionStorage.getItem("userId") || "guest";
   const isAdmin = useSelector((state) => state.user.isAdmin);
   const [messages, setMessages] = useState([
-    {
-      text: "Xin chào! Tôi là trợ lý bán hàng của nhà S-Fashion. Tôi có thể giúp gì cho bạn?",
-      sender: "bot",
-    },
+    userId === "guest"
+      ? {
+          text: "Bạn cần phải đăng nhập để sử dụng chức năng này!",
+          sender: "bot",
+        }
+      : {
+          text: "Xin chào! Tôi là trợ lý bán hàng của nhà S-Fashion. Tôi có thể giúp gì cho bạn?",
+          sender: "bot",
+        },
   ]);
+  console.log(userId);
+
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -44,6 +51,14 @@ const ChatbotUser = () => {
           });
           const answer = response.answer;
           setMessages((prev) => [...prev, { text: answer, sender: "bot" }]);
+        } else if (userId === "guest") {
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: "Bạn cần phải đăng nhập để sử dụng chức năng này!",
+              sender: "bot",
+            },
+          ]);
         } else {
           const response = await UserChatbot({
             question: userMessage,
