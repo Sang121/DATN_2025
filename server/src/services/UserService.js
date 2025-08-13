@@ -2,6 +2,8 @@ const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const { processImageUrls } = require("./productService");
 const { genneralRefreshToken, genneralAccessToken } = require("./jwtService");
+const jwt = require("jsonwebtoken");
+
 const { jwtDecode } = require("jwt-decode");
 //const genneralRefreshToken = require('./jwtService');
 const validateEmail = (email) => {
