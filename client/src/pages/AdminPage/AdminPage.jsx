@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, lazy, Suspense } from "react";
 import {
   AppstoreOutlined,
   CalendarOutlined,
@@ -12,14 +12,16 @@ import {
 } from "@ant-design/icons";
 import styles from "./styles/AdminPage.module.css";
 import "./styles/index.css"; // Import global admin styles
-import { Col, Divider, Menu, Switch } from "antd";
-import UserManager from "./modules/Users";
-import ProductManager from "./modules/Products";
-import OrderManager from "./modules/Orders";
-import OptimizedStatistics from "./modules/Statistics/OptimizedStatistics";
-import StatisticsFallback from "./modules/Statistics/components/StatisticsFallback";
+import { Col, Divider, Menu, Switch, Spin } from "antd";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+
+const UserManager = lazy(() => import("./modules/Users"));
+const ProductManager = lazy(() => import("./modules/Products"));
+const OrderManager = lazy(() => import("./modules/Orders"));
+const OptimizedStatistics = lazy(() =>
+  import("./modules/Statistics/OptimizedStatistics")
+);
 
 const items = [
   {
@@ -50,28 +52,17 @@ const AdminPage = () => {
   const handleOnClick = ({ key }) => {
     setSelectedKey(key);
   };
-  const renderContent = () => {
-    try {
-      switch (selectedKey) {
-        case "user":
-          return <UserManager />;
-        case "product":
-          return <ProductManager />;
-        case "order":
-          return <OrderManager />;
-        case "Statistics":
-          return <OptimizedStatistics />;
-        default:
-          return <UserManager />;
-      }
-    } catch (error) {
-      console.error("Error rendering content:", error);
-      if (selectedKey === "Statistics") {
-        return <StatisticsFallback />;
-      }
-      return <UserManager />;
-    }
-  };
+
+  const components = useMemo(
+    () => ({
+      user: <UserManager />,
+      product: <ProductManager />,
+      order: <OrderManager />,
+      Statistics: <OptimizedStatistics />,
+    }),
+    []
+  );
+
   const location = useLocation();
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -92,7 +83,9 @@ const AdminPage = () => {
             />
           </Col>
           <Col xs={18} sm={18} md={18} lg={20} className={styles["content"]}>
-            {renderContent()}
+            <Suspense fallback={<Spin size="large" />}>
+              {components[selectedKey]}
+            </Suspense>
           </Col>
         </Col>
       </div>

@@ -549,8 +549,8 @@ function AdminOrderDetail() {
                   {/* Hiển thị thông báo cho COD */}
                   {order.paymentMethod === "COD" && (
                     <Text type="secondary" className={styles.paymentNote}>
-                      {order.orderStatus === "delivered" 
-                        ? "Đã tự động cập nhật khi giao hàng" 
+                      {order.orderStatus === "delivered"
+                        ? "Đã tự động cập nhật khi giao hàng"
                         : "Sẽ tự động cập nhật khi giao hàng"}
                     </Text>
                   )}
