@@ -3,7 +3,23 @@ const variantSchema = new mongoose.Schema({
   size: {
     type: String,
     required: true,
-    enum: ["S", "M", "L", "XL", "XXL"], // Các size có sẵn
+    enum: [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL", // Size áo
+      "35",
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44", // Size giày
+    ],
   },
   color: {
     type: String,

@@ -45,19 +45,36 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
     variants: [],
   });
 
-  // Định nghĩa thứ tự kích thước từ nhỏ đến lớn
-  const sizeOrder = useMemo(() => ({ S: 1, M: 2, L: 3, XL: 4, XXL: 5 }), []);
+  // Định nghĩa thứ tự kích thước động dựa trên category
+  const getSizeOptions = useCallback((category) => {
+    if (category === "Giày dép") {
+      // Size giày từ 35-44
+      const shoeSizes = {};
+      for (let i = 35; i <= 44; i++) {
+        shoeSizes[i.toString()] = i - 34; // Thứ tự từ 1-10
+      }
+      return shoeSizes;
+    } else {
+      // Size áo mặc định
+      return { S: 1, M: 2, L: 3, XL: 4, XXL: 5 };
+    }
+  }, []);
+
+  // Sử dụng size options dựa trên category hiện tại
+  const currentSizeOrder = useMemo(() => {
+    return getSizeOptions(product.category);
+  }, [product.category, getSizeOptions]);
 
   // Hàm sắp xếp variants theo kích thước
   const sortVariantsBySize = useCallback(
     (variants) => {
       return [...variants].sort((a, b) => {
-        const orderA = sizeOrder[a.size] || 999; // Nếu không tìm thấy trong bảng sắp xếp, đặt ở cuối
-        const orderB = sizeOrder[b.size] || 999;
+        const orderA = currentSizeOrder[a.size] || 999; // Nếu không tìm thấy trong bảng sắp xếp, đặt ở cuối
+        const orderB = currentSizeOrder[b.size] || 999;
         return orderA - orderB;
       });
     },
-    [sizeOrder]
+    [currentSizeOrder]
   );
 
   const [variant, setVariant] = useState({
@@ -167,6 +184,10 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
 
   const handleChange = (name, value) => {
     if (name === "category") {
+      // Kiểm tra nếu category mới khác với category cũ về loại size
+      const oldIsShoe = product.category === "Giày dép";
+      const newIsShoe = value === "Giày dép";
+
       setProduct((prev) => ({
         ...prev,
         [name]: value,
@@ -176,7 +197,18 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
           material: "",
           brand: "",
         },
+        // Reset variants nếu chuyển đổi giữa giày và không phải giày
+        ...(oldIsShoe !== newIsShoe && { variants: [] }),
       }));
+
+      // Reset variant form nếu có thay đổi loại size
+      if (oldIsShoe !== newIsShoe) {
+        setVariant({
+          size: "",
+          color: "",
+          stock: 0,
+        });
+      }
     } else if (name.startsWith("attr_")) {
       const attributeName = name.replace("attr_", "");
       setProduct((prev) => ({
@@ -598,7 +630,7 @@ function AddProduct({ mode = "add", productData, onSuccess }) {
                       setVariant((prev) => ({ ...prev, size: value }))
                     }
                   >
-                    {Object.keys(sizeOrder).map((size) => (
+                    {Object.keys(currentSizeOrder).map((size) => (
                       <Option key={size} value={size}>
                         {size}
                       </Option>
