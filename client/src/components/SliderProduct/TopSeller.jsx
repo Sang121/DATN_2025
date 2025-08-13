@@ -239,11 +239,6 @@ const TopSeller = ({
             {subtitle && <p className={styles.sliderSubtitle}>{subtitle}</p>}
           </div>
         )}
-        <div className={styles.viewMoreContainer}>
-          <Link to={`/search/${query}`} className={styles.viewMoreLink}>
-            Xem thêm <RightOutlined />
-          </Link>
-        </div>
       </div>
 
       <div className={styles.sliderWrapper}>
