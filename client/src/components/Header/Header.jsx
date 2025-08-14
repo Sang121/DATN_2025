@@ -36,7 +36,7 @@ import {
   Typography,
   AutoComplete,
 } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser, logout } from "../../redux/slices/userSlice";
 import { clearOrder } from "../../redux/slices/orderSlice";
@@ -49,14 +49,23 @@ const { Search } = Input;
 function AppHeader({ onShowSignIn }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const user = useSelector((state) => state.user);
   const order = useSelector((state) => state.order);
   const cartItemCount = order?.orderItems?.length || 0;
 
   const isLoggedIn = !!user.access_token;
+
+  // Xử lý thay đổi URL để xóa từ khóa search khi chuyển trang
+  useEffect(() => {
+    if (!location.pathname.includes('/search/')) {
+      setSearchValue("");
+    }
+  }, [location.pathname]);
 
   // Xử lý lưu thông tin đăng nhập vào sessionStorage
   useEffect(() => {
@@ -155,26 +164,26 @@ function AppHeader({ onShowSignIn }) {
     }
   };
 
-  // Menu người dùng
-  const userMenu = (
-    <Menu>
-      <Menu.Item key="profile" icon={<UserOutlined />}>
-        <Link to="/profile">Thông tin tài khoản</Link>
-      </Menu.Item>
-      <Menu.Item key="orders" icon={<ShoppingOutlined />}>
-        <Link to="/profile/my-orders">Đơn hàng của tôi</Link>
-      </Menu.Item>
-      {user?.isAdmin && (
-        <Menu.Item key="admin" icon={<DashboardOutlined />}>
-          <Link to="/system/admin">Quản lý hệ thống</Link>
-        </Menu.Item>
-      )}
-      <Menu.Divider />
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-        Đăng xuất
-      </Menu.Item>
-    </Menu>
-  );
+  // Menu người dùng - không còn cần thiết vì đã chuyển sang menu prop
+  // const userMenu = (
+  //   <Menu>
+  //     <Menu.Item key="profile" icon={<UserOutlined />}>
+  //       <Link to="/profile">Thông tin tài khoản</Link>
+  //     </Menu.Item>
+  //     <Menu.Item key="orders" icon={<ShoppingOutlined />}>
+  //       <Link to="/profile/my-orders">Đơn hàng của tôi</Link>
+  //     </Menu.Item>
+  //     {user?.isAdmin && (
+  //       <Menu.Item key="admin" icon={<DashboardOutlined />}>
+  //         <Link to="/system/admin">Quản lý hệ thống</Link>
+  //       </Menu.Item>
+  //     )}
+  //     <Menu.Divider />
+  //     <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+  //       Đăng xuất
+  //     </Menu.Item>
+  //   </Menu>
+  // );
 
   return (
     <Header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
@@ -210,6 +219,8 @@ function AppHeader({ onShowSignIn }) {
               onSearch={handleSearch}
               className={styles.searchInput}
               allowClear
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
             />
           </div>
         </div>
@@ -264,15 +275,46 @@ function AppHeader({ onShowSignIn }) {
                 </div>
               </Tooltip>
               <Dropdown
-                overlay={userMenu}
+                menu={{
+                  items: [
+                    {
+                      key: "profile",
+                      icon: <UserOutlined />,
+                      label: <Link to="/profile">Thông tin tài khoản</Link>,
+                    },
+                    {
+                      key: "orders",
+                      icon: <ShoppingOutlined />,
+                      label: <Link to="/profile/my-orders">Đơn hàng của tôi</Link>,
+                    },
+                    ...(user?.isAdmin
+                      ? [
+                          {
+                            key: "admin",
+                            icon: <DashboardOutlined />,
+                            label: <Link to="/system/admin">Quản lý hệ thống</Link>,
+                          },
+                        ]
+                      : []),
+                    {
+                      type: "divider",
+                    },
+                    {
+                      key: "logout",
+                      icon: <LogoutOutlined />,
+                      label: "Đăng xuất",
+                      onClick: handleLogout,
+                    },
+                  ],
+                }}
                 trigger={["click"]}
                 placement="bottomRight"
                 className={styles.userDropdown}
                 getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                destroyPopupOnHide={true}
+                destroyOnHidden={true}
                 overlayStyle={{
                   position: "fixed",
-                  zIndex: 9999,
+                  zIndex: 1050,
                 }}
               >
                 <div className={styles.userProfile}>
@@ -420,6 +462,8 @@ function AppHeader({ onShowSignIn }) {
               enterButton
               size="large"
               className={styles.mobileSearchInput}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
             />
           </div>
 
