@@ -198,52 +198,63 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
     <div className="fade-in">
       {/* Filter Controls */}
       <Card style={{ marginBottom: "24px" }}>
-        <Row gutter={16} align="middle" justify="space-between">
-          <Col>
-            <Row gutter={16} align="middle">
-              <Col>
-                <span style={{ fontWeight: 500 }}>Doanh thu theo thời gian:</span>
-                <Select
-                  value={revenuePeriod}
-                  onChange={setRevenuePeriod}
-                  style={{ width: 150, marginLeft: 8 }}
-                >
-                  <Option value="7days">7 ngày gần đây</Option>
-                  <Option value="30days">30 ngày gần đây</Option>
-                  <Option value="12months">12 tháng gần đây</Option>
-                </Select>
+        <Row gutter={[16, 16]} align="middle" justify="space-between">
+          <Col xs={24} sm={24} md={18} lg={20} xl={20}>
+            <Row gutter={[12, 12]} align="middle">
+              <Col xs={24} sm={12} md={8} lg={8}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <span style={{ fontWeight: 500, fontSize: "14px" }}>Doanh thu theo thời gian:</span>
+                  <Select
+                    value={revenuePeriod}
+                    onChange={setRevenuePeriod}
+                    style={{ width: "100%" }}
+                    size="middle"
+                  >
+                    <Option value="7days">7 ngày gần đây</Option>
+                    <Option value="30days">30 ngày gần đây</Option>
+                    <Option value="12months">12 tháng gần đây</Option>
+                  </Select>
+                </div>
               </Col>
-              <Col>
-                <span style={{ fontWeight: 500 }}>Xu hướng sản phẩm:</span>
-                <Select
-                  value={trendDays}
-                  onChange={setTrendDays}
-                  style={{ width: 120, marginLeft: 8 }}
-                >
-                  <Option value={7}>7 ngày</Option>
-                  <Option value={15}>15 ngày</Option>
-                  <Option value={30}>30 ngày</Option>
-                  <Option value={60}>60 ngày</Option>
-                </Select>
+              <Col xs={24} sm={12} md={8} lg={8}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <span style={{ fontWeight: 500, fontSize: "14px" }}>Xu hướng sản phẩm:</span>
+                  <Select
+                    value={trendDays}
+                    onChange={setTrendDays}
+                    style={{ width: "100%" }}
+                    size="middle"
+                  >
+                    <Option value={7}>7 ngày</Option>
+                    <Option value={15}>15 ngày</Option>
+                    <Option value={30}>30 ngày</Option>
+                    <Option value={60}>60 ngày</Option>
+                  </Select>
+                </div>
               </Col>
-              <Col>
-                <span style={{ fontWeight: 500 }}>So sánh:</span>
-                <Select
-                  value={comparisonPeriod}
-                  onChange={setComparisonPeriod}
-                  style={{ width: 180, marginLeft: 8 }}
-                >
-                  <Option value="week">Tuần này vs tuần trước</Option>
-                  <Option value="month">Tháng này vs tháng trước</Option>
-                </Select>
+              <Col xs={24} sm={24} md={8} lg={8}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <span style={{ fontWeight: 500, fontSize: "14px" }}>So sánh:</span>
+                  <Select
+                    value={comparisonPeriod}
+                    onChange={setComparisonPeriod}
+                    style={{ width: "100%" }}
+                    size="middle"
+                  >
+                    <Option value="week">Tuần này vs tuần trước</Option>
+                    <Option value="month">Tháng này vs tháng trước</Option>
+                  </Select>
+                </div>
               </Col>
             </Row>
           </Col>
-          <Col>
+          <Col xs={24} sm={24} md={6} lg={4} xl={4}>
             <Button
               icon={<ReloadOutlined />}
               onClick={onRefresh}
               type="primary"
+              block
+              size="middle"
             >
               Làm mới dữ liệu
             </Button>
@@ -257,7 +268,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
       {/* Main Content */}
       <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
         {/* Revenue Chart */}
-        <Col xs={24} lg={14}>
+        <Col xs={24} sm={24} md={24} lg={14} xl={14}>
           <Card
             title={<Title level={4}>📈 Doanh thu theo thời gian</Title>}
             loading={revenueLoading}
@@ -267,8 +278,18 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={revenueData.data}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis tickFormatter={formatCurrency} />
+                  <XAxis 
+                    dataKey="date" 
+                    fontSize={12}
+                    angle={window.innerWidth < 768 ? -45 : 0}
+                    textAnchor={window.innerWidth < 768 ? "end" : "middle"}
+                    height={window.innerWidth < 768 ? 60 : 30}
+                  />
+                  <YAxis 
+                    tickFormatter={formatCurrency}
+                    fontSize={12}
+                    width={window.innerWidth < 768 ? 60 : 80}
+                  />
                   <Tooltip
                     formatter={(value) => [formatCurrency(value), "Doanh thu"]}
                   />
@@ -277,7 +298,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                     dataKey="revenue"
                     stroke="#1890ff"
                     strokeWidth={2}
-                    dot={{ r: 4 }}
+                    dot={{ r: window.innerWidth < 768 ? 2 : 4 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -292,15 +313,15 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
         </Col>
 
         {/* Comparison Stats */}
-        <Col xs={24} lg={10}>
+        <Col xs={24} sm={24} md={24} lg={10} xl={10}>
           <Card
             title={<Title level={4}>📊 So sánh hiệu suất</Title>}
             loading={comparisonLoading}
           >
             {comparisonData?.data ? (
               <div>
-                <Row gutter={16}>
-                  <Col span={12}>
+                <Row gutter={[12, 12]}>
+                  <Col xs={24} sm={12} md={12} lg={24} xl={12}>
                     <Card
                       size="small"
                       title="Kỳ hiện tại"
@@ -310,22 +331,22 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                         title="Doanh thu"
                         value={comparisonData.data.current.revenue}
                         formatter={formatCurrency}
-                        valueStyle={{ fontSize: "16px" }}
+                        valueStyle={{ fontSize: "14px" }}
                       />
                       <Statistic
                         title="Đơn hàng"
                         value={comparisonData.data.current.orders}
-                        valueStyle={{ fontSize: "14px" }}
+                        valueStyle={{ fontSize: "12px" }}
                       />
                       <Statistic
                         title="AOV"
                         value={comparisonData.data.current.avgOrderValue}
                         formatter={formatCurrency}
-                        valueStyle={{ fontSize: "14px" }}
+                        valueStyle={{ fontSize: "12px" }}
                       />
                     </Card>
                   </Col>
-                  <Col span={12}>
+                  <Col xs={24} sm={12} md={12} lg={24} xl={12}>
                     <Card
                       size="small"
                       title="Kỳ trước"
@@ -335,18 +356,18 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                         title="Doanh thu"
                         value={comparisonData.data.previous.revenue}
                         formatter={formatCurrency}
-                        valueStyle={{ fontSize: "16px" }}
+                        valueStyle={{ fontSize: "14px" }}
                       />
                       <Statistic
                         title="Đơn hàng"
                         value={comparisonData.data.previous.orders}
-                        valueStyle={{ fontSize: "14px" }}
+                        valueStyle={{ fontSize: "12px" }}
                       />
                       <Statistic
                         title="AOV"
                         value={comparisonData.data.previous.avgOrderValue}
                         formatter={formatCurrency}
-                        valueStyle={{ fontSize: "14px" }}
+                        valueStyle={{ fontSize: "12px" }}
                       />
                     </Card>
                   </Col>
@@ -360,7 +381,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                     textAlign: "center",
                   }}
                 >
-                  <div style={{ fontSize: "16px", fontWeight: "bold" }}>
+                  <div style={{ fontSize: "14px", fontWeight: "bold" }}>
                     Tăng trưởng doanh thu:
                     <span
                       style={{
@@ -369,7 +390,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                             ? "#52c41a"
                             : "#ff4d4f",
                         marginLeft: 8,
-                        fontSize: "18px",
+                        fontSize: "16px",
                       }}
                     >
                       {comparisonData.data.growth.revenue >= 0 ? "+" : ""}
@@ -389,7 +410,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
         </Col>
 
         {/* Top Products Table */}
-        <Col xs={24} lg={14}>
+        <Col xs={24} sm={24} md={24} lg={14} xl={14}>
           <Card
             title={<Title level={4}>🏆 Top sản phẩm bán chạy</Title>}
             loading={productsLoading}
@@ -398,19 +419,26 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
             <Table
               dataSource={topProducts?.data || []}
               columns={productColumns}
-              pagination={{ pageSize: 8, showSizeChanger: false }}
+              pagination={{ 
+                pageSize: window.innerWidth < 768 ? 5 : 8, 
+                showSizeChanger: false,
+                showQuickJumper: false,
+                showTotal: (total, range) => 
+                  `${range[0]}-${range[1]} của ${total} sản phẩm`
+              }}
               size="small"
               className="statistics-table"
               rowKey={(record, index) => record._id || `product-${index}`}
               locale={{
                 emptyText: "Chưa có dữ liệu sản phẩm",
               }}
+              scroll={{ x: 600 }}
             />
           </Card>
         </Col>
 
         {/* Product Trends Chart */}
-        <Col xs={24} lg={10}>
+        <Col xs={24} sm={24} md={24} lg={10} xl={10}>
           <Card
             title={
               <Title level={4}>📈 Xu hướng sản phẩm ({trendDays} ngày)</Title>
@@ -418,7 +446,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
             loading={trendsLoading}
           >
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={productTrends?.data?.slice(0, 8) || []}>
+              <BarChart data={productTrends?.data?.slice(0, window.innerWidth < 768 ? 5 : 8) || []}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="productName"
@@ -426,8 +454,9 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                   textAnchor="end"
                   height={100}
                   interval={0}
+                  fontSize={10}
                 />
-                <YAxis />
+                <YAxis fontSize={10} />
                 <Tooltip
                   formatter={(value, name) => [
                     name === "totalUnits"
@@ -447,17 +476,17 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
         {/* Quick Metrics */}
         <Col span={24}>
           <Card title={<Title level={4}>📊 Chỉ số nhanh</Title>}>
-            <Row gutter={16}>
-              <Col xs={12} sm={6}>
+            <Row gutter={[16, 16]}>
+              <Col xs={12} sm={6} md={6} lg={6} xl={6}>
                 <Statistic
                   title="Conversion Rate"
                   value={overview?.data?.conversionRate || 0}
                   precision={2}
                   suffix="%"
-                  valueStyle={{ color: "#722ed1" }}
+                  valueStyle={{ color: "#722ed1", fontSize: window.innerWidth < 768 ? "16px" : "20px" }}
                 />
               </Col>
-              <Col xs={12} sm={6}>
+              <Col xs={12} sm={6} md={6} lg={6} xl={6}>
                 <Statistic
                   title="Tỷ lệ hoàn thành"
                   value={
@@ -467,22 +496,22 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                   }
                   precision={1}
                   suffix="%"
-                  valueStyle={{ color: "#52c41a" }}
+                  valueStyle={{ color: "#52c41a", fontSize: window.innerWidth < 768 ? "16px" : "20px" }}
                 />
               </Col>
-              <Col xs={12} sm={6}>
+              <Col xs={12} sm={6} md={6} lg={6} xl={6}>
                 <Statistic
                   title="Đơn hàng/Ngày"
                   value={Math.round((overview?.data?.totalOrders || 0) / 30)}
-                  valueStyle={{ color: "#1890ff" }}
+                  valueStyle={{ color: "#1890ff", fontSize: window.innerWidth < 768 ? "16px" : "20px" }}
                 />
               </Col>
-              <Col xs={12} sm={6}>
+              <Col xs={12} sm={6} md={6} lg={6} xl={6}>
                 <Statistic
                   title="Doanh thu/Đơn"
                   value={overview?.data?.avgOrderValue || 0}
                   formatter={formatCurrency}
-                  valueStyle={{ color: "#fa8c16" }}
+                  valueStyle={{ color: "#fa8c16", fontSize: window.innerWidth < 768 ? "16px" : "20px" }}
                 />
               </Col>
             </Row>

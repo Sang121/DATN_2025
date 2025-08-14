@@ -14,7 +14,7 @@ const OptimizedStatistics = () => {
   };
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div className="statistics-page">
       {/* Main Statistics Content */}
       <UnifiedStatistics refreshKey={refreshKey} onRefresh={handleRefresh} />
     </div>

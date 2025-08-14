@@ -216,6 +216,46 @@
     flex-wrap: wrap;
     gap: 16px;
   }
+  
+  .comparison-stats .ant-card-small .ant-card-body {
+    padding: 8px;
+  }
+  
+  .comparison-stats .ant-statistic-content {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 992px) {
+  .statistics-page {
+    padding: 15px;
+  }
+  
+  .chart-container .ant-card-body {
+    padding: 16px;
+  }
+  
+  .statistics-table .ant-table {
+    font-size: 13px;
+  }
+  
+  .statistics-table .ant-table-thead > tr > th {
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  .statistics-table .ant-table-tbody > tr > td {
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  .quick-metrics .ant-statistic-title {
+    font-size: 12px;
+  }
+  
+  .quick-metrics .ant-statistic-content {
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -249,6 +289,170 @@
   
   .quick-metrics .ant-col {
     margin-bottom: 16px;
+  }
+  
+  .quick-metrics .ant-statistic-title {
+    font-size: 11px;
+  }
+  
+  .quick-metrics .ant-statistic-content {
+    font-size: 14px;
+  }
+  
+  .chart-container .ant-card-head-title {
+    font-size: 14px;
+  }
+  
+  .chart-container .ant-card-body {
+    padding: 12px;
+  }
+  
+  .comparison-stats .ant-card-small {
+    margin-bottom: 12px;
+  }
+  
+  .comparison-stats .ant-statistic-title {
+    font-size: 11px;
+  }
+  
+  .comparison-stats .ant-statistic-content {
+    font-size: 12px;
+  }
+  
+  .growth-summary {
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  .growth-value {
+    font-size: 14px;
+  }
+  
+  /* Table responsive adjustments */
+  .statistics-table .ant-table-thead > tr > th {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+  
+  .statistics-table .ant-table-tbody > tr > td {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+  
+  .statistics-table .ant-table-pagination {
+    margin: 16px 0 0 0;
+  }
+  
+  .statistics-table .ant-pagination-item {
+    margin: 0 2px;
+  }
+  
+  /* Chart responsive text */
+  .recharts-xAxis .recharts-cartesian-axis-tick-value {
+    font-size: 10px;
+  }
+  
+  .recharts-yAxis .recharts-cartesian-axis-tick-value {
+    font-size: 10px;
+  }
+  
+  .recharts-legend-wrapper {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .statistics-page {
+    padding: 8px;
+  }
+  
+  .statistics-header {
+    padding: 12px;
+  }
+  
+  .filter-controls {
+    padding: 8px;
+  }
+  
+  .overview-card .ant-card-body {
+    padding: 12px;
+  }
+  
+  .overview-card .ant-statistic-title {
+    font-size: 11px;
+  }
+  
+  .overview-card .ant-statistic-content {
+    font-size: 16px;
+  }
+  
+  .chart-container .ant-card-body {
+    padding: 8px;
+  }
+  
+  .quick-metrics .ant-statistic-title {
+    font-size: 10px;
+  }
+  
+  .quick-metrics .ant-statistic-content {
+    font-size: 12px;
+  }
+  
+  .comparison-stats .ant-card-small .ant-card-body {
+    padding: 6px;
+  }
+  
+  .comparison-stats .ant-statistic-content {
+    font-size: 10px;
+  }
+  
+  .growth-summary {
+    padding: 6px;
+    font-size: 11px;
+  }
+  
+  .growth-value {
+    font-size: 12px;
+  }
+  
+  /* Very small table adjustments */
+  .statistics-table .ant-table-thead > tr > th {
+    padding: 4px 2px;
+    font-size: 10px;
+  }
+  
+  .statistics-table .ant-table-tbody > tr > td {
+    padding: 4px 2px;
+    font-size: 10px;
+  }
+  
+  .statistics-table .ant-table-pagination {
+    margin: 12px 0 0 0;
+  }
+  
+  .statistics-table .ant-pagination-item {
+    margin: 0 1px;
+    min-width: 24px;
+    height: 24px;
+    line-height: 22px;
+  }
+  
+  .statistics-table .ant-pagination-prev,
+  .statistics-table .ant-pagination-next {
+    min-width: 24px;
+    height: 24px;
+    line-height: 22px;
+  }
+}
+
+/* Landscape phone adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .quick-metrics .ant-statistic-content {
+    font-size: 12px;
+  }
+  
+  .chart-container .recharts-wrapper {
+    height: 250px !important;
   }
 }
 
