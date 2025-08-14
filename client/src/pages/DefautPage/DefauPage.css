@@ -1,6 +1,1 @@
-.global-chatbot-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000; /* Ensure it's above other content */
-}
+/* Global chatbot container - positioning handled by component */
