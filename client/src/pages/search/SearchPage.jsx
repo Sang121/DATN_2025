@@ -172,7 +172,11 @@ function SearchPage() {
           </Card>
 
           {/* Product grid */}
-          <div className={styles.product_grid}>
+          <div 
+            className={`${styles.product_grid} ${
+              searchData.data.length <= 3 ? styles[`grid_${searchData.data.length}`] : ''
+            }`}
+          >
             {searchData.data.map((product) => (
               <ProductCard
                 key={product._id}
