@@ -66,7 +66,9 @@ function SearchPage() {
     return (
       <div className={styles.container}>
         <Card className={styles.loading_card}>
-          <Spin size="large" tip="Đang tìm kiếm sản phẩm..." />
+          <Spin size="large" spinning={true} tip="Đang tìm kiếm sản phẩm...">
+            <div style={{ minHeight: 300 }} />
+          </Spin>
         </Card>
       </div>
     );
