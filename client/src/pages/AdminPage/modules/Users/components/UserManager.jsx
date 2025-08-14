@@ -321,7 +321,9 @@ const UserManager = () => {
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
-        <Spin size="large" tip="Đang tải dữ liệu..." />
+        <Spin size="large" spinning={true} tip="Đang tải dữ liệu...">
+          <div style={{ minHeight: 300 }} />
+        </Spin>
       </div>
     );
   }

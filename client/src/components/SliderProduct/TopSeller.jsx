@@ -8,7 +8,7 @@ import { Alert, Spin } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import ProductCardV2 from "../ProductCardV2/ProductCardV2";
-import { bestSeller, searchProduct } from "../../services/productService";
+import { bestSeller } from "../../services/productService";
 import styles from "./TopSeller.module.css";
 
 const TopSeller = ({
@@ -42,6 +42,7 @@ const TopSeller = ({
     isError,
     error,
   } = useQuery({
+    queryKey: ["bestSeller"],
     queryFn: () => bestSeller(),
   });
 
@@ -61,7 +62,7 @@ const TopSeller = ({
       }));
     }
     return [];
-  }, [fetchedRawProducts, query]);
+  }, [fetchedRawProducts]);
 
   const updateItemsToShow = useCallback(() => {
     const width = window.innerWidth;
@@ -85,15 +86,6 @@ const TopSeller = ({
       setItemsToShow(newItemsToShow);
     }
   }, [breakpoints, listProducts.length]);
-  console.log(
-    "query:",
-    query,
-
-    "Items to show:",
-    itemsToShow,
-    "List products length:",
-    listProducts.length
-  );
   useEffect(() => {
     updateItemsToShow();
     const handleResize = () => updateItemsToShow();
@@ -185,8 +177,11 @@ const TopSeller = ({
         <div className={styles.loading}>
           <Spin
             indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
+            spinning={true}
             tip="Đang tải sản phẩm..."
-          />
+          >
+            <div style={{ minHeight: 200 }} />
+          </Spin>
         </div>
       </div>
     );

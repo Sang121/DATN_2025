@@ -428,7 +428,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
               }}
               size="small"
               className="statistics-table"
-              rowKey={(record, index) => record._id || `product-${index}`}
+              rowKey={(record) => record._id || `product-${record.name || Math.random()}`}
               locale={{
                 emptyText: "Chưa có dữ liệu sản phẩm",
               }}

@@ -494,7 +494,7 @@ function AdminOrderDetail() {
       {renderSteps()}{" "}
       <Row gutter={[24, 24]} className={styles.adminToolbar}>
         <Col span={24}>
-          <Card title="Cập nhật đơn hàng" bordered={false}>
+          <Card title="Cập nhật đơn hàng" variant="outlined">
             <Row gutter={[16, 16]}>
               {" "}
               <Col xs={24} md={12}>
@@ -562,7 +562,7 @@ function AdminOrderDetail() {
       </Row>
       <Card
         title="Tổng quan đơn hàng"
-        bordered={false}
+        variant="borderless"
         className={styles.contentCard}
       >
         <Row gutter={[32, 24]}>
@@ -619,73 +619,87 @@ function AdminOrderDetail() {
               className={styles.timelineCard}
               size="small"
             >
-              <Timeline>
-                <Timeline.Item>
-                  Đơn hàng được tạo -{" "}
-                  {new Date(order.createdAt).toLocaleString()}
-                </Timeline.Item>
-                {order.isPaid && (
-                  <Timeline.Item color="green">
-                    Thanh toán thành công -{" "}
-                    {new Date(order.paidAt).toLocaleString()}
-                  </Timeline.Item>
-                )}
+              <Timeline
+                items={[
+                  {
+                    children: (
+                      <>
+                        Đơn hàng được tạo -{" "}
+                        {new Date(order.createdAt).toLocaleString()}
+                      </>
+                    ),
+                  },
+                  ...(order.isPaid
+                    ? [
+                        {
+                          color: "green",
+                          children: (
+                            <>
+                              Thanh toán thành công -{" "}
+                              {new Date(order.paidAt).toLocaleString()}
+                            </>
+                          ),
+                        },
+                      ]
+                    : []),
+                  ...(order.statusHistory && order.statusHistory.length > 0
+                    ? order.statusHistory.map((history, index) => {
+                        let color = "blue";
+                        let statusText = "Đang xử lý";
 
-                {/* Hiển thị lịch sử trạng thái từ statusHistory */}
-                {order.statusHistory &&
-                  order.statusHistory.length > 0 &&
-                  order.statusHistory.map((history, index) => {
-                    let color = "blue";
-                    let statusText = "Đang xử lý";
+                        switch (history.status) {
+                          case "pending":
+                            color = "orange";
+                            statusText = "Chờ xử lý";
+                            break;
+                          case "processing":
+                            color = "blue";
+                            statusText = "Đang xử lý";
+                            break;
+                          case "delivered":
+                            color = "green";
+                            statusText = "Đã giao hàng";
+                            break;
+                          case "cancelled":
+                            color = "red";
+                            statusText = "Đã hủy";
+                            break;
+                          case "payment_failed":
+                            color = "red";
+                            statusText = "Thanh toán thất bại";
+                            break;
+                          case "returned":
+                            color = "orange";
+                            statusText = "Đã trả hàng";
+                            break;
+                          case "refunded":
+                            color = "red";
+                            statusText = "Đã hoàn tiền";
+                            break;
+                          default:
+                            color = "blue";
+                        }
 
-                    switch (history.status) {
-                      case "pending":
-                        color = "orange";
-                        statusText = "Chờ xử lý";
-                        break;
-                      case "processing":
-                        color = "blue";
-                        statusText = "Đang xử lý";
-                        break;
-                      case "delivered":
-                        color = "green";
-                        statusText = "Đã giao hàng";
-                        break;
-                      case "cancelled":
-                        color = "red";
-                        statusText = "Đã hủy";
-                        break;
-                      case "payment_failed":
-                        color = "red";
-                        statusText = "Thanh toán thất bại";
-                        break;
-                      case "returned":
-                        color = "orange";
-                        statusText = "Đã trả hàng";
-                        break;
-                      case "refunded":
-                        color = "red";
-                        statusText = "Đã hoàn tiền";
-                        break;
-                      default:
-                        color = "blue";
-                    }
-
-                    return (
-                      <Timeline.Item color={color} key={index}>
-                        <div>
-                          <strong>{statusText}</strong> -{" "}
-                          {new Date(history.updatedAt).toLocaleString()}
-                        </div>
-                        {history.note && (
-                          <div className={styles.historyNote}>
-                            {history.note}
-                          </div>
-                        )}
-                      </Timeline.Item>
-                    );
-                  })}
-              </Timeline>
+                        return {
+                          color,
+                          children: (
+                            <div key={index}>
+                              <div>
+                                <strong>{statusText}</strong> -{" "}
+                                {new Date(history.updatedAt).toLocaleString()}
+                              </div>
+                              {history.note && (
+                                <div className={styles.historyNote}>
+                                  {history.note}
+                                </div>
+                              )}
+                            </div>
+                          ),
+                        };
+                      })
+                    : []),
+                ]}
+              />
             </Card>
             <Card
               title={
@@ -828,7 +842,7 @@ function AdminOrderDetail() {
       {/* Modal cập nhật trạng thái đơn hàng */}
       <Modal
         title="Cập nhật trạng thái đơn hàng"
-        visible={modalVisible}
+        open={modalVisible}
         onOk={handleUpdateStatus}
         onCancel={() => setModalVisible(false)}
         confirmLoading={updatingStatus}

@@ -13,7 +13,7 @@ function ProductDetail() {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
   const [availableColors, setAvailableColors] = useState([]);
   const [availableSizes, setAvailableSizes] = useState([]);
   const userId = sessionStorage.getItem("userId") || null;
@@ -258,7 +258,9 @@ function ProductDetail() {
                   className={styles["product-card-badge-out-of-stock"]}
                 ></div>
               )}
-              <img src={selectedImage} alt={product.name} />
+              {selectedImage && (
+                <img src={selectedImage} alt={product.name} />
+              )}
             </div>
           </div>
           <div style={{ flex: 1, paddingLeft: 32 }}>

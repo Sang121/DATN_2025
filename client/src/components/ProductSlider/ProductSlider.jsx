@@ -63,7 +63,7 @@ const ProductSlider = ({
       }));
     }
     return [];
-  }, [fetchedRawProducts, query]);
+  }, [fetchedRawProducts]);
 
   const updateItemsToShow = useCallback(() => {
     const width = window.innerWidth;
@@ -179,8 +179,11 @@ const ProductSlider = ({
         <div className={styles.loading}>
           <Spin
             indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
+            spinning={true}
             tip="Đang tải sản phẩm..."
-          />
+          >
+            <div style={{ minHeight: 200 }} />
+          </Spin>
         </div>
       </div>
     );

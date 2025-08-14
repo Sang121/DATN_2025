@@ -24,7 +24,9 @@ function ListProduct({ query }) {
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <Spin size="large" tip="Đang tải sản phẩm..." />
+        <Spin size="large" spinning={true} tip="Đang tải sản phẩm...">
+          <div style={{ minHeight: 200 }} />
+        </Spin>
       </div>
     );
   }

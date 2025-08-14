@@ -4,7 +4,7 @@ import BelowHeader from "../../components/BelowHeader/BelowHeader";
 import styles from "./HomePage.module.css";
 import Carousel from "../../components/Carousel/Carousel";
 import ImgAds from "../../components/ListCategory/ListCategory";
-import { BackTop, Col } from "antd";
+import { FloatButton, Col } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import ProductSlider from "../../components/ProductSlider/ProductSlider";
 import SliderProduct from "../../components/SliderProduct/TopSeller";
@@ -115,11 +115,22 @@ function HomePage() {
       </main>
 
       {/* Nút cuộn lên đầu trang */}
-      <BackTop>
-        <div className={styles.backTopButton}>
-          <ArrowUpOutlined />
-        </div>
-      </BackTop>
+      <FloatButton.BackTop 
+        icon={<ArrowUpOutlined />}
+        style={{
+          right: 88, // Đẩy sang trái để tránh chatbot (thường ở right: 24)
+          bottom: 24,
+          height: 48,
+          width: 48,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: '#fff',
+          boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
+          fontSize: '20px',
+          transition: 'all 0.3s ease',
+          zIndex: 999, // Đảm bảo nút hiển thị trên các element khác
+        }}
+      />
     </div>
   );
 }
