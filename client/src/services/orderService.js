@@ -208,3 +208,75 @@ export const getAllOrdersForExport = async () => {
     throw new Error(errorMessage);
   }
 };
+
+// Tạo yêu cầu trả hàng
+export const createReturnRequest = async (orderId, returnData) => {
+  try {
+    const response = await axiosInstance.post(`/return/orders/${orderId}/return-request`, returnData);
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Unknown error occurred while creating return request.";
+    console.error("Error creating return request:", errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+// Lấy danh sách yêu cầu trả hàng (cho admin)
+export const getReturnRequests = async (page = 0, limit = 10, status = null) => {
+  try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    
+    if (status) {
+      params.append('status', status);
+    }
+
+    const response = await axiosInstance.get(`/return/admin/return-requests?${params}`);
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Unknown error occurred while fetching return requests.";
+    console.error("Error fetching return requests:", errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+// Xử lý yêu cầu trả hàng (cho admin)
+export const processReturnRequest = async (requestId, action, adminNote = '') => {
+  try {
+    const response = await axiosInstance.put(`/return/admin/return-requests/${requestId}/process`, {
+      action, // 'approve' hoặc 'reject'
+      adminNote
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Unknown error occurred while processing return request.";
+    console.error("Error processing return request:", errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+// Đánh dấu hoàn tiền hoàn tất (cho admin)
+export const markReturnRequestCompleted = async (requestId) => {
+  try {
+    const response = await axiosInstance.put(`/return/admin/return-requests/${requestId}/complete`);
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Unknown error occurred while marking return request as completed.";
+    console.error("Error marking return request as completed:", errorMessage);
+    throw new Error(errorMessage);
+  }
+};

@@ -294,19 +294,3 @@ export const bestSeller = async () => {
     throw error;
   }
 };
-export const createCategory = async (category) => {
-  try {
-    const url = `${import.meta.env.VITE_API_URL}/product/createCategory`;
-    const response = await axiosInstance.post(url, category);
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      throw new Error(
-        `Failed to create category: ${
-          error.response.data.message || error.message
-        }`
-      );
-    }
-    throw error;
-  }
-};

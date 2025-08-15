@@ -1,9 +1,15 @@
 import axiosInstance from "../utils/axios";
 
 // API để lấy tổng quan thống kê
-export const getOverviewStats = async () => {
+export const getOverviewStats = async (startDate, endDate) => {
   try {
-    const response = await axiosInstance.get("/statistics/overview");
+    const params = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    
+    const response = await axiosInstance.get("/statistics/overview", {
+      params
+    });
     return response.data;
   } catch (error) {
     throw new Error(
@@ -58,7 +64,27 @@ export const getCategoryStats = async () => {
   }
 };
 
-// API để lấy thống kê trạng thái đơn hàng
+// API để lấy thống kê return/refund
+export const getReturnRefundStats = async (startDate, endDate) => {
+  try {
+    const params = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    
+    const response = await axiosInstance.get("/return/admin/return-requests/stats", {
+      params
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch return/refund statistics: ${
+        error.response?.data?.message || error.message
+      }`
+    );
+  }
+};
+
+// API để lấy thống kê đơn hàng theo trạng thái
 export const getOrderStatusStats = async () => {
   try {
     const response = await axiosInstance.get("/statistics/order-status");

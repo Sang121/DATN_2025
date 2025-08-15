@@ -9,6 +9,8 @@ import {
   UserOutlined,
   ShoppingCartOutlined, // Thêm icon cho đơn hàng
   BarChartOutlined, // Thêm icon cho thống kê
+  RollbackOutlined, // Icon cho yêu cầu trả hàng
+  OrderedListOutlined, // Icon cho quản lý đơn hàng
 } from "@ant-design/icons";
 import styles from "./styles/AdminPage.module.css";
 import "./styles/index.css"; // Import global admin styles
@@ -19,6 +21,7 @@ import { useEffect } from "react";
 const UserManager = lazy(() => import("./modules/Users"));
 const ProductManager = lazy(() => import("./modules/Products"));
 const OrderManager = lazy(() => import("./modules/Orders"));
+const ReturnRequestManager = lazy(() => import("./modules/Orders/components/ReturnRequestManager"));
 const OptimizedStatistics = lazy(() =>
   import("./modules/Statistics/OptimizedStatistics")
 );
@@ -35,12 +38,24 @@ const items = [
     label: "Sản phẩm",
   },
   {
-    key: "order", // Thêm key cho đơn hàng
+    key: "orders",
     icon: <ShoppingCartOutlined />,
-    label: "Đơn hàng",
+    label: "Quản lý đơn hàng",
+    children: [
+      {
+        key: "order",
+        icon: <OrderedListOutlined />,
+        label: "Đơn hàng",
+      },
+      {
+        key: "return-requests",
+        icon: <RollbackOutlined />,
+        label: "Yêu cầu trả hàng",
+      },
+    ],
   },
   {
-    key: "Statistics", // Thêm key cho thống kê
+    key: "Statistics",
     icon: <BarChartOutlined />,
     label: "Thống kê doanh số",
   },
@@ -58,6 +73,7 @@ const AdminPage = () => {
       user: <UserManager />,
       product: <ProductManager />,
       order: <OrderManager />,
+      "return-requests": <ReturnRequestManager />,
       Statistics: <OptimizedStatistics />,
     }),
     []
