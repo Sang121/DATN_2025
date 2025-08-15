@@ -162,6 +162,8 @@ const OrderManager = () => {
         return "Đã hủy";
       case "payment_failed":
         return "Thanh toán thất bại";
+      case "return_requested":
+        return "Chờ duyệt hoàn tiền";
       case "returned":
         return "Đã trả hàng";
       case "refunded":
@@ -254,6 +256,10 @@ const OrderManager = () => {
             color = "orange";
             text = "Đã trả hàng";
             break;
+          case "return_requested":
+            color = "gold";
+            text = "Chờ duyệt hoàn tiền";
+            break;
           case "refunded":
             color = "red";
             text = "Đã hoàn tiền";
@@ -267,6 +273,7 @@ const OrderManager = () => {
         { text: "Đã giao", value: "delivered" },
         { text: "Đã hủy", value: "cancelled" },
         { text: "Thanh toán thất bại", value: "payment_failed" },
+        { text: "Chờ duyệt hoàn tiền", value: "return_requested" },
         { text: "Đã trả hàng", value: "returned" },
         { text: "Đã hoàn tiền", value: "refunded" },
       ],

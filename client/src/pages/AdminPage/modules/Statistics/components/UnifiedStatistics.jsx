@@ -30,6 +30,8 @@ import {
   getOverviewStats,
   getTopSellingProducts,
   getRevenueByPeriod,
+  getReturnRefundStats,
+  getOrderStatusStats,
   formatCurrency,
   formatNumber,
 } from "../../../../../services/statisticsService";
@@ -47,6 +49,29 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
   const [trendDays, setTrendDays] = useState(30);
   const [comparisonPeriod, setComparisonPeriod] = useState("month");
   const [revenuePeriod, setRevenuePeriod] = useState("7days");
+  const [dateRange, setDateRange] = useState(null); // [startDate, endDate] hoặc null
+
+  // Function để tính toán date range từ revenuePeriod
+  const getDateRangeFromPeriod = (period) => {
+    const endDate = new Date();
+    const startDate = new Date();
+    
+    switch(period) {
+      case "7days":
+        startDate.setDate(endDate.getDate() - 7);
+        break;
+      case "30days":
+        startDate.setDate(endDate.getDate() - 30);
+        break;
+      case "12months":
+        startDate.setMonth(endDate.getMonth() - 12);
+        break;
+      default:
+        return null;
+    }
+    
+    return [startDate.toISOString(), endDate.toISOString()];
+  };
 
   // API calls
   const {
@@ -54,8 +79,28 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
     isLoading: overviewLoading,
     error: overviewError,
   } = useQuery({
-    queryKey: ["overview-stats", refreshKey],
-    queryFn: getOverviewStats,
+    queryKey: ["overview-stats", refreshKey, revenuePeriod],
+    queryFn: () => {
+      const dateRange = getDateRangeFromPeriod(revenuePeriod);
+      if (dateRange) {
+        return getOverviewStats(dateRange[0], dateRange[1]);
+      }
+      return getOverviewStats();
+    },
+    staleTime: 300000,
+    retry: 2,
+  });
+
+  const { data: returnRefundStats, isLoading: returnStatsLoading } = useQuery({
+    queryKey: ["return-refund-stats", refreshKey],
+    queryFn: getReturnRefundStats,
+    staleTime: 300000,
+    retry: 2,
+  });
+
+  const { data: orderStatusStats, isLoading: orderStatusLoading } = useQuery({
+    queryKey: ["order-status-stats", refreshKey],
+    queryFn: getOrderStatusStats,
     staleTime: 300000,
     retry: 2,
   });
@@ -263,7 +308,112 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
       </Card>
 
       {/* Overview Cards */}
-      <OverviewCards data={overview?.data} loading={overviewLoading} />
+      <OverviewCards 
+        data={{
+          ...overview?.data,
+          // Sử dụng currentRevenue và currentOrders thay vì monthly
+          totalRevenue: overview?.data?.currentRevenue || overview?.data?.totalRevenue || 0,
+          totalOrders: overview?.data?.currentOrders || overview?.data?.totalOrders || 0,
+        }} 
+        loading={overviewLoading || returnStatsLoading} 
+      />
+
+      {/* Order Status Statistics */}
+      {orderStatusStats?.data && (
+        <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
+          <Col xs={24} md={16}>
+            <Card title={<Title level={4}>📊 Thống kê theo trạng thái đơn hàng</Title>}>
+              <Row gutter={[16, 16]}>
+                {orderStatusStats.data.map((status, index) => (
+                  <Col xs={12} sm={8} md={6} key={index}>
+                    <Card size="small" style={{ 
+                      borderLeft: `4px solid ${status.color}`,
+                      textAlign: 'center'
+                    }}>
+                      <Statistic
+                        title={status.statusName}
+                        value={status.count}
+                        valueStyle={{ 
+                          color: status.color,
+                          fontSize: '18px'
+                        }}
+                        suffix={`(${status.percentage}%)`}
+                      />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </Card>
+          </Col>
+          <Col xs={24} md={8}>
+            <Card title={<Title level={4}>💰 Giá trị theo trạng thái</Title>}>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={orderStatusStats.data}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="statusName" 
+                    fontSize={10}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis 
+                    tickFormatter={(value) => formatCurrency(value)}
+                    fontSize={10}
+                  />
+                  <Tooltip
+                    formatter={[
+                      (value) => formatCurrency(value),
+                      "Giá trị"
+                    ]}
+                  />
+                  <Bar dataKey="totalValue" fill="#1890ff" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
+        </Row>
+      )}
+
+      {/* Return/Refund Statistics */}
+      {returnRefundStats?.data && (
+        <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
+          <Col xs={24}>
+            <Card title={<Title level={4}>📋 Thống kê yêu cầu hoàn hàng</Title>}>
+              <Row gutter={[16, 16]}>
+                <Col xs={12} sm={6}>
+                  <Statistic
+                    title="Chờ xử lý"
+                    value={returnRefundStats.data.overview.pendingRequests}
+                    valueStyle={{ color: '#fa8c16' }}
+                  />
+                </Col>
+                <Col xs={12} sm={6}>
+                  <Statistic
+                    title="Đã duyệt"
+                    value={returnRefundStats.data.overview.approvedRequests}
+                    valueStyle={{ color: '#52c41a' }}
+                  />
+                </Col>
+                <Col xs={12} sm={6}>
+                  <Statistic
+                    title="Đã từ chối"
+                    value={returnRefundStats.data.overview.rejectedRequests}
+                    valueStyle={{ color: '#f5222d' }}
+                  />
+                </Col>
+                <Col xs={12} sm={6}>
+                  <Statistic
+                    title="Hoàn thành"
+                    value={returnRefundStats.data.overview.completedRequests}
+                    valueStyle={{ color: '#1890ff' }}
+                  />
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+      )}
 
       {/* Main Content */}
       <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
@@ -330,7 +480,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                       <Statistic
                         title="Doanh thu"
                         value={comparisonData.data.current.revenue}
-                        formatter={formatCurrency}
+                        formatter={(value) => formatCurrency(value)}
                         valueStyle={{ fontSize: "14px" }}
                       />
                       <Statistic
@@ -341,7 +491,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                       <Statistic
                         title="AOV"
                         value={comparisonData.data.current.avgOrderValue}
-                        formatter={formatCurrency}
+                        formatter={(value) => formatCurrency(value)}
                         valueStyle={{ fontSize: "12px" }}
                       />
                     </Card>
@@ -355,7 +505,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                       <Statistic
                         title="Doanh thu"
                         value={comparisonData.data.previous.revenue}
-                        formatter={formatCurrency}
+                        formatter={(value) => formatCurrency(value)}
                         valueStyle={{ fontSize: "14px" }}
                       />
                       <Statistic
@@ -366,7 +516,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                       <Statistic
                         title="AOV"
                         value={comparisonData.data.previous.avgOrderValue}
-                        formatter={formatCurrency}
+                        formatter={(value) => formatCurrency(value)}
                         valueStyle={{ fontSize: "12px" }}
                       />
                     </Card>
@@ -473,6 +623,43 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
           </Card>
         </Col>
 
+        {/* Return Reasons Chart */}
+        {returnRefundStats?.data?.reasonStats && returnRefundStats.data.reasonStats.length > 0 && (
+          <Col span={24}>
+            <Card title={<Title level={4}>📊 Lý do yêu cầu hoàn hàng</Title>}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={returnRefundStats.data.reasonStats.map(item => ({
+                  ...item,
+                  reason: item._id === 'defective' ? 'Sản phẩm lỗi' :
+                          item._id === 'not_as_described' ? 'Không đúng mô tả' :
+                          item._id === 'wrong_size' ? 'Sai kích thước' :
+                          item._id === 'wrong_color' ? 'Sai màu sắc' :
+                          item._id === 'not_satisfied' ? 'Không hài lòng' :
+                          item._id === 'other' ? 'Khác' : item._id
+                }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="reason" 
+                    fontSize={12}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis fontSize={12} />
+                  <Tooltip
+                    formatter={[
+                      (value) => `${value} yêu cầu`,
+                      "Số lượng"
+                    ]}
+                  />
+                  <Legend />
+                  <Bar dataKey="count" fill="#f5222d" name="Số yêu cầu" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
+        )}
+
         {/* Quick Metrics */}
         <Col span={24}>
           <Card title={<Title level={4}>📊 Chỉ số nhanh</Title>}>
@@ -510,7 +697,7 @@ const UnifiedStatistics = ({ refreshKey, onRefresh }) => {
                 <Statistic
                   title="Doanh thu/Đơn"
                   value={overview?.data?.avgOrderValue || 0}
-                  formatter={formatCurrency}
+                  formatter={(value) => formatCurrency(value)}
                   valueStyle={{ color: "#fa8c16", fontSize: window.innerWidth < 768 ? "16px" : "20px" }}
                 />
               </Col>

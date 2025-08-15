@@ -4,6 +4,7 @@
 // Main Components
 export { default as OrderManager } from './components/OrderManager';
 export { default as AdminOrderDetail } from './components/AdminOrderDetail';
+export { default as ReturnRequestManager } from './components/ReturnRequestManager';
 
 // Sub Components
 // export { default as OrderList } from './components/OrderList';
@@ -25,6 +26,11 @@ export const ORDERS_MODULE_CONFIG = {
       path: '/admin/orders/:id',
       component: 'AdminOrderDetail',
       name: 'Order Details'
+    },
+    {
+      path: '/admin/return-requests',
+      component: 'ReturnRequestManager',
+      name: 'Return Request Management'
     }
   ]
 };

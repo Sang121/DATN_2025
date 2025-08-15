@@ -6,7 +6,9 @@ import {
   UserOutlined, 
   TrophyOutlined,
   RiseOutlined,
-  FallOutlined 
+  FallOutlined,
+  RollbackOutlined,
+  ExclamationCircleOutlined
 } from "@ant-design/icons";
 import { formatCurrency, formatNumber, formatPercentage } from "../../../../../services/statisticsService";
 
@@ -46,20 +48,13 @@ const OverviewCards = ({ data, loading }) => {
       icon: <UserOutlined style={{ color: "#722ed1", fontSize: "24px" }} />,
       growth: data.customersGrowth,
       color: "#722ed1"
-    },
-    {
-      title: "Giá trị đơn TB",
-      value: formatCurrency(data.avgOrderValue || 0),
-      icon: <TrophyOutlined style={{ color: "#fa8c16", fontSize: "24px" }} />,
-      growth: data.aovGrowth,
-      color: "#fa8c16"
     }
   ];
 
   return (
     <Row gutter={[16, 16]}>
       {cards.map((card, index) => (
-        <Col xs={24} sm={12} lg={6} key={index}>
+        <Col xs={24} sm={12} md={8} lg={8} key={index}>
           <Card 
             loading={loading}
             style={{ 
