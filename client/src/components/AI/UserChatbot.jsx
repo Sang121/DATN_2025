@@ -378,7 +378,7 @@ const ChatbotUser = () => {
                   </div>
                 ) : (
                   <div className="chat-input-demo">
-                    <div className="demo-input">Đang demo tính năng AI...</div>
+                    <div className="demo-input">Demo AI chatbot...</div>
                   </div>
                 )
               ) : (
