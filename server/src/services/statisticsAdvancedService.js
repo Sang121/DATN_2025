@@ -4,62 +4,6 @@ const User = require("../models/userModel");
 const moment = require("moment");
 
 /**
- * Lấy thống kê doanh thu theo giờ trong ngày
- */
-const getHourlyRevenue = (date) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const startOfDay = moment(date).startOf('day').toDate();
-      const endOfDay = moment(date).endOf('day').toDate();
-
-      const hourlyData = await Order.aggregate([
-        {
-          $match: {
-            orderStatus: "delivered",
-            createdAt: { $gte: startOfDay, $lte: endOfDay },
-          },
-        },
-        {
-          $group: {
-            _id: { $hour: "$createdAt" },
-            revenue: { $sum: "$totalPrice" },
-            orders: { $sum: 1 },
-          },
-        },
-        { $sort: { "_id": 1 } },
-      ]);
-
-      // Fill missing hours with 0 values
-      const completeHourlyData = Array.from({ length: 24 }, (_, hour) => {
-        const existingData = hourlyData.find(item => item._id === hour);
-        return {
-          hour: `${hour}:00`,
-          revenue: existingData ? Math.round(existingData.revenue) : 0,
-          orders: existingData ? existingData.orders : 0,
-        };
-      });
-
-      resolve({
-        status: "Ok",
-        message: "Hourly revenue data retrieved successfully",
-        data: completeHourlyData,
-        summary: {
-          date: moment(date).format("DD/MM/YYYY"),
-          totalRevenue: completeHourlyData.reduce((sum, item) => sum + item.revenue, 0),
-          totalOrders: completeHourlyData.reduce((sum, item) => sum + item.orders, 0),
-        },
-      });
-    } catch (error) {
-      reject({
-        status: "Err",
-        message: "Error retrieving hourly revenue data",
-        error: error.message,
-      });
-    }
-  });
-};
-
-/**
  * Lấy thống kê so sánh theo khoảng thời gian
  */
 const getComparisonStats = (currentStart, currentEnd, previousStart, previousEnd) => {
@@ -155,117 +99,6 @@ const getComparisonStats = (currentStart, currentEnd, previousStart, previousEnd
 };
 
 /**
- * Lấy thống kê khách hàng nâng cao
- */
-const getAdvancedCustomerStats = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // Customer lifetime value
-      const customerLTV = await Order.aggregate([
-        { $match: { orderStatus: "delivered" } },
-        {
-          $group: {
-            _id: "$user",
-            totalSpent: { $sum: "$totalPrice" },
-            orderCount: { $sum: 1 },
-            firstOrder: { $min: "$createdAt" },
-            lastOrder: { $max: "$createdAt" },
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "_id",
-            foreignField: "_id",
-            as: "userInfo",
-          },
-        },
-        { $unwind: "$userInfo" },
-        {
-          $addFields: {
-            customerLifetime: {
-              $divide: [
-                { $subtract: ["$lastOrder", "$firstOrder"] },
-                1000 * 60 * 60 * 24, // Convert to days
-              ],
-            },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            avgLifetimeValue: { $avg: "$totalSpent" },
-            avgOrdersPerCustomer: { $avg: "$orderCount" },
-            avgCustomerLifetime: { $avg: "$customerLifetime" },
-            totalCustomersWithOrders: { $sum: 1 },
-          },
-        },
-      ]);
-
-      // Customer segmentation
-      const customerSegments = await Order.aggregate([
-        { $match: { orderStatus: "delivered" } },
-        {
-          $group: {
-            _id: "$user",
-            totalSpent: { $sum: "$totalPrice" },
-            orderCount: { $sum: 1 },
-          },
-        },
-        {
-          $bucket: {
-            groupBy: "$totalSpent",
-            boundaries: [0, 1000000, 5000000, 10000000, 50000000], // VND
-            default: "50M+",
-            output: {
-              count: { $sum: 1 },
-              avgOrderCount: { $avg: "$orderCount" },
-              totalRevenue: { $sum: "$totalSpent" },
-            },
-          },
-        },
-      ]);
-
-      const ltv = customerLTV[0] || {
-        avgLifetimeValue: 0,
-        avgOrdersPerCustomer: 0,
-        avgCustomerLifetime: 0,
-        totalCustomersWithOrders: 0,
-      };
-
-      resolve({
-        status: "Ok",
-        message: "Advanced customer statistics retrieved successfully",
-        data: {
-          lifetimeValue: {
-            average: Math.round(ltv.avgLifetimeValue),
-            avgOrdersPerCustomer: ltv.avgOrdersPerCustomer.toFixed(2),
-            avgLifetimeDays: Math.round(ltv.avgCustomerLifetime),
-            totalActiveCustomers: ltv.totalCustomersWithOrders,
-          },
-          segments: customerSegments.map((segment, index) => {
-            const ranges = ["0-1M", "1M-5M", "5M-10M", "10M-50M", "50M+"];
-            return {
-              range: ranges[index] || segment._id,
-              customerCount: segment.count,
-              avgOrderCount: segment.avgOrderCount.toFixed(2),
-              totalRevenue: Math.round(segment.totalRevenue),
-              percentage: 0, // Will be calculated on frontend
-            };
-          }),
-        },
-      });
-    } catch (error) {
-      reject({
-        status: "Err",
-        message: "Error retrieving advanced customer statistics",
-        error: error.message,
-      });
-    }
-  });
-};
-
-/**
  * Lấy thống kê xu hướng sản phẩm
  */
 const getProductTrends = (days = 30) => {
@@ -351,8 +184,6 @@ const getProductTrends = (days = 30) => {
 };
 
 module.exports = {
-  getHourlyRevenue,
   getComparisonStats,
-  getAdvancedCustomerStats,
   getProductTrends,
 };

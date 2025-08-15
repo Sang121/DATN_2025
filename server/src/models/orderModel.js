@@ -12,7 +12,23 @@ const orderSchema = new mongoose.Schema(
           size: {
             type: String,
             required: true,
-            enum: ["S", "M", "L", "XL", "XXL"], // Các size có sẵn
+            enum: [
+              "S",
+              "M",
+              "L",
+              "XL",
+              "XXL", // Size áo
+              "35",
+              "36",
+              "37",
+              "38",
+              "39",
+              "40",
+              "41",
+              "42",
+              "43",
+              "44", // Size giày
+            ], // Các size có sẵn
           },
           color: {
             type: String,
@@ -60,6 +76,7 @@ const orderSchema = new mongoose.Schema(
         "delivered",
         "cancelled",
         "payment_failed",
+        "return_requested", // Đã yêu cầu hoàn tiền, chờ duyệt
         "returned",
         "refunded",
       ],

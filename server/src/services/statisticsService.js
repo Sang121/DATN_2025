@@ -6,32 +6,30 @@ const moment = require("moment");
 /**
  * Lấy tổng quan doanh số
  */
-const getOverviewStats = () => {
+const getOverviewStats = (startDate = null, endDate = null) => {
   return new Promise(async (resolve, reject) => {
     try {
       const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(
-        now.getFullYear(),
-        now.getMonth() + 1,
-        0,
-        23,
-        59,
-        59
-      );
-      const startOfLastMonth = new Date(
-        now.getFullYear(),
-        now.getMonth() - 1,
-        1
-      );
-      const endOfLastMonth = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        0,
-        23,
-        59,
-        59
-      );
+      
+      // Nếu có startDate và endDate từ parameters, sử dụng chúng
+      // Nếu không, sử dụng tháng hiện tại
+      let currentPeriodStart, currentPeriodEnd, lastPeriodStart, lastPeriodEnd;
+      
+      if (startDate && endDate) {
+        currentPeriodStart = new Date(startDate);
+        currentPeriodEnd = new Date(endDate);
+        
+        // Tính period trước đó có cùng độ dài
+        const periodLength = currentPeriodEnd - currentPeriodStart;
+        lastPeriodEnd = new Date(currentPeriodStart);
+        lastPeriodStart = new Date(currentPeriodStart.getTime() - periodLength);
+      } else {
+        // Sử dụng tháng hiện tại và tháng trước
+        currentPeriodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        currentPeriodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+        lastPeriodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        lastPeriodEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+      }
 
       // Tổng doanh thu
       const totalRevenueResult = await Order.aggregate([
@@ -41,39 +39,39 @@ const getOverviewStats = () => {
       const totalRevenue =
         totalRevenueResult.length > 0 ? totalRevenueResult[0].total : 0;
 
-      // Doanh thu tháng này
-      const monthlyRevenueResult = await Order.aggregate([
+      // Doanh thu trong khoảng thời gian hiện tại
+      const currentRevenueResult = await Order.aggregate([
         {
           $match: {
             orderStatus: "delivered",
-            createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+            createdAt: { $gte: currentPeriodStart, $lte: currentPeriodEnd },
           },
         },
         { $group: { _id: null, total: { $sum: "$totalPrice" } } },
       ]);
-      const monthlyRevenue =
-        monthlyRevenueResult.length > 0 ? monthlyRevenueResult[0].total : 0;
+      const currentRevenue =
+        currentRevenueResult.length > 0 ? currentRevenueResult[0].total : 0;
 
-      // Doanh thu tháng trước
-      const lastMonthRevenueResult = await Order.aggregate([
+      // Doanh thu trong khoảng thời gian trước đó
+      const lastRevenueResult = await Order.aggregate([
         {
           $match: {
             orderStatus: "delivered",
-            createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+            createdAt: { $gte: lastPeriodStart, $lte: lastPeriodEnd },
           },
         },
         { $group: { _id: null, total: { $sum: "$totalPrice" } } },
       ]);
-      const lastMonthRevenue =
-        lastMonthRevenueResult.length > 0 ? lastMonthRevenueResult[0].total : 0;
+      const lastRevenue =
+        lastRevenueResult.length > 0 ? lastRevenueResult[0].total : 0;
 
       // Tổng số đơn hàng
       const totalOrders = await Order.countDocuments();
-      const monthlyOrders = await Order.countDocuments({
-        createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+      const currentOrders = await Order.countDocuments({
+        createdAt: { $gte: currentPeriodStart, $lte: currentPeriodEnd },
       });
-      const lastMonthOrders = await Order.countDocuments({
-        createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+      const lastOrders = await Order.countDocuments({
+        createdAt: { $gte: lastPeriodStart, $lte: lastPeriodEnd },
       });
 
       // Tổng số sản phẩm đã bán
@@ -89,6 +87,18 @@ const getOverviewStats = () => {
 
       // Tổng số khách hàng
       const totalCustomers = await User.countDocuments({ isAdmin: false });
+      
+      // Khách hàng mới trong period hiện tại
+      const currentCustomers = await User.countDocuments({
+        isAdmin: false,
+        createdAt: { $gte: currentPeriodStart, $lte: currentPeriodEnd },
+      });
+      
+      // Khách hàng mới trong period trước đó  
+      const lastCustomers = await User.countDocuments({
+        isAdmin: false,
+        createdAt: { $gte: lastPeriodStart, $lte: lastPeriodEnd },
+      });
 
       // Low stock products (less than 10 items)
       const lowStockProducts = await Product.countDocuments({ totalStock: { $lt: 10 } });
@@ -100,20 +110,27 @@ const getOverviewStats = () => {
       ]);
       const averageOrderValue = avgOrderValueResult.length > 0 ? avgOrderValueResult[0].avgValue : 0;
 
-      // Tính phần trăm thay đổi (FIX: Division by zero và logic error)
+      // Tính phần trăm thay đổi
       const revenueGrowth =
-        lastMonthRevenue > 0
+        lastRevenue > 0
           ? parseFloat(
-              ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100
+              ((currentRevenue - lastRevenue) / lastRevenue) * 100
             ).toFixed(2)
-          : monthlyRevenue > 0 ? 100 : 0; // Nếu tháng trước = 0 mà tháng này > 0 thì tăng 100%
+          : currentRevenue > 0 ? 100 : 0; // Nếu period trước = 0 mà hiện tại > 0 thì tăng 100%
 
       const orderGrowth =
-        lastMonthOrders > 0
+        lastOrders > 0
           ? parseFloat(
-              ((monthlyOrders - lastMonthOrders) / lastMonthOrders) * 100
+              ((currentOrders - lastOrders) / lastOrders) * 100
             ).toFixed(2)
-          : monthlyOrders > 0 ? 100 : 0; // Nếu tháng trước = 0 mà tháng này > 0 thì tăng 100%
+          : currentOrders > 0 ? 100 : 0;
+
+      const customerGrowth =
+        lastCustomers > 0
+          ? parseFloat(
+              ((currentCustomers - lastCustomers) / lastCustomers) * 100
+            ).toFixed(2)
+          : currentCustomers > 0 ? 100 : 0;
 
       // Calculate conversion rate (delivered orders / total orders)
       const deliveredOrdersCount = await Order.countDocuments({ orderStatus: "delivered" });
@@ -126,16 +143,16 @@ const getOverviewStats = () => {
         data: {
           // Main metrics
           totalRevenue: Math.round(totalRevenue) || 0,
-          monthlyRevenue: Math.round(monthlyRevenue) || 0,
+          currentRevenue: Math.round(currentRevenue) || 0,
           revenueGrowth: parseFloat(revenueGrowth) || 0,
           totalOrders: totalOrders || 0,
-          monthlyOrders: monthlyOrders || 0,
-          ordersGrowth: parseFloat(orderGrowth) || 0, // Fix: ordersGrowth thay vì orderGrowth
+          currentOrders: currentOrders || 0,
+          ordersGrowth: parseFloat(orderGrowth) || 0,
           totalProductsSold: totalProductsSold || 0,
           totalCustomers: totalCustomers || 0,
-          newCustomers: monthlyOrders || 0, // Estimate new customers as monthly orders
+          newCustomers: currentCustomers || 0,
+          customersGrowth: parseFloat(customerGrowth) || 0,
           avgOrderValue: Math.round(averageOrderValue) || 0,
-          customersGrowth: 0, // TODO: Calculate customer growth
           aovGrowth: 0, // TODO: Calculate AOV growth
           lowStockProducts: lowStockProducts || 0,
           conversionRate: conversionRate || 0,
@@ -144,10 +161,10 @@ const getOverviewStats = () => {
           metrics: {
             revenuePerCustomer: totalCustomers > 0 ? Math.round(totalRevenue / totalCustomers) : 0,
             ordersPerCustomer: totalCustomers > 0 ? parseFloat((totalOrders / totalCustomers).toFixed(2)) : 0,
-            lastMonthRevenue: Math.round(lastMonthRevenue) || 0,
-            lastMonthOrders: lastMonthOrders || 0,
-            averageDailyRevenue: Math.round(monthlyRevenue / 30) || 0,
-            averageDailyOrders: Math.round(monthlyOrders / 30) || 0,
+            lastRevenue: Math.round(lastRevenue) || 0,
+            lastOrders: lastOrders || 0,
+            averageDailyRevenue: Math.round(currentRevenue / 30) || 0,
+            averageDailyOrders: Math.round(currentOrders / 30) || 0,
           },
         },
       });
@@ -484,7 +501,10 @@ const getOrderStatusStats = () => {
         shipped: "Đã gửi",
         delivered: "Đã giao",
         cancelled: "Đã hủy",
+        payment_failed: "Thanh toán thất bại",
+        return_requested: "Chờ duyệt hoàn tiền",
         returned: "Đã trả",
+        refunded: "Đã hoàn tiền",
       };
 
       // Color mapping for frontend
@@ -494,7 +514,10 @@ const getOrderStatusStats = () => {
         shipped: "#66bb6a",
         delivered: "#4caf50",
         cancelled: "#ef5350",
+        payment_failed: "#ff5722",
+        return_requested: "#ff9800",
         returned: "#ff7043",
+        refunded: "#9c27b0",
       };
 
       const totalOrders = statusStats.reduce((sum, stat) => sum + stat.count, 0);
