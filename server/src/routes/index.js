@@ -4,6 +4,7 @@ const orderRouter = require("./orderRouter");
 const ChatbotRouter = require("./ChatbotRouter");
 const statisticsRouter = require("./statisticsRouter");
 const statisticsAdvancedRouter = require("./statisticsAdvancedRouter");
+const returnRequestRoutes = require("./returnRequestRoutes");
 
 const routes = (app) => {
   app.use("/api/user", userRouter);
@@ -12,5 +13,6 @@ const routes = (app) => {
   app.use("/api/ai", ChatbotRouter);
   app.use("/api/statistics", statisticsRouter);
   app.use("/api/statistics/advanced", statisticsAdvancedRouter);
+  app.use("/api/return", returnRequestRoutes);
 };
 module.exports = routes;
