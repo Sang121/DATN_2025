@@ -19,14 +19,17 @@ const validateUsername = (username) => {
 const createUser = (newUser) => {
   return new Promise(async (resolve, reject) => {
     const { username, email, address, password, phone } = newUser;
+    console.log("New user data:", newUser);
 
-    if (!validateEmail(email)) {
+    // Validate required fields
+    if (!username || !email || !address || !password || !phone) {
       return reject({
         status: 400,
-        message: "Email không hợp lệ!",
+        message: "Tất cả các trường đều bắt buộc",
       });
     }
 
+    // Validate username format
     if (!validateUsername(username)) {
       return reject({
         status: 400,
@@ -35,45 +38,74 @@ const createUser = (newUser) => {
       });
     }
 
+    // Validate email format
+    if (!validateEmail(email)) {
+      return reject({
+        status: 400,
+        message: "Email không hợp lệ!",
+      });
+    }
+
     try {
+      // Check for existing user with case-insensitive search
       const existingUser = await User.findOne({
         $or: [
           { username: username.trim().toLowerCase() },
           { email: email.trim().toLowerCase() },
         ],
       });
+
       if (existingUser) {
+        const duplicateField = existingUser.username && existingUser.username.toLowerCase() === username.trim().toLowerCase() 
+          ? "Tên đăng nhập" 
+          : "Email";
         return reject({
           status: 400,
-          message: "Tên đăng nhập hoặc email đã tồn tại!",
+          message: `${duplicateField} đã tồn tại!`,
         });
       }
-      const hashedPassword = await bcrypt.hashSync(password, 10);
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Create user with normalized data
       const createUser = await User.create({
         username: username.trim().toLowerCase(),
         email: email.trim().toLowerCase(),
-        address,
+        address: address.trim(),
         password: hashedPassword,
-        phone,
+        phone: phone.trim(),
         typeLogin: "Email",
       });
+
       if (createUser) {
+        // Don't return password in response
+        const { password: _, ...userWithoutPassword } = createUser.toObject();
         resolve({
           status: "Ok",
-          message: "User created successfully",
-          data: createUser,
+          message: "Tạo tài khoản thành công",
+          data: userWithoutPassword,
         });
       } else {
-        reject({ message: "User created Unsuccessfully" });
+        reject({ 
+          status: 500,
+          message: "Không thể tạo tài khoản" 
+        });
       }
     } catch (error) {
-      reject({ message: "Server error while create user", error });
+      console.error("Error creating user:", error);
+      reject({ 
+        status: 500,
+        message: "Lỗi server khi tạo tài khoản",
+        error: error.message 
+      });
     }
   });
 };
 const loginUser = (loginData) => {
   return new Promise(async (resolve, reject) => {
     const { identifier, password } = loginData;
+    console.log("Login attempt:", loginData);
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const isEmail = emailRegex.test(identifier);
     const newLoginData = isEmail

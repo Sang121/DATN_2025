@@ -5,8 +5,8 @@ const createUser = async (req, res) => {
   try {
     const { username, email, password, address, confirmPassword, phone } =
       req.body;
-    const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    const isCheckEmail = reg.test(email);
+
+    // Validate required fields
     if (
       !username ||
       !email ||
@@ -15,19 +15,43 @@ const createUser = async (req, res) => {
       !confirmPassword ||
       !phone
     ) {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "Err",
-        message: "The input is required",
+        message: "Tất cả các trường đều bắt buộc",
       });
-    } else if (isCheckEmail === false) {
-      return res.status(200).json({
+    }
+
+    // Validate email format
+    const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
         status: "Err",
-        message: "The input must be email format",
+        message: "Email không đúng định dạng",
       });
-    } else if (password !== confirmPassword) {
-      return res.status(200).json({
-        status: "200",
-        message: "Password must be equal confirm password",
+    }
+
+    // Validate password match
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        status: "Err",
+        message: "Mật khẩu xác nhận không khớp",
+      });
+    }
+
+    // Validate password strength
+    if (password.length < 6) {
+      return res.status(400).json({
+        status: "Err",
+        message: "Mật khẩu phải có ít nhất 6 ký tự",
+      });
+    }
+
+    // Validate phone number format
+    const phoneRegex = /^[0-9]{10,11}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({
+        status: "Err",
+        message: "Số điện thoại không hợp lệ (10-11 chữ số)",
       });
     }
 
@@ -35,7 +59,17 @@ const createUser = async (req, res) => {
 
     return res.status(201).json(response);
   } catch (error) {
-    return res.status(500).json({ message: error.message, error });
+    // Handle service-level errors
+    if (error.status) {
+      return res.status(error.status).json({
+        status: "Err",
+        message: error.message,
+      });
+    }
+    return res.status(500).json({
+      status: "Err", 
+      message: "Lỗi server khi tạo tài khoản",
+    });
   }
 };
 const loginUser = async (req, res) => {
@@ -49,6 +83,7 @@ const loginUser = async (req, res) => {
     }
 
     const loginData = { identifier, password };
+    console.log(loginData);
 
     const response = await UserService.loginUser(loginData);
     const { refresh_token, ...newResponse } = response;
