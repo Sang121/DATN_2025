@@ -15,6 +15,12 @@ import {
   Pagination,
   Image,
   Tooltip,
+  Modal,
+  Form,
+  Input,
+  Select,
+  message,
+  Radio,
 } from "antd";
 import {
   FilterOutlined,
@@ -28,6 +34,8 @@ import {
   ReloadOutlined,
   CalendarOutlined,
   CreditCardOutlined,
+  RollbackOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
@@ -37,7 +45,9 @@ import { Link } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 
 const { Title, Text } = Typography;
+const { TextArea } = Input;
 
+// Thêm status cho returned và refunded
 const getStatusTag = (status) => {
   const statusMap = {
     pending: {
@@ -60,6 +70,21 @@ const getStatusTag = (status) => {
       color: "volcano",
       text: "Thanh toán thất bại",
       icon: <CreditCardOutlined />,
+    },
+    returned: {
+      color: "purple",
+      text: "Yêu cầu trả hàng",
+      icon: <RollbackOutlined />,
+    },
+    return_requested: {
+      color: "orange",
+      text: "Chờ duyệt hoàn tiền",
+      icon: <ClockCircleOutlined />,
+    },
+    refunded: {
+      color: "cyan",
+      text: "Đã hoàn tiền",
+      icon: <CheckCircleOutlined />,
     },
   };
 
@@ -90,6 +115,15 @@ function MyOrder() {
     pageSize: 5, // Hiển thị 5 đơn hàng mỗi trang
   });
 
+  // State cho modal trả hàng
+  const [returnModal, setReturnModal] = useState({
+    visible: false,
+    orderId: null,
+    orderData: null,
+  });
+  const [returnForm] = Form.useForm();
+  const [submittingReturn, setSubmittingReturn] = useState(false);
+
   // Đếm số lượng cho từng loại trạng thái
   const [orderCounts, setOrderCounts] = useState({
     all: 0,
@@ -97,6 +131,8 @@ function MyOrder() {
     processing: 0,
     delivered: 0,
     cancelled: 0,
+    returned: 0,
+    refunded: 0,
   });
   useEffect(() => {
     const fetchOrderCounts = async () => {
@@ -112,6 +148,8 @@ function MyOrder() {
             processing: allOrdersCount.processing || 0,
             delivered: allOrdersCount.delivered || 0,
             cancelled: allOrdersCount.cancelled || 0,
+            returned: allOrdersCount.returned || 0,
+            refunded: allOrdersCount.refunded || 0,
           });
 
           console.log("Fetched order counts:", allOrdersCount);
@@ -176,6 +214,73 @@ function MyOrder() {
     console.log(`Changing status filter to: ${status}`);
     setActiveStatus(status);
     setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+
+  // Xử lý mở modal trả hàng
+  const handleOpenReturnModal = (order) => {
+    setReturnModal({
+      visible: true,
+      orderId: order._id,
+      orderData: order,
+    });
+    returnForm.resetFields();
+  };
+
+  // Xử lý đóng modal trả hàng
+  const handleCloseReturnModal = () => {
+    setReturnModal({
+      visible: false,
+      orderId: null,
+      orderData: null,
+    });
+    returnForm.resetFields();
+  };
+
+  // Xử lý gửi yêu cầu trả hàng
+  const handleSubmitReturn = async (values) => {
+    try {
+      setSubmittingReturn(true);
+      
+      const returnData = {
+        reason: values.reason,
+        description: values.description,
+        refundMethod: 'bank', // Luôn là chuyển khoản ngân hàng
+        bankInfo: {
+          bankName: values.bankName,
+          accountNumber: values.accountNumber,
+          accountHolder: values.accountHolder,
+        },
+      };
+
+      // Gọi API để tạo yêu cầu trả hàng
+      await orderService.createReturnRequest(returnModal.orderId, returnData);
+      
+      message.success('Yêu cầu trả hàng đã được gửi thành công!');
+      handleCloseReturnModal();
+      
+      // Refresh dữ liệu đơn hàng
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Lỗi khi gửi yêu cầu trả hàng:', error);
+      message.error('Có lỗi xảy ra khi gửi yêu cầu trả hàng. Vui lòng thử lại!');
+    } finally {
+      setSubmittingReturn(false);
+    }
+  };
+
+  // Kiểm tra xem đơn hàng có thể trả hàng không
+  const canReturnOrder = (order) => {
+    // Không cho phép trả hàng nếu đã có yêu cầu hoàn tiền hoặc đã hoàn tiền
+    if (['return_requested', 'returned', 'refunded'].includes(order.orderStatus)) {
+      return false;
+    }
+    
+    const deliveredDate = new Date(order.deliveredAt || order.updatedAt);
+    const currentDate = new Date();
+    const daysDiff = Math.floor((currentDate - deliveredDate) / (1000 * 60 * 60 * 24));
+    
+    return (order.isDelivered || order.orderStatus === 'delivered') && daysDiff <= 7; // Cho phép trả hàng trong 7 ngày
   };
   const handlePageChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
@@ -250,6 +355,30 @@ function MyOrder() {
             Đã hủy
             <span className={styles.statusCount}>
               {orderCounts.cancelled || 0}
+            </span>
+          </span>
+        ),
+      },
+      {
+        key: "returned",
+        icon: <RollbackOutlined />,
+        label: (
+          <span>
+            Yêu cầu trả hàng
+            <span className={styles.statusCount}>
+              {orderCounts.returned || 0}
+            </span>
+          </span>
+        ),
+      },
+      {
+        key: "refunded",
+        icon: <CheckCircleOutlined />,
+        label: (
+          <span>
+            Đã hoàn tiền
+            <span className={styles.statusCount}>
+              {orderCounts.refunded || 0}
             </span>
           </span>
         ),
@@ -410,6 +539,17 @@ function MyOrder() {
                                 Chi tiết
                               </Button>
                             </Link>
+                            {canReturnOrder(order) && (
+                              <Tooltip title="Yêu cầu trả hàng trong vòng 7 ngày kể từ khi nhận hàng">
+                                <Button 
+                                  icon={<RollbackOutlined />}
+                                  onClick={() => handleOpenReturnModal(order)}
+                                  style={{ color: '#722ed1', borderColor: '#722ed1' }}
+                                >
+                                  Trả hàng
+                                </Button>
+                              </Tooltip>
+                            )}
                             <Button icon={<ReloadOutlined />}>Mua lại</Button>
                           </Space>
                         </div>
@@ -439,6 +579,131 @@ function MyOrder() {
           </div>
         </Col>
       </Row>
+
+      {/* Modal trả hàng */}
+      <Modal
+        title={
+          <Space>
+            <RollbackOutlined style={{ color: '#722ed1' }} />
+            <span>Yêu cầu trả hàng</span>
+          </Space>
+        }
+        open={returnModal.visible}
+        onCancel={handleCloseReturnModal}
+        footer={null}
+        width={600}
+        destroyOnClose
+      >
+        <Alert
+          message="Lưu ý về chính sách trả hàng"
+          description="Bạn chỉ có thể trả hàng trong vòng 7 ngày kể từ khi nhận hàng. Sản phẩm phải còn nguyên vẹn, chưa sử dụng và có đầy đủ bao bì."
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+
+        <Form
+          form={returnForm}
+          layout="vertical"
+          onFinish={handleSubmitReturn}
+        >
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                label="Lý do trả hàng"
+                name="reason"
+                rules={[{ required: true, message: 'Vui lòng chọn lý do trả hàng!' }]}
+              >
+                <Select placeholder="Chọn lý do trả hàng">
+                  <Select.Option value="defective">Sản phẩm bị lỗi/hỏng</Select.Option>
+                  <Select.Option value="not_as_described">Không đúng mô tả</Select.Option>
+                  <Select.Option value="wrong_size">Sai kích thước</Select.Option>
+                  <Select.Option value="wrong_color">Sai màu sắc</Select.Option>
+                  <Select.Option value="not_satisfied">Không hài lòng</Select.Option>
+                  <Select.Option value="other">Lý do khác</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                label="Mô tả chi tiết"
+                name="description"
+                rules={[{ required: true, message: 'Vui lòng mô tả chi tiết lý do trả hàng!' }]}
+              >
+                <TextArea
+                  rows={4}
+                  placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm và lý do muốn trả hàng..."
+                  maxLength={500}
+                  showCount
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                label="Phương thức hoàn tiền"
+                name="refundMethod"
+                initialValue="bank"
+                rules={[{ required: true, message: 'Vui lòng chọn phương thức hoàn tiền!' }]}
+              >
+                <Radio.Group>
+                  <Radio value="bank">Chuyển khoản ngân hàng</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+
+            {/* Thông tin ngân hàng - luôn hiển thị vì chỉ có một phương thức */}
+            <Col span={24}>
+              <Form.Item
+                label="Tên ngân hàng"
+                name="bankName"
+                rules={[{ required: true, message: 'Vui lòng nhập tên ngân hàng!' }]}
+              >
+                <Input placeholder="VD: Vietcombank, BIDV, Techcombank..." />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Số tài khoản"
+                name="accountNumber"
+                rules={[{ required: true, message: 'Vui lòng nhập số tài khoản!' }]}
+              >
+                <Input placeholder="Nhập số tài khoản ngân hàng" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Chủ tài khoản"
+                name="accountHolder"
+                rules={[{ required: true, message: 'Vui lòng nhập tên chủ tài khoản!' }]}
+              >
+                <Input placeholder="Nhập tên chủ tài khoản" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Divider />
+
+          <div style={{ textAlign: 'right' }}>
+            <Space>
+              <Button onClick={handleCloseReturnModal}>
+                Hủy
+              </Button>
+              <Button 
+                type="primary" 
+                htmlType="submit"
+                loading={submittingReturn}
+                icon={<RollbackOutlined />}
+              >
+                Gửi yêu cầu trả hàng
+              </Button>
+            </Space>
+          </div>
+        </Form>
+      </Modal>
     </div>
   );
 }
