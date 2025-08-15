@@ -30,6 +30,7 @@ function SignUpPage({ open, onClose, onSwitchToSignIn, onLoginSuccess }) {
       onSwitchToSignIn();
       onClose();
 
+
       // Gọi callback onLoginSuccess nếu có
       if (onLoginSuccess) {
         // Chuyển đổi dữ liệu người dùng nếu cần thiết
@@ -42,15 +43,20 @@ function SignUpPage({ open, onClose, onSwitchToSignIn, onLoginSuccess }) {
         onLoginSuccess(userDataToDispatch);
       }
     },
+  
     onError: (error) => {
-      console.error("Registration failed:", error.response.data.error.message);
+      console.error("Registration failed:", error);
       let errorMessage = "Đăng ký thất bại. Vui lòng thử lại.";
-      if (error.response?.data) {
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data) {
         errorMessage = error.response.data;
       } else if (error.message === "Network Error") {
         errorMessage = "Lỗi kết nối mạng. Vui lòng kiểm tra internet.";
       }
-      antdMessage.error("signup", errorMessage);
+      
+      antdMessage.error(errorMessage);
     },
   });
 
@@ -123,8 +129,8 @@ function SignUpPage({ open, onClose, onSwitchToSignIn, onLoginSuccess }) {
                         message: "Vui lòng nhập số điện thoại!",
                       },
                       {
-                        pattern: /^[0-9]{9,12}$/,
-                        message: "Số điện thoại không hợp lệ!",
+                        pattern: /^[0-9]{10,11}$/,
+                        message: "Số điện thoại không hợp lệ (10-11 chữ số)!",
                       },
                     ]}
                   >
@@ -142,6 +148,22 @@ function SignUpPage({ open, onClose, onSwitchToSignIn, onLoginSuccess }) {
                     ]}
                   >
                     <Input size="large" placeholder="Email" />
+                  </Form.Item>
+                  
+                  <Form.Item
+                    name="address"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng nhập địa chỉ!",
+                      },
+                      {
+                        min: 10,
+                        message: "Địa chỉ phải có ít nhất 10 ký tự!",
+                      },
+                    ]}
+                  >
+                    <Input size="large" placeholder="Địa chỉ" />
                   </Form.Item>
 
                   <Form.Item

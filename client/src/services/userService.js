@@ -14,19 +14,15 @@ export const signInUser = async (credentials) => {
   }
 };
 
-// Hàm signUpUser
 export const signUpUser = async (userData) => {
   try {
+    console.log("Sending signup data:", userData); // Debug log
     const response = await axiosInstance.post(`/user/signup`, userData);
     console.log("Sign up response:", response.data);
     return response.data;
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Unknown error occurred during sign up.";
-    console.error(errorMessage);
-    throw new Error(errorMessage);
+    console.error("Signup error:", error.response?.data || error.message);
+    throw error; // Throw the original error to preserve response structure
   }
 };
 export const loginGoogle = async (credential) => {
