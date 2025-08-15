@@ -4,6 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const Order = require("../models/orderModel");
+const ReturnRequest = require("../models/ReturnRequest");
 const mongoose = require("mongoose"); // Imported for potential aggregation helpers if needed, though not directly used for basic models
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
@@ -233,6 +234,86 @@ const AdminChatbot = async (req, res) => {
     const totalUsers = await User.countDocuments();
     const totalAdmins = await User.countDocuments({ isAdmin: true });
 
+    // Aggregate Return/Refund Data
+    const totalReturnRequests = await ReturnRequest.countDocuments();
+    const pendingReturnRequests = await ReturnRequest.countDocuments({
+      status: "pending",
+    });
+    const approvedReturnRequests = await ReturnRequest.countDocuments({
+      status: "approved",
+    });
+    const rejectedReturnRequests = await ReturnRequest.countDocuments({
+      status: "rejected",
+    });
+    const completedReturnRequests = await ReturnRequest.countDocuments({
+      status: "completed",
+    });
+
+    // Get return requests by reason
+    const returnReasonStats = await ReturnRequest.aggregate([
+      {
+        $group: {
+          _id: "$reason",
+          count: { $sum: 1 },
+          totalRefundAmount: { $sum: "$refundAmount" },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]);
+
+    // Get recent return requests
+    const recentReturnRequests = await ReturnRequest.find()
+      .populate({
+        path: "order",
+        select: "totalPrice createdAt user",
+        populate: {
+          path: "user",
+          select: "username fullName"
+        }
+      })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("reason status refundAmount createdAt");
+
+    // Calculate total refund amount
+    const totalRefundAmountResult = await ReturnRequest.aggregate([
+      { $match: { status: { $in: ["approved", "completed"] } } },
+      { $group: { _id: null, total: { $sum: "$refundAmount" } } },
+    ]);
+    const totalRefundAmount =
+      totalRefundAmountResult.length > 0 ? totalRefundAmountResult[0].total : 0;
+
+    // Monthly return requests
+    const monthlyReturnRequestsResult = await ReturnRequest.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          count: { $sum: 1 },
+          totalAmount: { $sum: "$refundAmount" },
+        },
+      },
+    ]);
+    const monthlyReturnRequests =
+      monthlyReturnRequestsResult.length > 0
+        ? monthlyReturnRequestsResult[0]
+        : { count: 0, totalAmount: 0 };
+
+    // Orders with return status
+    const returnedOrders = await Order.countDocuments({
+      orderStatus: "returned",
+    });
+    const refundedOrders = await Order.countDocuments({
+      orderStatus: "refunded",
+    });
+    const returnRequestedOrders = await Order.countDocuments({
+      orderStatus: "return_requested",
+    });
+
     // Store aggregated data in an object
     const aggregatedData = {
       totalProducts,
@@ -244,12 +325,58 @@ const AdminChatbot = async (req, res) => {
       totalOrders,
       pendingOrders,
       completedOrders,
+      processingOrders,
+      returnRequestedOrders,
+      returnedOrders,
+      refundedOrders,
       totalRevenue: totalRevenue.toLocaleString("vi-VN") + " VND",
       monthlyRevenue: monthlyRevenue.toLocaleString("vi-VN") + " VND",
       currentMonth: now.getMonth() + 1,
       currentYear: now.getFullYear(),
       totalUsers,
       totalAdmins,
+      // Return/Refund data
+      totalReturnRequests,
+      pendingReturnRequests,
+      approvedReturnRequests,
+      rejectedReturnRequests,
+      completedReturnRequests,
+      totalRefundAmount: totalRefundAmount.toLocaleString("vi-VN") + " VND",
+      monthlyReturnRequests: monthlyReturnRequests.count,
+      monthlyRefundAmount: monthlyReturnRequests.totalAmount.toLocaleString("vi-VN") + " VND",
+      returnReasonStats: returnReasonStats
+        .map((stat) => {
+          const reasonMap = {
+            defective: "Sản phẩm lỗi",
+            not_as_described: "Không đúng mô tả",
+            wrong_size: "Sai kích thước",
+            wrong_color: "Sai màu sắc",
+            not_satisfied: "Không hài lòng",
+            other: "Khác",
+          };
+          return `${reasonMap[stat._id] || stat._id}: ${stat.count} yêu cầu (${stat.totalRefundAmount.toLocaleString("vi-VN")} VND)`;
+        })
+        .join(", ") || "Chưa có yêu cầu hoàn hàng nào",
+      recentReturnRequests: recentReturnRequests
+        .map((req) => {
+          const reasonMap = {
+            defective: "Sản phẩm lỗi",
+            not_as_described: "Không đúng mô tả",
+            wrong_size: "Sai kích thước",
+            wrong_color: "Sai màu sắc",
+            not_satisfied: "Không hài lòng",
+            other: "Khác",
+          };
+          const statusMap = {
+            pending: "Chờ xử lý",
+            approved: "Đã duyệt",
+            rejected: "Đã từ chối",
+            completed: "Hoàn thành",
+          };
+          const userName = req.order?.user?.fullName || req.order?.user?.username || "N/A";
+          return `${userName} - ${reasonMap[req.reason] || req.reason} - ${statusMap[req.status]} - ${req.refundAmount.toLocaleString("vi-VN")} VND`;
+        })
+        .join("; ") || "Chưa có yêu cầu hoàn hàng gần đây",
     };
 
     // Format aggregated data into a string for the prompt
@@ -257,25 +384,47 @@ const AdminChatbot = async (req, res) => {
     --- Dữ liệu Tổng Quan Cửa Hàng (Cập nhật tới ${new Date().toLocaleDateString(
       "vi-VN"
     )}) ---
+    📦 SẢN PHẨM:
     - Tổng số sản phẩm: ${aggregatedData.totalProducts}
     - 5 sản phẩm bán chạy nhất: ${aggregatedData.topSellingProducts}
-    - Sản phẩm sắp hết hàng( dưới 5 sản phẩm tồn kho): ${
+    - Sản phẩm sắp hết hàng (dưới 5 tồn kho): ${
       aggregatedData.nearOutOfStockProducts
         .map((p) => `${p.name} (${p.sold} đã bán)`)
         .join(", ") || "Chưa có sản phẩm nào sắp hết hàng"
     }
+    
+    🛒 ĐỚN HÀNG:
     - Tổng số đơn hàng: ${aggregatedData.totalOrders}
     - Đơn hàng đang chờ xử lý: ${aggregatedData.pendingOrders}
     - Đơn hàng đang được giao: ${aggregatedData.processingOrders}
     - Đơn hàng đã giao: ${aggregatedData.completedOrders}
+    - Đơn hàng yêu cầu hoàn trả: ${aggregatedData.returnRequestedOrders}
+    - Đơn hàng đã trả lại: ${aggregatedData.returnedOrders}
+    - Đơn hàng đã hoàn tiền: ${aggregatedData.refundedOrders}
+    
+    💰 DOANH THU:
     - Tổng doanh thu (tất cả thời gian, đơn đã giao): ${
       aggregatedData.totalRevenue
     }
     - Doanh thu tháng ${aggregatedData.currentMonth}/${
       aggregatedData.currentYear
     } (đơn đã giao): ${aggregatedData.monthlyRevenue}
+    - Tổng số tiền đã hoàn trả: ${aggregatedData.totalRefundAmount}
+    - Số tiền hoàn trả tháng này: ${aggregatedData.monthlyRefundAmount}
+    
+    👥 NGƯỜI DÙNG:
     - Tổng số người dùng: ${aggregatedData.totalUsers}
     - Số lượng quản trị viên: ${aggregatedData.totalAdmins}
+    
+    🔄 HOÀN HÀNG/HOÀN TIỀN:
+    - Tổng yêu cầu hoàn hàng: ${aggregatedData.totalReturnRequests}
+    - Yêu cầu chờ xử lý: ${aggregatedData.pendingReturnRequests}
+    - Yêu cầu đã duyệt: ${aggregatedData.approvedReturnRequests}
+    - Yêu cầu đã từ chối: ${aggregatedData.rejectedReturnRequests}
+    - Yêu cầu hoàn thành: ${aggregatedData.completedReturnRequests}
+    - Yêu cầu hoàn hàng tháng này: ${aggregatedData.monthlyReturnRequests}
+    - Thống kê theo lý do: ${aggregatedData.returnReasonStats}
+    - 5 yêu cầu gần đây: ${aggregatedData.recentReturnRequests}
     --- Hết Dữ liệu Tổng Quan ---
     `;
 
@@ -302,8 +451,11 @@ const AdminChatbot = async (req, res) => {
       - Báo cáo doanh số theo tháng/năm.
       - Thống kê về đơn hàng (tổng, chờ xử lý, đã hoàn thành).
       - Thống kê người dùng.
-      - Đề xuất các hành động dựa trên dữ liệu (ví dụ: nhập hàng, giảm giá sản phẩm sắp hết hàng).
-      - Đề xuất các chiến lược kinh doanh dựa trên xu hướng bán hàng.
+      - Thống kê hoàn hàng/hoàn tiền (số lượng yêu cầu, lý do, tỷ lệ, tác động tài chính).
+      - Phân tích xu hướng hoàn hàng và đề xuất cải thiện chất lượng sản phẩm/dịch vụ.
+      - Đề xuất các hành động dựa trên dữ liệu (ví dụ: nhập hàng, giảm giá sản phẩm sắp hết hàng, xử lý yêu cầu hoàn hàng).
+      - Đề xuất các chiến lược kinh doanh dựa trên xu hướng bán hàng và tỷ lệ hoàn hàng.
+      - Báo cáo về tác động của hoàn hàng lên doanh thu và lợi nhuận.
       Khi Admin hỏi về thông tin, hãy sử dụng dữ liệu tổng quan đã cung cấp ở trên để trả lời.
 
       Khi Admin hỏi về thông tin mà bạn có thể cung cấp từ dữ liệu tổng quan trên, hãy trả lời trực tiếp, rõ ràng và sử dụng các số liệu đã cung cấp.
