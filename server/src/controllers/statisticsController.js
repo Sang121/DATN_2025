@@ -5,7 +5,8 @@ const statisticsService = require("../services/statisticsService");
  */
 const getOverviewStats = async (req, res) => {
   try {
-    const response = await statisticsService.getOverviewStats();
+    const { startDate, endDate } = req.query;
+    const response = await statisticsService.getOverviewStats(startDate, endDate);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({

@@ -1,31 +1,6 @@
 const statisticsAdvancedService = require("../services/statisticsAdvancedService");
 
 /**
- * Lấy doanh thu theo giờ
- */
-const getHourlyRevenue = async (req, res) => {
-  try {
-    const { date } = req.query;
-    
-    if (!date) {
-      return res.status(400).json({
-        status: "Err",
-        message: "Date parameter is required (YYYY-MM-DD format)",
-      });
-    }
-
-    const response = await statisticsAdvancedService.getHourlyRevenue(date);
-    return res.status(200).json(response);
-  } catch (error) {
-    return res.status(500).json({
-      status: "Err",
-      message: "Error retrieving hourly revenue",
-      error: error.message,
-    });
-  }
-};
-
-/**
  * Lấy thống kê so sánh
  */
 const getComparisonStats = async (req, res) => {
@@ -53,22 +28,6 @@ const getComparisonStats = async (req, res) => {
 };
 
 /**
- * Lấy thống kê khách hàng nâng cao
- */
-const getAdvancedCustomerStats = async (req, res) => {
-  try {
-    const response = await statisticsAdvancedService.getAdvancedCustomerStats();
-    return res.status(200).json(response);
-  } catch (error) {
-    return res.status(500).json({
-      status: "Err",
-      message: "Error retrieving advanced customer statistics",
-      error: error.message,
-    });
-  }
-};
-
-/**
  * Lấy xu hướng sản phẩm
  */
 const getProductTrends = async (req, res) => {
@@ -86,8 +45,6 @@ const getProductTrends = async (req, res) => {
 };
 
 module.exports = {
-  getHourlyRevenue,
   getComparisonStats,
-  getAdvancedCustomerStats,
   getProductTrends,
 };
